@@ -18,18 +18,18 @@ module instr_decode(
     output [31:0] reg2_o,
 
     output        wreg_o, //是否有数据要写寄存器
-    output [4:0]  wd_o,  //write destination
-
-    //读寄存器堆
-    output        reg1_read_o,//是否读寄存器1
-    output [4:0]  reg1_addr_o,//读寄存器地址
-    output        reg2_read_o,
-    output [4:0]  reg2_addr_o
+    output [4:0]  wd_o  //write destination
 );
 
 //寄存器堆接收到的信号
 wire [31:0] reg1_data_i;
 wire [31:0] reg2_data_i;
+
+//读寄存器堆
+wire        reg1_read_o, //是否读寄存器1
+wire [4:0]  reg1_addr_o, //读寄存器地址
+wire        reg2_read_o,
+wire [4:0]  reg2_addr_o
 
 //定义指令字段信号
 //op   re   rt  immediate
@@ -51,7 +51,6 @@ assign unsi_imm={16'b0,inst_i[15:0]};
 //符号扩展
 assign sign_imm={16{inst_i[16]},inst_i[15:0]};
 
-
 regfile datapath_regfile(
     .clk(clk),
     .rst(rst),
@@ -59,7 +58,7 @@ regfile datapath_regfile(
     .re1(reg1_read_o), //寄存器1的读使能
     .raddr1(reg1_addr_o),//寄存器1的读地址
     .re2(reg2_read_o),
-    .raddr2(reg1_addr_o),
+    .raddr2(reg2_addr_o),
 
     .we(we_i),//写使能信号
     .waddr(waddr_i),//写寄存器地址
@@ -68,7 +67,6 @@ regfile datapath_regfile(
     .rdata1(reg1_data_i),
     .rdata2(reg2_data_i)
 );
-
 
 //根据指令读取控制信号
 always@(posedge clk) begin
