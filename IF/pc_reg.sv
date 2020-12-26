@@ -5,7 +5,7 @@
 * @param rst_i 复位信号
 * @param pc_i 输入的PC信号，检测到时钟上升沿后被赋值给pc_o
 * @param pc_o 输出的PC信号
-* @param ce_o 输出的使能信�?
+* @param ce_o 输出的使能信号
 */
 module pc_reg (
     input   logic           clk_i,

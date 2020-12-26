@@ -30,8 +30,24 @@ module mips_cpu (
     output  logic           ram_ce_o
 );
 
+    // id阶段的信号
     logic [31:0] id_pc;
     logic [31:0] id_inst;
+
+    // ex阶段的信号
+    logic [`AluOpBus]       ex_aluop;
+    logic [`AluSelBus]      ex_alusel;
+    logic [`DataBus]        ex_reg1;
+    logic [`DataBus]        ex_reg2;
+    logic [`RegAddrBus]     ex_wd;
+    logic                   ex_wreg;
+    logic [`RegAddrBus]     ex_wdata;
+
+    // mem阶段的信号
+    logic [`RegAddrBus]     mem_wd;
+    logic                   mem_wreg;
+    logic [`RegAddrBus]     mem_wdata;
+
 
     // IF为取指令模块，主要负责对PC进行更新
     // IF模块会与指令寄存器（ROM）进行交互
@@ -51,6 +67,33 @@ module mips_cpu (
         .if_inst_i(rom_data_i),
         .id_pc_o(id_pc),
         .id_inst_o(id_inst)
+    );
+
+    // EX阶段
+    // 负责接收ID阶段的译码结果以及读取的寄存器值
+    // 并且通过译码结果进行选择，对读出的寄存器进行不同的运算，将结果写入ex_wdata
+    EX datapath_ex(
+        .clk_i(clk_i),
+        .rst_i(rst_i),
+        .aluop_i(ex_aluop),
+        .alusel_i(ex_alusel),
+        .reg1_i(ex_reg1),
+        .reg2_i(ex_reg2),
+        .wd_i(ex_wd),
+        .wreg_i(ex_wreg),
+        .wdata_o(ex_wdata)
+    );
+
+    // 从EX到MEM的信号传递
+    EX2MEM datapath_ex2mem(
+        .clk_i(clk_i),
+        .rst_i(rst_i),
+        .ex_wd_i(ex_wd),
+        .ex_wreg_i(ex_wreg),
+        .ex_wdata_i(ex_wdata),
+        .mem_wd_o(mem_wd),
+        .mem_wreg_o(mem_wreg),
+        .mem_wdata_o(mem_wdata)
     );
     
 
