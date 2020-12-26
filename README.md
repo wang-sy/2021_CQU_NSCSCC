@@ -1,6 +1,6 @@
 # 2021_CQU_NSCSCC
 
-# 开始
+# 1.开始
 
 ## 团队赛资源包下载：
 ### 下载链接：https://nscscc2020-team.oss-cn-beijing.aliyuncs.com/nscscc2020_group_v0.01.zip
