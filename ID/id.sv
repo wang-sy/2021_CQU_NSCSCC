@@ -1,4 +1,5 @@
 `include "defines.vh"
+`include "id_defines.vh"
 //encoding:UTF-8
 module ID(
     // //输入
@@ -70,41 +71,18 @@ regfile datapath_regfile(
     .rdata2(reg2_data_i)
 );
 
-//根据指令读取控制信号
-always@(*) begin
-    if(rst==1'b1) begin
-        aluop_o     <= 8'b0;
-        alusel_o    <= 3'b0;
-        wreg_o      <= 1'b0; //是否有数据要写寄存器
-        wd_o        <= 5'b0; //write destination
-        reg1_read_o <= 1'b0; //是否读寄存器1
-        reg1_addr_o <= 5'b0; //读寄存器地址
-        reg2_read_o <= 1'b0;
-        reg2_addr_o <= 5'b0;
-    end else begin
-        aluop_o     <= 8'b0;
-        alusel_o    <= 3'b0;
-        wreg_o      = 1'b0; //是否有数据要写寄存器
-        wd_o        <= 5'b0; //write destination
-        reg1_read_o <= 1'b0; //是否读寄存器1
-        reg1_addr_o <= 5'b0; //读寄存器地址
-        reg2_read_o <= 1'b0;
-        reg2_addr_o <= 5'b0;
-        case (op)
-            `EXE_ORI: begin
-                aluop_o     <= `EXE_ORI_OP;
-                alusel_o    <= `EXE_RES_LOGIC;
-                wreg_o      <= 1'b1; //是否有数据要写寄存器
-                wd_o        <= rt; //write destination
-                reg1_read_o <= 1'b1; //是否读寄存器1
-                reg1_addr_o <= rs; //读寄存器地址
-                reg2_read_o <= 1'b0;
-                reg2_addr_o <= 5'b0;
-            end
-            default: ;
-        endcase
-    end
-end
+assign { 
+    aluop_o,
+    alusel_o,
+    wreg_o,
+    wd_o,
+    reg1_read_o,
+    reg1_addr_o,
+    reg2_read_o,
+    reg2_addr_o
+} = (rst == 1'b1) ? `INIT_DECODE :
+        (op == `EXE_ORI) ? `ORI_DECODE :
+    `INIT_DECODE;
 
 assign reg1_o = (rst == 1'b1) ? `ZeroWord : 
                     (reg1_read_o==1'b1) ? reg1_data_i : unsi_imm;

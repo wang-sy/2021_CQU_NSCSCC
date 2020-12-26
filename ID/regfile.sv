@@ -22,7 +22,7 @@ module regfile(
 logic [31:0] regs [31:0];
 
 //写寄存器
-always@(negedge  clk) begin
+always@(posedge  clk) begin
     if(rst==1'b0) begin
         if(we==1'b1) begin
             regs[waddr]<=wdata;
@@ -30,31 +30,10 @@ always@(negedge  clk) begin
     end
 end
 
-//读寄存器1
-always@(*) begin
-    if(rst==1'b1 || raddr1==5'b0 || re1==1'b0) begin
-        rdata1 <=32'b0;
-    end 
-    else 
-    if(raddr1==waddr && we==1'b1) begin
-        rdata1<=wdata;
-    end else begin
-        rdata1<=regs[raddr1];
-    end
-end
+assign rdata1 = (rst==1'b1 || raddr1==5'b0 || re1==1'b0) ? 32'd0 :
+                (raddr1==waddr && we==1'b1) ? wdata : regs[raddr1];
 
-//读寄存器2
-//读寄存器1
-always@(*) begin
-    if(rst==1'b1 || raddr2==5'b0 || re1==2'b0) begin
-        rdata2 <=32'b0;
-    end 
-    else 
-    if(raddr2==waddr && we==1'b1) begin
-        rdata2<=wdata;
-    end else begin
-        rdata2<=regs[raddr2];
-    end
-end
+assign rdata2 = (rst==1'b1 || raddr2==5'b0 || re2==1'b0) ? 32'd0 :
+                (raddr2==waddr && we==1'b1) ? wdata : regs[raddr2];        
 
 endmodule
