@@ -5,11 +5,11 @@ module EX2MEM (
 
     input logic [`RegAddrBus]   ex_wd_i,
     input logic                 ex_wreg_i,
-    input logic [`RegBus]       ex_wdata_i,
+    input logic [`DataBus]       ex_wdata_i,
 
     output logic[`RegAddrBus]   mem_wd_o,
     output logic                mem_wreg_o,
-    output logic[`RegBus]       mem_wdata_o
+    output logic[`DataBus]       mem_wdata_o
 );
     always @(posedge clk_i) begin
         if (rst_i == 1'b1) begin

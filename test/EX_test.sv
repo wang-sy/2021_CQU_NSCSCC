@@ -10,7 +10,7 @@ module EX_test ();
     logic wreg_i;
     logic [`RegAddrBus]wd_o;
     logic wreg_o;
-    logic [`RegBus]wdata_o;
+    logic [`DataBus]wdata_o;
 
     EX my_ex(
         .clk_i(clk_i),

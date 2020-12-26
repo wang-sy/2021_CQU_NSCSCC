@@ -19,10 +19,10 @@ module regfile(
 );
 
 //32个32位宽的寄存器
-logic [32:0] regs [31:0];
+logic [31:0] regs [31:0];
 
 //写寄存器
-always@(posedge clk) begin
+always@(negedge  clk) begin
     if(rst==1'b0) begin
         if(we==1'b1) begin
             regs[waddr]<=wdata;

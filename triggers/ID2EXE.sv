@@ -1,21 +1,21 @@
 //encoding:UTF-8
 module id2exe(
-    input rst,
-    input clk,
+    input logic  rst,
+    input logic  clk,
 
-    input  [2:0]   id_alu_sel,
-    input  [7:0]   id_alu_op,
-    input  [31:0]  id_reg1,
-    input  [31:0]  id_reg2,
-    input          id_wreg,
-    input  [4:0]   id_wd,
+    input logic   [2:0]   id_alu_sel,
+    input logic   [7:0]   id_alu_op,
+    input logic   [31:0]  id_reg1,
+    input logic   [31:0]  id_reg2,
+    input logic           id_wreg,
+    input logic   [4:0]   id_wd,
     
-    output [2:0]   exe_alu_sel,
-    output [7:0]   exe_alu_op,
-    output [31:0]  exe_reg1,
-    output [31:0]  exe_reg2,
-    output         exe_wreg,
-    output [4:0]   exe_wd
+    output logic  [2:0]   exe_alu_sel,
+    output logic  [7:0]   exe_alu_op,
+    output logic  [31:0]  exe_reg1,
+    output logic  [31:0]  exe_reg2,
+    output logic          exe_wreg,
+    output logic  [4:0]   exe_wd
 );
 
 always@(posedge clk) begin

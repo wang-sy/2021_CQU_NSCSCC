@@ -24,8 +24,8 @@ module ID(
 );
 
 //寄存器堆接收到的信号
-wire [31:0] reg1_data_i;
-wire [31:0] reg2_data_i;
+logic [31:0] reg1_data_i;
+logic [31:0] reg2_data_i;
 
 //读寄存器�?
 logic        reg1_read_o; //是否读寄存器1
@@ -35,13 +35,13 @@ logic [4:0]  reg2_addr_o;
 
 //定义指令字段信号
 //op   re   rt  immediate
-wire [5:0]  op;
-wire [4:0]  rs;
-wire [4:0]  rt;
-wire [15:0] im;
+logic [5:0]  op;
+logic [4:0]  rs;
+logic [4:0]  rt;
+logic [15:0] im;
 
-reg [31:0] sign_imm;
-reg [31:0] unsi_imm;
+logic [31:0] sign_imm;
+logic [31:0] unsi_imm;
 
 //指令字段信号赋�??
 assign op=inst_i[31:26];
@@ -75,8 +75,6 @@ always@(*) begin
     if(rst==1'b1) begin
         aluop_o     <= 8'b0;
         alusel_o    <= 3'b0;
-        reg1_o      <= 32'b0;
-        reg2_o      <= 32'b0;
         wreg_o      <= 1'b0; //是否有数据要写寄存器
         wd_o        <= 5'b0; //write destination
         reg1_read_o <= 1'b0; //是否读寄存器1
@@ -84,50 +82,33 @@ always@(*) begin
         reg2_read_o <= 1'b0;
         reg2_addr_o <= 5'b0;
     end else begin
+        aluop_o     <= 8'b0;
+        alusel_o    <= 3'b0;
+        wreg_o      = 1'b0; //是否有数据要写寄存器
+        wd_o        <= 5'b0; //write destination
+        reg1_read_o <= 1'b0; //是否读寄存器1
+        reg1_addr_o <= 5'b0; //读寄存器地址
+        reg2_read_o <= 1'b0;
+        reg2_addr_o <= 5'b0;
         case (op)
             `EXE_ORI: begin
                 aluop_o     <= `EXE_ORI_OP;
                 alusel_o    <= `EXE_RES_LOGIC;
                 wreg_o      <= 1'b1; //是否有数据要写寄存器
-                wd_o        <= rs; //write destination
+                wd_o        <= rt; //write destination
                 reg1_read_o <= 1'b1; //是否读寄存器1
                 reg1_addr_o <= rs; //读寄存器地址
                 reg2_read_o <= 1'b0;
                 reg2_addr_o <= 5'b0;
             end
-            default:;
+            default: ;
         endcase
     end
 end
 
-//读取寄存�?1的操作数
-always@(*) begin
-    if(rst==1'b1) begin
-        reg1_o <= 32'b0;
-    end else
-    if(reg1_read_o==1'b1) begin
-        reg1_o <= reg1_data_i;
-    end else
-    if(reg1_read_o==1'b0) begin
-        reg1_o <= unsi_imm;
-    end else begin
-        reg1_o <= 32'b0;
-    end
-end
-
-//读取寄存�?2的操作数
-always@(*) begin
-    if(rst==1'b1) begin
-        reg2_o <= 32'b0;
-    end else
-    if(reg2_read_o==1'b1) begin
-        reg2_o <= reg2_data_i;
-    end else
-    if(reg2_read_o==1'b0) begin
-        reg2_o <= unsi_imm;
-    end else begin
-        reg2_o <= 32'b0;
-    end
-end
+assign reg1_o = (rst == 1'b1) ? `ZeroWord : 
+                    (reg1_read_o==1'b1) ? reg1_data_i : unsi_imm;
+assign reg2_o = (rst == 1'b1) ? `ZeroWord : 
+                    (reg2_read_o==1'b1) ? reg2_data_i : unsi_imm;
 
 endmodule

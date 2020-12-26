@@ -16,14 +16,14 @@ module pc_reg (
     output  logic           ce_o
 );
 
+    assign ce_o = ~ rst_i;
+
     always @ (posedge clk_i) begin
         if(rst_i == 1'b1) begin
-            pc_o <= 32'd0;
-            ce_o <= 1'b0;
+            pc_o <= `ZeroWord;
         end
         else begin
             pc_o <= pc_i;
-            ce_o <= 1'b1;
         end
     end
 
