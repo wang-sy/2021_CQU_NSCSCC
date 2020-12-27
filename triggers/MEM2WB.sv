@@ -1,14 +1,14 @@
 module MEM2WB (
-    input logic                 clk_i,
-    input logic                 rst_i,
+    input logic                  clk_i,
+    input logic                  rst_i,
 
-    input logic [`RegAddrBus]   mem_wd_i,
-    input logic                 mem_wreg_i,
-    input logic [`DataBus]      mem_wdata_i,
+    input logic [`RegAddrBus]    mem_wd_i,
+    input logic                  mem_wreg_i,
+    input logic [`DoubleRegBus]  mem_wdata_i,
 
     output logic [`RegAddrBus]   wb_wd_o,
     output logic                 wb_wreg_o,
-    output logic [`DataBus]      wb_wdata_o
+    output logic [`DoubleRegBus] wb_wdata_o
 );
     
     always @(posedge clk_i) begin

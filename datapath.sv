@@ -41,6 +41,10 @@ module datapath (
     logic [`DataBus]        id_reg2;
     logic [`RegAddrBus]     id_wd;
     logic                   id_wreg;
+    logic                   id_mt_hi;
+    logic                   id_mt_lo;
+    logic                   id_mf_hi;
+    logic                   id_mf_lo;
     
 
     // ex阶段的信号
@@ -50,22 +54,31 @@ module datapath (
     logic [`DataBus]        ex_reg2;
     logic [`RegAddrBus]     ex_wd;
     logic                   ex_wreg;
-    logic [`DataBus]        ex_wdata;
+    logic [`DoubleRegBus]   ex_wdata;
+    logic                   ex_mt_hi;
+    logic                   ex_mt_lo;
+    logic                   ex_mf_hi;
+    logic                   ex_mf_lo;
 
 
     // mem阶段的信号
     logic [`RegAddrBus]     mem_wd;
     logic                   mem_wreg;
-    logic [`DataBus]        mem_wdata;
+    logic [`DoubleRegBus]   mem_wdata;
+    logic                   mem_mt_hi;
+    logic                   mem_mt_lo;
+    logic                   mem_mf_hi;
+    logic                   mem_mf_lo;
+    logic [`DataBus]        mem_hi;
+    logic [`DataBus]        mem_lo;
 
     // wb阶段的信号
     logic [`RegAddrBus]     wb_wd;
     logic                   wb_wreg;
-    logic [`DataBus]        wb_wdata;
+    logic [`DoubleRegBus]   wb_wdata;
     logic [`RegAddrBus]     wb_wd_control;
     logic                   wb_wreg_control;
     logic [`DataBus]        wb_wdata_control;
-
     
 
     // IF为取指令模块，主要负责对PC进行更新
@@ -103,10 +116,23 @@ module datapath (
         .we_i(wb_wreg_control),
         .waddr_i(wb_wd_control),
         .wdata_i(wb_wdata_control),
+        .ex_we_i(ex_wreg),
+        .ex_waddr_i(ex_wd),
+        .ex_wdata_i(ex_wdata[31:0]),
+        .mem_we_i(mem_wreg),
+        .mem_waddr_i(mem_wd),
+        .mem_wdata_i(mem_wdata[31:0]),
+        .wb_we_i(wb_wreg),
+        .wb_waddr_i(wb_wd),
+        .wb_wdata_i(wb_wdata[31:0]),
         .aluop_o(id_aluop),
         .alusel_o(id_alusel),
         .reg1_o(id_reg1),
         .reg2_o(id_reg2),
+        .mt_hi_o(id_mt_hi),
+        .mt_lo_o(id_mt_lo),
+        .mf_hi_o(id_mf_hi),
+        .mf_lo_o(id_mf_lo),
         .wreg_o(id_wreg),
         .wd_o(id_wd)
     );
@@ -115,18 +141,26 @@ module datapath (
     id2exe datapath_id2ex(
         .rst(rst_i),
         .clk(clk_i),
-        .id_alu_sel(id_alusel),
-        .id_alu_op(id_aluop),
-        .id_reg1(id_reg1),
-        .id_reg2(id_reg2),
-        .id_wreg(id_wreg),
-        .id_wd(id_wd),
-        .exe_alu_sel(ex_alusel),
-        .exe_alu_op(ex_aluop),
-        .exe_reg1(ex_reg1),
-        .exe_reg2(ex_reg2),
-        .exe_wreg(ex_wreg),
-        .exe_wd(ex_wd)
+        .id_alu_sel_i(id_alusel),
+        .id_alu_op_i(id_aluop),
+        .id_reg1_i(id_reg1),
+        .id_reg2_i(id_reg2),
+        .id_wreg_i(id_wreg),
+        .id_wd_i(id_wd),
+        .id_mt_hi_i(id_mt_hi),
+        .id_mt_lo_i(id_mt_lo),
+        .id_mf_hi_i(id_mf_hi),
+        .id_mf_lo_i(id_mf_lo),
+        .exe_alu_sel_o(ex_alusel),
+        .exe_alu_op_o(ex_aluop),
+        .exe_reg1_o(ex_reg1),
+        .exe_reg2_o(ex_reg2),
+        .exe_wreg_o(ex_wreg),
+        .exe_wd_o(ex_wd),
+        .exe_mt_hi_o(ex_mt_hi),
+        .exe_mt_lo_o(ex_mt_lo),
+        .exe_mf_hi_o(ex_mf_hi),
+        .exe_mf_lo_o(ex_mf_lo)
     );
 
     // EX阶段
@@ -141,6 +175,10 @@ module datapath (
         .reg2_i(ex_reg2),
         .wd_i(ex_wd),
         .wreg_i(ex_wreg),
+        .mf_hi_i(ex_mf_hi),
+        .mf_lo_i(ex_mf_lo),
+        .hi_i(mem_hi),
+        .lo_i(mem_lo),
         .wdata_o(ex_wdata)
     );
 
@@ -151,9 +189,17 @@ module datapath (
         .ex_wd_i(ex_wd),
         .ex_wreg_i(ex_wreg),
         .ex_wdata_i(ex_wdata),
+        .ex_mt_hi_i(ex_mt_hi),
+        .ex_mt_lo_i(ex_mt_lo),
+        .ex_mf_hi_i(ex_mf_hi),
+        .ex_mf_lo_i(ex_mf_lo),
         .mem_wd_o(mem_wd),
         .mem_wreg_o(mem_wreg),
-        .mem_wdata_o(mem_wdata)
+        .mem_wdata_o(mem_wdata),
+        .mem_mt_hi_o(mem_mt_hi),
+        .mem_mt_lo_o(mem_mt_lo),
+        .mem_mf_hi_o(mem_mf_hi),
+        .mem_mf_lo_o(mem_mf_lo)
     );
 
     // MEM阶段，负责进行访存操作
@@ -163,7 +209,11 @@ module datapath (
         .rst_i(rst_i),
         .wd_i(mem_wd),
         .wreg_i(mem_wreg),
-        .wdata_i(mem_wdata)
+        .wdata_i(mem_wdata),
+        .mt_hi_i(mem_mt_hi),
+        .mt_lo_i(mem_mt_lo),
+        .hi_o(mem_hi),
+        .lo_o(mem_lo)
     );
 
     // 从MEM到WB的信号传递

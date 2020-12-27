@@ -12,13 +12,4 @@ module pc_next_sel (
 );
 
     assign pc_o = (rst_i == 1'b1) ? `ZeroWord : pc_i + 32'd4;
-/*
-    always @ (posedge clk_i) begin
-        if (rst_i == 1'b1) begin
-            pc_o <= `ZeroWord;
-        end
-        else begin
-            pc_o <= pc_i + 32'd4;
-        end
-    end*/
 endmodule
