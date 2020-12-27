@@ -3,36 +3,52 @@ module id2exe(
     input logic  rst,
     input logic  clk,
 
-    input logic   [2:0]   id_alu_sel,
-    input logic   [7:0]   id_alu_op,
-    input logic   [31:0]  id_reg1,
-    input logic   [31:0]  id_reg2,
-    input logic           id_wreg,
-    input logic   [4:0]   id_wd,
+    input logic   [2:0]   id_alu_sel_i,
+    input logic   [7:0]   id_alu_op_i,
+    input logic   [31:0]  id_reg1_i,
+    input logic   [31:0]  id_reg2_i,
+    input logic           id_wreg_i,
+    input logic   [4:0]   id_wd_i,
+    input logic           id_mt_hi_i,
+    input logic           id_mt_lo_i,
+    input logic           id_mf_hi_i,
+    input logic           id_mf_lo_i,
     
-    output logic  [2:0]   exe_alu_sel,
-    output logic  [7:0]   exe_alu_op,
-    output logic  [31:0]  exe_reg1,
-    output logic  [31:0]  exe_reg2,
-    output logic          exe_wreg,
-    output logic  [4:0]   exe_wd
+    output logic  [2:0]   exe_alu_sel_o,
+    output logic  [7:0]   exe_alu_op_o,
+    output logic  [31:0]  exe_reg1_o,
+    output logic  [31:0]  exe_reg2_o,
+    output logic          exe_wreg_o,
+    output logic  [4:0]   exe_wd_o,
+    output logic          exe_mt_hi_o,
+    output logic          exe_mt_lo_o,
+    output logic          exe_mf_hi_o,
+    output logic          exe_mf_lo_o
 );
 
 always@(posedge clk) begin
     if(rst==1'b1) begin
-        exe_alu_sel <=  3'b0;
-        exe_alu_op  <=  8'b0;
-        exe_reg1    <=  32'b0;
-        exe_reg2    <=  32'b0;
-        exe_wreg    <=  1'b0;
-        exe_wd      <=  5'b0;
+        exe_alu_sel_o <=  3'b0;
+        exe_alu_op_o  <=  8'b0;
+        exe_reg1_o    <=  32'b0;
+        exe_reg2_o    <=  32'b0;
+        exe_wreg_o    <=  1'b0;
+        exe_wd_o      <=  5'b0;
+        exe_mt_hi_o   <=  1'b0;
+        exe_mt_lo_o   <=  1'b0;
+        exe_mf_hi_o   <=  1'b0;
+        exe_mf_lo_o   <=  1'b0;
     end else begin
-        exe_alu_sel <=  id_alu_sel;
-        exe_alu_op  <=  id_alu_op;
-        exe_reg1    <=  id_reg1;
-        exe_reg2    <=  id_reg2;
-        exe_wreg    <=  id_wreg;
-        exe_wd      <=  id_wd;
+        exe_alu_sel_o <=  id_alu_sel_i;
+        exe_alu_op_o  <=  id_alu_op_i;
+        exe_reg1_o    <=  id_reg1_i;
+        exe_reg2_o    <=  id_reg2_i;
+        exe_wreg_o    <=  id_wreg_i;
+        exe_wd_o      <=  id_wd_i;
+        exe_mt_hi_o   <=  id_mt_hi_i;
+        exe_mt_lo_o   <=  id_mt_lo_i;
+        exe_mf_hi_o   <=  id_mf_hi_i;
+        exe_mf_lo_o   <=  id_mf_lo_i;
     end
 end
 

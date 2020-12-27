@@ -28,6 +28,11 @@ module ID(
     output logic [31:0] reg1_o,
     output logic [31:0] reg2_o,
 
+    output logic        mt_hi_o,
+    output logic        mt_lo_o,
+    output logic        mf_hi_o,
+    output logic        mf_lo_o,
+
     output logic        wreg_o, //是否有数据要写寄存器
     output logic [4:0]  wd_o  //write destination
 );
@@ -106,7 +111,11 @@ module ID(
         wd_o,
         reg1_read,
         reg2_read,
-        special_num
+        special_num,
+        mt_hi_o,
+        mt_lo_o,
+        mf_hi_o,
+        mf_lo_o
     } = (rst == 1'b1) ? `INIT_DECODE : (
         (op == `EXE_ORI)    ? `ORI_DECODE   :
         (op == `EXE_ANDI)   ? `ANDI_DECODE  :
@@ -133,6 +142,13 @@ module ID(
             (sel == `EXE_SUBU)  ?  `SUBU_DECODE :
             (sel == `EXE_SLT)   ?  `SLT_DECODE  :
             (sel == `EXE_SLTU)  ?  `SLTU_DECODE : 
+            // special 中的移动指令
+            (sel == `EXE_MOVN)   ?  `MOVN_DECODE : 
+            (sel == `EXE_MOVZ)  ?   `MOVZ_DECODE :
+            (sel == `EXE_MFHI)   ?  `MFHI_DECODE :
+            (sel == `EXE_MTHI)  ?   `MTHI_DECODE :
+            (sel == `EXE_MFLO)   ?  `MFLO_DECODE :
+            (sel == `EXE_MTLO)  ?   `MTLO_DECODE : 
             // special 中的sync
             (sel == `EXE_SYNC)  ? `INIT_DECODE  : `INIT_DECODE
         ) : `INIT_DECODE

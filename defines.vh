@@ -47,6 +47,8 @@
 `define EXE_SRA 		6'b000011
 `define EXE_SRAV 		6'b000111
 //move inst
+`define EXE_MOVN        6'b001011
+`define EXE_MOVZ        6'b001010
 `define EXE_MFHI  		6'b010000
 `define EXE_MTHI  		6'b010001
 `define EXE_MFLO  		6'b010010
@@ -139,6 +141,8 @@
 `define EXE_SRA_OP  	8'b00000011
 `define EXE_SRAV_OP  	8'b00000111
 
+`define EXE_MOVN_OP  8'b11111111
+`define EXE_MOVZ_OP  8'b11111110
 `define EXE_MFHI_OP  8'b00010000
 `define EXE_MTHI_OP  8'b00010001
 `define EXE_MFLO_OP  8'b00010010

@@ -5,6 +5,8 @@ module alu (
     input logic [`AluSelBus]    alusel_i,
     input logic [`DataBus]      reg1_i,
     input logic [`DataBus]      reg2_i,
+    input logic [`DataBus]      hi_i,
+    input logic [`DataBus]      lo_i,
 
     output logic [`DataBus]     wdata_o
 );
@@ -19,8 +21,13 @@ module alu (
                             ( aluop_i == `EXE_SRL_OP || aluop_i == `EXE_SRLV_OP)  ? ( reg2_i >> reg1_i[4:0] )  : 
                             ( aluop_i == `EXE_SRA_OP || aluop_i == `EXE_SRAV_OP)  ? ( ({32{reg2_i[31]}} << (6'd32 - {1'b0, reg1_i[4:0]})) | reg2_i >> reg1_i[4:0] )  : `ZeroWord;
     
+    wire [31:0]move_res =   ( aluop_i == `EXE_MOVN_OP || aluop_i == `EXE_MOVZ_OP || aluop_i == `EXE_MTHI_OP || aluop_i == `EXE_MTLO_OP) ? reg1_i : 
+                            ( aluop_i == `EXE_MTHI_OP ) ? hi_i :
+                            ( aluop_i == `EXE_MTLO_OP ) ? lo_i : `ZeroWord;
+
     assign wdata_o =    (rst_i == 1'b1) ? `ZeroWord : 
                         (alusel_i == `EXE_RES_LOGIC) ? logic_res : 
-                        (alusel_i == `EXE_RES_SHIFT) ? shift_res : `ZeroWord;
-    
+                        (alusel_i == `EXE_RES_SHIFT) ? shift_res :
+                        (alusel_i == `EXE_RES_MOVE ) ? move_res  : `ZeroWord;
+
 endmodule
