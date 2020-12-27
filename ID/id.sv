@@ -72,7 +72,6 @@ module ID(
     // 就使用本资源
     wire [31:0] special_num;
 
-
     regfile id_regfile(
         .clk(clk),
         .rst(rst),
@@ -123,7 +122,7 @@ module ID(
         mt_lo_o,
         mf_hi_o,
         mf_lo_o
-    } = (rst == 1'b1) ? `INIT_DECODE : (
+    } = (rst == 1'b1    ) ? `INIT_DECODE : (
         (op == `EXE_ORI)    ? `ORI_DECODE   :
         (op == `EXE_ANDI)   ? `ANDI_DECODE  :
         (op == `EXE_XORI)   ? `XORI_DECODE  :

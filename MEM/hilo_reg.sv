@@ -16,7 +16,7 @@ module hilo_reg (
     reg [31:0] lo_reg;
 
     // output assign
-    assign {hi_o, lo_o} = {hi_reg, lo_reg};
+    assign {hi_o, lo_o} = {(w_hi_i == 1'b1) ? new_hi_i : hi_reg, (w_lo_i == 1'b1) ? new_lo_i : lo_reg};
 
     always @ (posedge clk_i) begin
         if (rst_i == 1'b1) begin
