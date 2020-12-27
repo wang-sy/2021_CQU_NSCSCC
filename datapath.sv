@@ -54,7 +54,7 @@ module datapath (
     logic [`DataBus]        ex_reg2;
     logic [`RegAddrBus]     ex_wd;
     logic                   ex_wreg;
-    logic [`DataBus]        ex_wdata;
+    logic [`DoubleRegBus]   ex_wdata;
     logic                   ex_mt_hi;
     logic                   ex_mt_lo;
     logic                   ex_mf_hi;
@@ -64,7 +64,7 @@ module datapath (
     // mem阶段的信号
     logic [`RegAddrBus]     mem_wd;
     logic                   mem_wreg;
-    logic [`DataBus]        mem_wdata;
+    logic [`DoubleRegBus]   mem_wdata;
     logic                   mem_mt_hi;
     logic                   mem_mt_lo;
     logic                   mem_mf_hi;
@@ -75,7 +75,7 @@ module datapath (
     // wb阶段的信号
     logic [`RegAddrBus]     wb_wd;
     logic                   wb_wreg;
-    logic [`DataBus]        wb_wdata;
+    logic [`DoubleRegBus]   wb_wdata;
     logic [`RegAddrBus]     wb_wd_control;
     logic                   wb_wreg_control;
     logic [`DataBus]        wb_wdata_control;
@@ -118,10 +118,13 @@ module datapath (
         .wdata_i(wb_wdata_control),
         .ex_we_i(ex_wreg),
         .ex_waddr_i(ex_wd),
-        .ex_wdata_i(ex_wdata),
+        .ex_wdata_i(ex_wdata[31:0]),
         .mem_we_i(mem_wreg),
         .mem_waddr_i(mem_wd),
-        .mem_wdata_i(mem_wdata),
+        .mem_wdata_i(mem_wdata[31:0]),
+        .wb_we_i(wb_wreg),
+        .wb_waddr_i(wb_wd),
+        .wb_wdata_i(wb_wdata[31:0]),
         .aluop_o(id_aluop),
         .alusel_o(id_alusel),
         .reg1_o(id_reg1),

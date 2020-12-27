@@ -5,7 +5,7 @@ module MEM (
 
     input logic [`RegAddrBus]   wd_i,
     input logic                 wreg_i,
-    input logic [`DataBus]      wdata_i,
+    input logic [`DoubleRegBus] wdata_i,
 
     input logic                 mt_hi_i,
     input logic                 mt_lo_i,
@@ -20,9 +20,9 @@ module MEM (
     hilo_reg mem_hilo_reg(
         .clk_i(clk_i),
         .rst_i(rst_i),
-        .new_hi_i(wdata_i),
+        .new_hi_i(wdata_i[63:32]),
         .w_hi_i(mt_hi_i),
-        .new_lo_i(wdata_i),
+        .new_lo_i(wdata_i[31:0]),
         .w_lo_i(mt_lo_i),
         .hi_o(hi_o),
         .lo_o(lo_o)

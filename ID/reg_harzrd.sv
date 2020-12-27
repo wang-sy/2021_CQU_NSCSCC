@@ -12,6 +12,9 @@ module reg_harzrd (
     input logic             mem_we_i,
     input logic     [4:0]   mem_waddr_i,
     input logic     [31:0]  mem_wdata_i,
+    input logic             wb_we_i,
+    input logic     [4:0]   wb_waddr_i,
+    input logic     [31:0]  wb_wdata_i,
     // 读取到的结果
     output logic    [31:0]  rdata1_o,
     output logic    [31:0]  rdata2_o
@@ -21,15 +24,18 @@ module reg_harzrd (
     // 这里的冒险主要针对RAW，冒险的方法是：
     // 1、判断当前计算阶段的目标寄存器是否是当前寄存器，如果是就将计算结果当作读取结果
     // 2、判断当前访存阶段的写入目标，是否是当前寄存器，如果是就将访存阶段的结果当作读取结果
-    // 3、都不是的情况下，就将读取结果作为最终结果
+    // 3、判断当前回写阶段的写入目标，是否是当前寄存器，如果是就将回写阶段的结果当作读取结果
+    // 4、都不是的情况下，就将读取结果作为最终结果
 
     assign rdata1_o =   (rst_i == 1'b1) ? `ZeroWord :
                         (ex_we_i == 1'b1 && ex_waddr_i == reg_addr1_i) ? ex_wdata_i :
-                        (mem_we_i == 1'b1 && mem_waddr_i == reg_addr1_i) ? mem_wdata_i : reg_data1_i;
+                        (mem_we_i == 1'b1 && mem_waddr_i == reg_addr1_i) ? mem_wdata_i :
+                        (wb_we_i == 1'b1 && wb_waddr_i == reg_addr1_i) ? wb_wdata_i : reg_data1_i;
     
     assign rdata2_o =   (rst_i == 1'b1) ? `ZeroWord :
                         (ex_we_i == 1'b1 && ex_waddr_i == reg_addr2_i) ? ex_wdata_i :
-                        (mem_we_i == 1'b1 && mem_waddr_i == reg_addr2_i) ? mem_wdata_i : reg_data2_i;
+                        (mem_we_i == 1'b1 && mem_waddr_i == reg_addr2_i) ? mem_wdata_i : 
+                        (wb_we_i == 1'b1 && wb_waddr_i == reg_addr2_i) ? wb_wdata_i : reg_data2_i;
 
 
                         

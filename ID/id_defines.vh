@@ -28,10 +28,17 @@
 `define MFLO_DECODE {   `EXE_MFLO_OP,   `EXE_RES_MOVE,          1'b1,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b0,       1'b0,       1'b1}
 `define MTLO_DECODE {   `EXE_MTLO_OP,   `EXE_RES_MOVE,          1'b0,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b1,       1'b0,       1'b0}
 
-
+//    instname          
+`define ADDI_DECODE{    `EXE_ADDI_OP,   `EXE_RES_ARITHMETIC,    1'b1,                       rt,     1'b1,       1'b0,       sign_imm,       1'b0,       1'b0,       1'b0,       1'b0}
+`define ADDIU_DECODE{   `EXE_ADDIU_OP,  `EXE_RES_ARITHMETIC,    1'b1,                       rt,     1'b1,       1'b0,       sign_imm,       1'b0,       1'b0,       1'b0,       1'b0}
+`define SLTI_DECODE{    `EXE_SLTI_OP,   `EXE_RES_ARITHMETIC,    1'b1,                       rt,     1'b1,       1'b0,       sign_imm,       1'b0,       1'b0,       1'b0,       1'b0}
+`define SLTIU_DECODE{   `EXE_SLTIU_OP,  `EXE_RES_ARITHMETIC,    1'b1,                       rt,     1'b1,       1'b0,       sign_imm,       1'b0,       1'b0,       1'b0,       1'b0}
 `define ADD_DECODE {    `EXE_ADD_OP,    `EXE_RES_ARITHMETIC,    1'b1,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b0,       1'b0,       1'b0}
 `define ADDU_DECODE {   `EXE_ADDU_OP,   `EXE_RES_ARITHMETIC,    1'b1,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b0,       1'b0,       1'b0}
 `define SUB_DECODE {    `EXE_SUB_OP,    `EXE_RES_ARITHMETIC,    1'b1,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b0,       1'b0,       1'b0}
 `define SUBU_DECODE {   `EXE_SUBU_OP,   `EXE_RES_ARITHMETIC,    1'b1,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b0,       1'b0,       1'b0}
 `define SLT_DECODE {    `EXE_SLT_OP,    `EXE_RES_ARITHMETIC,    1'b1,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b0,       1'b0,       1'b0}
 `define SLTU_DECODE {   `EXE_SLTU_OP,   `EXE_RES_ARITHMETIC,    1'b1,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b0,       1'b0,       1'b0}
+`define MUL_DECODE{     `EXE_MUL_OP,    `EXE_RES_ARITHMETIC,    1'b1,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b0,       1'b0,       1'b0}
+`define MULT_DECODE{    `EXE_MULT_OP,   `EXE_RES_MUL,           1'b0,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b1,       1'b1,       1'b0,       1'b0}
+`define MULTU_DECODE{   `EXE_MULTU_OP,  `EXE_RES_MUL,           1'b0,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b1,       1'b1,       1'b0,       1'b0}

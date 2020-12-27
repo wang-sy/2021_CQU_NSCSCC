@@ -20,6 +20,10 @@ module ID(
     input logic         mem_we_i,
     input logic  [4:0]  mem_waddr_i,
     input logic  [31:0] mem_wdata_i,
+    input logic         wb_we_i,
+    input logic  [4:0]  wb_waddr_i,
+    input logic  [31:0] wb_wdata_i,
+    
 
 
     // //输出
@@ -98,6 +102,9 @@ module ID(
         .mem_we_i(mem_we_i),
         .mem_waddr_i(mem_waddr_i),
         .mem_wdata_i(mem_wdata_i),
+        .wb_we_i(wb_we_i),
+        .wb_waddr_i(wb_waddr_i),
+        .wb_wdata_i(wb_wdata_i),
         .rdata1_o(harzrd_reg1_data),
         .rdata2_o(harzrd_reg2_data)
     );
@@ -122,6 +129,10 @@ module ID(
         (op == `EXE_XORI)   ? `XORI_DECODE  :
         (op == `EXE_LUI)    ? `LUI_DECODE   :
         (op == `EXE_PREF)   ? `INIT_DECODE  :
+        (op == `EXE_ADDI)   ? `ADDI_DECODE  :
+        (op == `EXE_ADDIU)  ? `ADDIU_DECODE :
+        (op == `EXE_SLTI)   ? `SLTI_DECODE  :
+        (op == `EXE_SLTIU)  ? `SLTIU_DECODE :
         (op == `EXE_SPECIAL_INST) ? (
             // special 中的逻辑指令
             (sel == `EXE_AND)   ? `AND_DECODE   :
@@ -135,22 +146,28 @@ module ID(
             (sel == `EXE_SLLV)  ? `SLLV_DECODE  :
             (sel == `EXE_SRLV)  ? `SRLV_DECODE  :
             (sel == `EXE_SRAV)  ? `SRAV_DECODE  :
+            // special 中的移动指令
+            (sel == `EXE_MOVN)  ?  `MOVN_DECODE : 
+            (sel == `EXE_MOVZ)  ?  `MOVZ_DECODE :
+            (sel == `EXE_MFHI)  ?  `MFHI_DECODE :
+            (sel == `EXE_MTHI)  ?  `MTHI_DECODE :
+            (sel == `EXE_MFLO)  ?  `MFLO_DECODE :
+            (sel == `EXE_MTLO)  ?  `MTLO_DECODE : 
             // special 中的算数指令
             (sel == `EXE_ADD)   ?  `ADD_DECODE  : 
             (sel == `EXE_ADDU)  ?  `ADDU_DECODE :
             (sel == `EXE_SUB)   ?  `SUB_DECODE  :
             (sel == `EXE_SUBU)  ?  `SUBU_DECODE :
             (sel == `EXE_SLT)   ?  `SLT_DECODE  :
-            (sel == `EXE_SLTU)  ?  `SLTU_DECODE : 
-            // special 中的移动指令
-            (sel == `EXE_MOVN)   ?  `MOVN_DECODE : 
-            (sel == `EXE_MOVZ)  ?   `MOVZ_DECODE :
-            (sel == `EXE_MFHI)   ?  `MFHI_DECODE :
-            (sel == `EXE_MTHI)  ?   `MTHI_DECODE :
-            (sel == `EXE_MFLO)   ?  `MFLO_DECODE :
-            (sel == `EXE_MTLO)  ?   `MTLO_DECODE : 
+            (sel == `EXE_SLTU)  ?  `SLTU_DECODE :
             // special 中的sync
-            (sel == `EXE_SYNC)  ? `INIT_DECODE  : `INIT_DECODE
+            (sel == `EXE_SYNC)  ? `INIT_DECODE  : 
+            // special 中的乘法指令，这两条乘法指令会直接将结果写入hilo
+            (sel == `EXE_MULT)  ? `MULT_DECODE  :
+            (sel == `EXE_MULTU) ? `MULTU_DECODE : `INIT_DECODE
+        ) : (op == `EXE_SPECIAL2_INST) ? (
+            // special2 中的mul指令
+            (sel == `EXE_MUL) ? `MUL_DECODE : `INIT_DECODE
         ) : `INIT_DECODE
     );
 

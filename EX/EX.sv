@@ -15,7 +15,7 @@ module EX (
     input logic [`DataBus]      hi_i,
     input logic [`DataBus]      lo_i,
 
-    output logic [`DataBus]     wdata_o
+    output logic [`DoubleRegBus]wdata_o
 );
 
     logic [`DataBus] alu_data1;

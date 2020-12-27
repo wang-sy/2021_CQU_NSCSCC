@@ -5,7 +5,7 @@ module EX2MEM (
 
     input logic [`RegAddrBus]   ex_wd_i,
     input logic                 ex_wreg_i,
-    input logic [`DataBus]      ex_wdata_i,
+    input logic [`DoubleRegBus] ex_wdata_i,
     input logic                 ex_mt_hi_i,
     input logic                 ex_mt_lo_i,
     input logic                 ex_mf_hi_i,
@@ -13,7 +13,7 @@ module EX2MEM (
 
     output logic[`RegAddrBus]   mem_wd_o,
     output logic                mem_wreg_o,
-    output logic[`DataBus]      mem_wdata_o,
+    output logic[`DoubleRegBus] mem_wdata_o,
     output logic                mem_mt_hi_o,
     output logic                mem_mt_lo_o,
     output logic                mem_mf_hi_o,
