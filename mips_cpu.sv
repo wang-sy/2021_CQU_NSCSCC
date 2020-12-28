@@ -34,7 +34,7 @@ module mips_cpu (
 
     inst_ram inst_cache(
         .addra(rom_addr_o),
-        .clka(clk_i),
+        .clka(~clk_i),
         .douta(rom_data_i),
         .ena(rom_ce_o)
     );

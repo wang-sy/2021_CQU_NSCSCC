@@ -45,6 +45,8 @@ module datapath (
     logic                   id_mt_lo;
     logic                   id_mf_hi;
     logic                   id_mf_lo;
+    logic                   id_branch_flag;
+    logic [31:0]            id_branch_to_addr;
     
 
     // ex阶段的信号
@@ -54,6 +56,7 @@ module datapath (
     logic [`DataBus]        ex_reg2;
     logic [`RegAddrBus]     ex_wd;
     logic                   ex_wreg;
+    logic                   ex_ok;
     logic [`DoubleRegBus]   ex_wdata;
     logic                   ex_mt_hi;
     logic                   ex_mt_lo;
@@ -79,6 +82,22 @@ module datapath (
     logic [`RegAddrBus]     wb_wd_control;
     logic                   wb_wreg_control;
     logic [`DataBus]        wb_wdata_control;
+
+    // 各阶段的stall状态
+    logic                   if_stall;
+    logic                   if2id_stall;
+    logic                   id2ex_stall;
+    logic                   ex2mem_stall;
+    logic                   mem2wb_stall;
+
+    stall_controller datapath_stall_controller(
+        .ex_ok_i(ex_ok),
+        .if2id_stall_o(if2id_stall),
+        .if_stall_o(if_stall),
+        .id2ex_stall_o(id2ex_stall),
+        .ex2mem_stall_o(ex2mem_stall),
+        .mem2wb_stall_o(mem2wb_stall)
+    );
     
 
     // IF为取指令模块，主要负责对PC进行更新
@@ -87,6 +106,9 @@ module datapath (
     IF datapath_if(
         .clk_i(clk_i),
         .rst_i(rst_i),
+        .stall_i(if_stall),
+        .branch_flag_i(id_branch_flag),
+        .branch_to_addr_i(id_branch_to_addr),
         .pc_o(rom_addr_o),
         .ce_o(rom_ce_o)
     );
@@ -95,6 +117,7 @@ module datapath (
     IF2ID datapath_if2id(
         .clk_i(clk_i),
         .rst_i(rst_i),
+        .stall_i(if2id_stall),
         .if_pc_i(rom_addr_o),
         .if_inst_i(rom_data_i),
         .id_pc_o(id_pc),
@@ -133,6 +156,8 @@ module datapath (
         .mt_lo_o(id_mt_lo),
         .mf_hi_o(id_mf_hi),
         .mf_lo_o(id_mf_lo),
+        .branch_flag_o(id_branch_flag),
+        .branch_to_addr_o(id_branch_to_addr),
         .wreg_o(id_wreg),
         .wd_o(id_wd)
     );
@@ -141,6 +166,7 @@ module datapath (
     id2exe datapath_id2ex(
         .rst(rst_i),
         .clk(clk_i),
+        .stall_i(id2ex_stall),
         .id_alu_sel_i(id_alusel),
         .id_alu_op_i(id_aluop),
         .id_reg1_i(id_reg1),
@@ -179,6 +205,7 @@ module datapath (
         .mf_lo_i(ex_mf_lo),
         .hi_i(mem_hi),
         .lo_i(mem_lo),
+        .ok_o(ex_ok),
         .wdata_o(ex_wdata)
     );
 
@@ -186,6 +213,7 @@ module datapath (
     EX2MEM datapath_ex2mem(
         .clk_i(clk_i),
         .rst_i(rst_i),
+        .stall_i(ex2mem_stall),
         .ex_wd_i(ex_wd),
         .ex_wreg_i(ex_wreg),
         .ex_wdata_i(ex_wdata),
@@ -220,6 +248,7 @@ module datapath (
     MEM2WB datapath_mem2wb(
         .clk_i(clk_i),
         .rst_i(rst_i),
+        .stall_i(mem2wb_stall),
         .mem_wd_i(mem_wd),
         .mem_wreg_i(mem_wreg),
         .mem_wdata_i(mem_wdata),

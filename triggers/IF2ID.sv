@@ -6,6 +6,7 @@
 module IF2ID (
     input logic         clk_i,
     input logic         rst_i,
+    input logic         stall_i,
 
     input logic [31:0]  if_pc_i,
     input logic [31:0]  if_inst_i,
@@ -18,6 +19,10 @@ module IF2ID (
         if (rst_i == 1'b1) begin
             id_pc_o <= `ZeroWord;
             id_inst_o <= `ZeroWord;
+        end
+        else if (stall_i == 1'b1) begin
+            id_pc_o <= id_pc_o;
+            id_inst_o <= id_inst_o;
         end
         else begin
             id_pc_o <= if_pc_i;

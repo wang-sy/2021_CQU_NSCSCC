@@ -15,6 +15,7 @@ module EX (
     input logic [`DataBus]      hi_i,
     input logic [`DataBus]      lo_i,
 
+    output logic                ok_o,
     output logic [`DoubleRegBus]wdata_o
 );
 
@@ -40,7 +41,9 @@ module EX (
 
 
     // alu运算单元: 通过前面传来的信号进行运算，将结果赋值给wdata_o
+    // 在当前阶段div指令执行时需要多个周期，因此会输出一个ok信号，在ok为0时，需要其他流水级stall
     alu ex_alu(
+        .clk_i(clk_i),
         .rst_i(rst_i),
         .aluop_i(aluop_i),
         .alusel_i(alusel_i),
@@ -48,6 +51,7 @@ module EX (
         .reg2_i(alu_data2),
         .hi_i(hi_i),
         .lo_i(lo_i),
+        .ok_o(ok_o),
         .wdata_o(wdata_o)
     );
 
