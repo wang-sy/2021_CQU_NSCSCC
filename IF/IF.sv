@@ -5,6 +5,7 @@
 module IF (
     input logic         clk_i,
     input logic         rst_i,
+    input logic         stall_i,
 
     output logic [31:0] pc_o,
     output logic        ce_o
@@ -16,6 +17,7 @@ module IF (
     pc_reg if_pc(
         .clk_i(clk_i),
         .rst_i(rst_i),
+        .stall_i(stall_i),
         .pc_i(pc_next),
         .pc_o(pc_o),
         .ce_o(ce_o)

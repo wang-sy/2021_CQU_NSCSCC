@@ -2,6 +2,7 @@
 module EX2MEM (
     input logic                 clk_i,
     input logic                 rst_i,
+    input logic                 stall_i,
 
     input logic [`RegAddrBus]   ex_wd_i,
     input logic                 ex_wreg_i,
@@ -28,6 +29,15 @@ module EX2MEM (
             mem_mt_lo_o <= 1'b0;
             mem_mf_hi_o <= 1'b0;
             mem_mf_lo_o <= 1'b0;
+        end
+        else if(stall_i == 1'b1) begin
+            mem_wd_o <= mem_wd_o;
+            mem_wreg_o <= mem_wreg_o;
+            mem_wdata_o <= mem_wdata_o;
+            mem_mt_hi_o <= mem_mt_hi_o;
+            mem_mt_lo_o <= mem_mt_lo_o;
+            mem_mf_hi_o <= mem_mf_hi_o;
+            mem_mf_lo_o <= mem_mf_lo_o;
         end
         else begin
             mem_wd_o <= ex_wd_i;

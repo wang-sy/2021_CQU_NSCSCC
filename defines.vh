@@ -226,7 +226,7 @@
 `define EXE_RES_MOVE 3'b011	
 `define EXE_RES_ARITHMETIC 3'b100	
 `define EXE_RES_MUL 3'b101
-`define EXE_RES_JUMP_BRANCH 3'b110
+`define EXE_RES_DIV 3'b110
 `define EXE_RES_LOAD_STORE 3'b111	
 
 `define EXE_RES_NOP 3'b000

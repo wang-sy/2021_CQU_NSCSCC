@@ -1,5 +1,6 @@
 `include "defines.vh"
 module alu (
+    input                       clk_i,
     input logic                 rst_i,
     input logic [`AluOpBus]     aluop_i,
     input logic [`AluSelBus]    alusel_i,
@@ -8,6 +9,7 @@ module alu (
     input logic [`DataBus]      hi_i,
     input logic [`DataBus]      lo_i,
 
+    output logic                ok_o,
     output logic [`DoubleRegBus]wdata_o
 );
 //                              条件                            结果
@@ -51,6 +53,33 @@ module alu (
                             )  :
                             (aluop_i == `EXE_MULTU_OP)  ?  ({1'b0, reg1_i} * {1'b0, reg2_i})    : ({`ZeroWord, `ZeroWord});
 
+    
+    wire  div_ena = (rst_i == 1'b1) ? 1'b0 :
+                    (aluop_i == `EXE_DIV_OP || aluop_i == `EXE_DIVU_OP) ? (
+                        (div_ready == 1'b0) ? 1'b1 : 1'b0
+                    ) : 1'b0;
+
+    wire div_signed = (aluop_i == `EXE_DIV_OP) ? 1'b1 : 1'b0;
+    logic div_ready;
+    logic [63:0]div_res;
+
+    // 除法器，直接使用了雷斯磊书中的
+    // 除法需要多周期，在进行除法的过程中需要将其他的流水级进行stall
+    div ex_alu_div(
+        .clk(clk_i),
+        .rst(rst_i),
+        .signed_div(div_signed),
+        .a(reg1_i),
+        .b(reg2_i),
+        .start(div_ena),
+        .annul(1'b0), // 除法取消
+        .result(div_res),
+        .ready(div_ready)
+    );
+    
+    assign ok_o =   (rst_i == 1'b1) ? 1'b1 : 
+                    (div_ena == 1'b1 && div_ready == 1'b0) ? 1'b0 : 1'b1;
+
 
     assign wdata_o =    (rst_i == 1'b1) ? {`ZeroWord, `ZeroWord} : 
                         (alusel_i == `EXE_RES_LOGIC) ? {logic_res, logic_res} : 
@@ -58,6 +87,9 @@ module alu (
                         (alusel_i == `EXE_RES_MOVE ) ? {move_res, move_res}  :
                         (alusel_i == `EXE_RES_ARITHMETIC) ? (
                             (overflow == 1'b0) ? {arithmetic_res, arithmetic_res} : {`ZeroWord, `ZeroWord}
-                        ) : (alusel_i == `EXE_RES_MUL) ? mul_res : {`ZeroWord, `ZeroWord};
+                        ) : (alusel_i == `EXE_RES_MUL) ? mul_res :
+                        (alusel_i == `EXE_RES_DIV) ? (
+                            (div_ready == 1'b1) ? div_res : {`ZeroWord, `ZeroWord}
+                        ) : {`ZeroWord, `ZeroWord};
 
 endmodule

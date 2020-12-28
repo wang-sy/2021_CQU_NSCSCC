@@ -10,6 +10,7 @@
 module pc_reg (
     input   logic           clk_i,
     input   logic           rst_i,
+    input   logic           stall_i,
     input   logic [31:0]    pc_i,
 
     output  logic [31:0]    pc_o,
@@ -17,13 +18,28 @@ module pc_reg (
 );
 
     assign ce_o = ~ rst_i;
+    logic  first_stall;
 
+    // 当需要重置时，将PC刷新
+    // 当需要stall时，保持PC不变
     always @ (posedge clk_i) begin
         if(rst_i == 1'b1) begin
             pc_o <= `ZeroWord;
+            first_stall <= 1'b1;
+        end
+        else if(stall_i) begin
+            if (first_stall == 1'b1) begin
+                pc_o <= pc_o - 32'd4;
+                first_stall <= 1'b0;
+            end
+            else begin
+                pc_o <= pc_o;
+                first_stall <= 1'b0;
+            end
         end
         else begin
             pc_o <= pc_i;
+            first_stall <= 1'b1;
         end
     end
 

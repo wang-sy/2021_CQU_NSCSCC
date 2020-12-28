@@ -163,7 +163,10 @@ module ID(
             (sel == `EXE_SYNC)  ? `INIT_DECODE  : 
             // special 中的乘法指令，这两条乘法指令会直接将结果写入hilo
             (sel == `EXE_MULT)  ? `MULT_DECODE  :
-            (sel == `EXE_MULTU) ? `MULTU_DECODE : `INIT_DECODE
+            (sel == `EXE_MULTU) ? `MULTU_DECODE : 
+            // special 中的除法指令
+            (sel == `EXE_DIV)   ? `DIV_DECODE   :
+            (sel == `EXE_DIVU)  ? `DIVU_DECODE  : `INIT_DECODE
         ) : (op == `EXE_SPECIAL2_INST) ? (
             // special2 中的mul指令
             (sel == `EXE_MUL) ? `MUL_DECODE : `INIT_DECODE

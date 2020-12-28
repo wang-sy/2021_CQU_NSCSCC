@@ -27,7 +27,7 @@
 `define MTHI_DECODE {   `EXE_MTHI_OP,   `EXE_RES_MOVE,          1'b0,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b1,       1'b0,       1'b0,       1'b0}
 `define MFLO_DECODE {   `EXE_MFLO_OP,   `EXE_RES_MOVE,          1'b1,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b0,       1'b0,       1'b1}
 `define MTLO_DECODE {   `EXE_MTLO_OP,   `EXE_RES_MOVE,          1'b0,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b1,       1'b0,       1'b0}
-
+//    instname          ALU_OP          ALU_SEL                 wreg                        wd      reg1_read   reg2_read   special_num     mt_hi       mt_lo       mf_hi       mf_lo
 //    instname          
 `define ADDI_DECODE{    `EXE_ADDI_OP,   `EXE_RES_ARITHMETIC,    1'b1,                       rt,     1'b1,       1'b0,       sign_imm,       1'b0,       1'b0,       1'b0,       1'b0}
 `define ADDIU_DECODE{   `EXE_ADDIU_OP,  `EXE_RES_ARITHMETIC,    1'b1,                       rt,     1'b1,       1'b0,       sign_imm,       1'b0,       1'b0,       1'b0,       1'b0}
@@ -42,3 +42,5 @@
 `define MUL_DECODE{     `EXE_MUL_OP,    `EXE_RES_ARITHMETIC,    1'b1,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b0,       1'b0,       1'b0,       1'b0}
 `define MULT_DECODE{    `EXE_MULT_OP,   `EXE_RES_MUL,           1'b0,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b1,       1'b1,       1'b0,       1'b0}
 `define MULTU_DECODE{   `EXE_MULTU_OP,  `EXE_RES_MUL,           1'b0,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b1,       1'b1,       1'b0,       1'b0}
+`define DIV_DECODE{     `EXE_DIV_OP,    `EXE_RES_DIV,           1'b0,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b1,       1'b1,       1'b0,       1'b0}
+`define DIVU_DECODE{    `EXE_DIVU_OP,   `EXE_RES_DIV,           1'b0,                       rd,     1'b1,       1'b1,       `ZeroWord,      1'b1,       1'b1,       1'b0,       1'b0}
