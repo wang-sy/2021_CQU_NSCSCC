@@ -38,7 +38,8 @@ module alu (
                                                 ( aluop_i ==  `EXE_SLT_OP   || aluop_i ==  `EXE_SLTI_OP     ) ? ($signed(reg1_i) < $signed(reg2_i)) :
                                                 ( aluop_i ==  `EXE_SLTU_OP  || aluop_i ==  `EXE_SLTIU_OP    ) ? (({1'b0, reg1_i} < {1'b0, reg2_i})) : 
                                                 ( aluop_i ==  `EXE_MUL_OP   ) ? (reg1_i * reg2_i) : 
-                                                ( aluop_i ==  `EXE_JAL_OP   || aluop_i ==  `EXE_JALR_OP     ) ? ({1'b0, reg2_i}) : ({1'b0, `ZeroWord});
+                                                ( aluop_i ==  `EXE_JAL_OP   || aluop_i ==  `EXE_JALR_OP     ) ? ({1'b0, reg2_i}) : 
+                                                ( aluop_i ==  `EXE_BGEZAL_OP|| aluop_i ==  `EXE_BLTZAL_OP   ) ? ({1'b0, reg2_i}) : ({1'b0, `ZeroWord});
 
     wire overflow = (aluop_i == `EXE_ADD_OP || aluop_i == `EXE_ADDI_OP || aluop_i ==  `EXE_SUB_OP) & (overflow_byte ^ arithmetic_res[31]);
 

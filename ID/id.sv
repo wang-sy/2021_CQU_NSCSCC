@@ -111,10 +111,20 @@ module ID(
         .rdata2_o(harzrd_reg2_data)
     );
 
+    logic do_branch;
+    // 用于判断是否进入branch分支的模块
+    branch_controller id_branch_controller(
+        .aluop_i(aluop_o),
+        .reg1_i(harzrd_reg1_data),
+        .reg2_i(harzrd_reg2_data),
+        .do_branch_o(do_branch)
+    );
+
     // 用于J类型的指令
     wire [31:0] pc_puls8 = pc_i + 32'd8;
     wire [31:0] pc_puls4 = pc_i + 32'd4;
     wire [31:0] j_to_addr = {pc_puls4[31:28], inst_i[25:0] ,2'b0};
+    wire [31:0] branch_to_addr = pc_puls4 + {sign_imm[29:0], 2'b0};
 
 
     // nop和ssnop不需要特殊实现，直接默认译码即可
@@ -145,6 +155,10 @@ module ID(
         (op == `EXE_SLTIU)  ? `SLTIU_DECODE :
         (op == `EXE_J)      ? `J_DECODE     :
         (op == `EXE_JAL)    ? `JAL_DECODE   :
+        (op == `EXE_BEQ)    ? `BEQ_DECODE   :
+        (op == `EXE_BGTZ)   ? `BGTZ_DECODE  :
+        (op == `EXE_BLEZ)   ? `BLEZ_DECODE  :
+        (op == `EXE_BNE)    ? `BNE_DECODE   :
         (op == `EXE_SPECIAL_INST) ? (
             // special 中的逻辑指令
             (sel == `EXE_AND)   ? `AND_DECODE   :
@@ -186,6 +200,12 @@ module ID(
         ) : (op == `EXE_SPECIAL2_INST) ? (
             // special2 中的mul指令
             (sel == `EXE_MUL) ? `MUL_DECODE : `INIT_DECODE
+        ) : (op == `EXE_REGIMM_INST) ? (
+            // 对branch指令的具体类型进行选择，需要判断rt
+            (rt == `EXE_BGEZ    ) ? `BGEZ_DECODE    : 
+            (rt == `EXE_BGEZAL  ) ? `BGEZAL_DECODE  : 
+            (rt == `EXE_BLTZ    ) ? `BLTZ_DECODE    : 
+            (rt == `EXE_BLTZAL  ) ? `BLTZAL_DECODE  : `INIT_DECODE
         ) : `INIT_DECODE
     );
 
