@@ -45,6 +45,8 @@ module datapath (
     logic                   id_mt_lo;
     logic                   id_mf_hi;
     logic                   id_mf_lo;
+    logic                   id_branch_flag;
+    logic [31:0]            id_branch_to_addr;
     
 
     // ex阶段的信号
@@ -105,6 +107,8 @@ module datapath (
         .clk_i(clk_i),
         .rst_i(rst_i),
         .stall_i(if_stall),
+        .branch_flag_i(id_branch_flag),
+        .branch_to_addr_i(id_branch_to_addr),
         .pc_o(rom_addr_o),
         .ce_o(rom_ce_o)
     );
@@ -152,6 +156,8 @@ module datapath (
         .mt_lo_o(id_mt_lo),
         .mf_hi_o(id_mf_hi),
         .mf_lo_o(id_mf_lo),
+        .branch_flag_o(id_branch_flag),
+        .branch_to_addr_o(id_branch_to_addr),
         .wreg_o(id_wreg),
         .wd_o(id_wd)
     );

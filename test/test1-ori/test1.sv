@@ -14,7 +14,7 @@ module test1 ();
         rst_i = 1'b1;
         clk_i = 1'b0;
         int_i = 1'b0;
-        # 50 rst_i = 1'b0;
+        # 47 rst_i = 1'b0;
     end
-    always #1 clk_i = ~clk_i;
+    always #2 clk_i = ~clk_i;
 endmodule

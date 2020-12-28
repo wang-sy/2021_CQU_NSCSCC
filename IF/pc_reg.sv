@@ -25,21 +25,12 @@ module pc_reg (
     always @ (posedge clk_i) begin
         if(rst_i == 1'b1) begin
             pc_o <= `ZeroWord;
-            first_stall <= 1'b1;
         end
         else if(stall_i) begin
-            if (first_stall == 1'b1) begin
-                pc_o <= pc_o - 32'd4;
-                first_stall <= 1'b0;
-            end
-            else begin
                 pc_o <= pc_o;
-                first_stall <= 1'b0;
-            end
         end
         else begin
             pc_o <= pc_i;
-            first_stall <= 1'b1;
         end
     end
 

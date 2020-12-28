@@ -37,6 +37,9 @@ module ID(
     output logic        mf_hi_o,
     output logic        mf_lo_o,
 
+    output logic        branch_flag_o,
+    output logic [31:0] branch_to_addr_o,
+
     output logic        wreg_o, //是否有数据要写寄存器
     output logic [4:0]  wd_o  //write destination
 );
@@ -108,6 +111,12 @@ module ID(
         .rdata2_o(harzrd_reg2_data)
     );
 
+    // 用于J类型的指令
+    wire [31:0] pc_puls8 = pc_i + 32'd8;
+    wire [31:0] pc_puls4 = pc_i + 32'd4;
+    wire [31:0] j_to_addr = {pc_puls4[31:28], inst_i[25:0] ,2'b0};
+
+
     // nop和ssnop不需要特殊实现，直接默认译码即可
     // 当前，将sync和pref当作空指令处理
     assign { 
@@ -121,7 +130,9 @@ module ID(
         mt_hi_o,
         mt_lo_o,
         mf_hi_o,
-        mf_lo_o
+        mf_lo_o,
+        branch_flag_o,
+        branch_to_addr_o
     } = (rst == 1'b1    ) ? `INIT_DECODE : (
         (op == `EXE_ORI)    ? `ORI_DECODE   :
         (op == `EXE_ANDI)   ? `ANDI_DECODE  :
@@ -132,6 +143,8 @@ module ID(
         (op == `EXE_ADDIU)  ? `ADDIU_DECODE :
         (op == `EXE_SLTI)   ? `SLTI_DECODE  :
         (op == `EXE_SLTIU)  ? `SLTIU_DECODE :
+        (op == `EXE_J)      ? `J_DECODE     :
+        (op == `EXE_JAL)    ? `JAL_DECODE   :
         (op == `EXE_SPECIAL_INST) ? (
             // special 中的逻辑指令
             (sel == `EXE_AND)   ? `AND_DECODE   :
@@ -166,7 +179,10 @@ module ID(
             (sel == `EXE_MULTU) ? `MULTU_DECODE : 
             // special 中的除法指令
             (sel == `EXE_DIV)   ? `DIV_DECODE   :
-            (sel == `EXE_DIVU)  ? `DIVU_DECODE  : `INIT_DECODE
+            (sel == `EXE_DIVU)  ? `DIVU_DECODE  : 
+            // special 直接跳转指令
+            (sel == `EXE_JR)    ? `JR_DECODE    :
+            (sel == `EXE_JALR)  ? `JALR_DECODE  : `INIT_DECODE
         ) : (op == `EXE_SPECIAL2_INST) ? (
             // special2 中的mul指令
             (sel == `EXE_MUL) ? `MUL_DECODE : `INIT_DECODE
