@@ -5,9 +5,11 @@ module ID(
     // //输入
     input logic         clk,
     input logic         rst,
+
     //从IF/ID接收到信号
     input logic [31:0]  pc_i,
     input logic [31:0]  inst_i,
+
     //WB级传输进来的信号
     input logic         we_i,
     input logic  [4:0]  waddr_i,
@@ -23,10 +25,13 @@ module ID(
     input logic         wb_we_i,
     input logic  [4:0]  wb_waddr_i,
     input logic  [31:0] wb_wdata_i,
-    
-
 
     // //输出
+    output logic [4:0]  rs_o,
+    output logic [4:0]  rt_o,
+    output logic        reg1_read_o,
+    output logic        reg2_read_o,
+
     output logic [7:0]  aluop_o,
     output logic [2:0]  alusel_o,
     output logic [31:0] reg1_o,
@@ -39,6 +44,9 @@ module ID(
 
     output logic        branch_flag_o,
     output logic [31:0] branch_to_addr_o,
+    output logic        rmem_o,
+    output logic        wmem_o,
+    output logic [31:0] mem_io_addr_o,
 
     output logic        wreg_o, //是否有数据要写寄存器
     output logic [4:0]  wd_o  //write destination
@@ -125,7 +133,8 @@ module ID(
     wire [31:0] pc_puls4 = pc_i + 32'd4;
     wire [31:0] j_to_addr = {pc_puls4[31:28], inst_i[25:0] ,2'b0};
     wire [31:0] branch_to_addr = pc_puls4 + {sign_imm[29:0], 2'b0};
-
+    // 用于访存
+    wire [31:0] mem_io_addr = harzrd_reg1_data + sign_imm;
 
     // nop和ssnop不需要特殊实现，直接默认译码即可
     // 当前，将sync和pref当作空指令处理
@@ -142,7 +151,10 @@ module ID(
         mf_hi_o,
         mf_lo_o,
         branch_flag_o,
-        branch_to_addr_o
+        branch_to_addr_o,
+        rmem_o,
+        wmem_o,
+        mem_io_addr_o
     } = (rst == 1'b1    ) ? `INIT_DECODE : (
         (op == `EXE_ORI)    ? `ORI_DECODE   :
         (op == `EXE_ANDI)   ? `ANDI_DECODE  :
@@ -159,6 +171,14 @@ module ID(
         (op == `EXE_BGTZ)   ? `BGTZ_DECODE  :
         (op == `EXE_BLEZ)   ? `BLEZ_DECODE  :
         (op == `EXE_BNE)    ? `BNE_DECODE   :
+        (op == `EXE_LB)     ? `LB_DECODE    :
+        (op == `EXE_LBU)    ? `LBU_DECODE   :
+        (op == `EXE_LH)     ? `LH_DECODE    :
+        (op == `EXE_LHU)    ? `LHU_DECODE   :
+        (op == `EXE_LW)     ? `LW_DECODE    :
+        (op == `EXE_SB)     ? `SB_DECODE    :
+        (op == `EXE_SH)     ? `SH_DECODE    :
+        (op == `EXE_SW)     ? `SW_DECODE    :
         (op == `EXE_SPECIAL_INST) ? (
             // special 中的逻辑指令
             (sel == `EXE_AND)   ? `AND_DECODE   :
@@ -208,6 +228,8 @@ module ID(
             (rt == `EXE_BLTZAL  ) ? `BLTZAL_DECODE  : `INIT_DECODE
         ) : `INIT_DECODE
     );
+
+    assign {rs_o, rt_o, reg1_read_o, reg2_read_o} = {rs, rt, reg1_read, reg2_read};
 
     assign reg1_o = (rst == 1'b1) ? `ZeroWord : 
                         (reg1_read == 1'b1) ? harzrd_reg1_data : special_num;

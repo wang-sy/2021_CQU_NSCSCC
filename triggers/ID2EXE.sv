@@ -2,6 +2,7 @@
 module id2exe(
     input logic             rst,
     input logic             clk,
+    input logic             flush_i,
     input logic             stall_i,
 
     input logic   [2:0]     id_alu_sel_i,
@@ -14,6 +15,10 @@ module id2exe(
     input logic             id_mt_lo_i,
     input logic             id_mf_hi_i,
     input logic             id_mf_lo_i,
+    input logic             id_rmem_i,
+    input logic             id_wmem_i,
+    input logic  [31:0]     id_mem_io_addr_i,
+    
 
     output logic  [2:0]     exe_alu_sel_o,
     output logic  [7:0]     exe_alu_op_o,
@@ -24,11 +29,14 @@ module id2exe(
     output logic            exe_mt_hi_o,
     output logic            exe_mt_lo_o,
     output logic            exe_mf_hi_o,
-    output logic            exe_mf_lo_o
+    output logic            exe_mf_lo_o,
+    output logic            exe_rmem_o,
+    output logic            exe_wmem_o,
+    output logic  [31:0]    exe_mem_io_addr_o
 );
 
 always@(posedge clk) begin
-    if(rst==1'b1) begin
+    if(rst==1'b1 || flush_i == 1'b1) begin
         exe_alu_sel_o <=  3'b0;
         exe_alu_op_o  <=  8'b0;
         exe_reg1_o    <=  32'b0;
@@ -39,6 +47,9 @@ always@(posedge clk) begin
         exe_mt_lo_o   <=  1'b0;
         exe_mf_hi_o   <=  1'b0;
         exe_mf_lo_o   <=  1'b0;
+        exe_rmem_o    <=  1'b0;
+        exe_wmem_o    <=  1'b0;
+        exe_mem_io_addr_o <= 32'd0;
     end 
     else if (stall_i == 1'b1) begin
         exe_alu_sel_o <=  exe_alu_sel_o;
@@ -51,6 +62,9 @@ always@(posedge clk) begin
         exe_mt_lo_o   <=  exe_mt_lo_o;
         exe_mf_hi_o   <=  exe_mf_hi_o;
         exe_mf_lo_o   <=  exe_mf_lo_o;
+        exe_rmem_o    <=  exe_rmem_o;
+        exe_wmem_o    <=  exe_wmem_o;  
+        exe_mem_io_addr_o <= exe_mem_io_addr_o;
     end
     else begin
         exe_alu_sel_o <=  id_alu_sel_i;
@@ -63,6 +77,9 @@ always@(posedge clk) begin
         exe_mt_lo_o   <=  id_mt_lo_i;
         exe_mf_hi_o   <=  id_mf_hi_i;
         exe_mf_lo_o   <=  id_mf_lo_i;
+        exe_rmem_o    <=  id_rmem_i;
+        exe_wmem_o    <=  id_wmem_i;  
+        exe_mem_io_addr_o <= id_mem_io_addr_i;
     end
 end
 
