@@ -5,9 +5,11 @@ module ID(
     // //输入
     input logic         clk,
     input logic         rst,
+
     //从IF/ID接收到信号
     input logic [31:0]  pc_i,
     input logic [31:0]  inst_i,
+
     //WB级传输进来的信号
     input logic         we_i,
     input logic  [4:0]  waddr_i,
@@ -23,10 +25,13 @@ module ID(
     input logic         wb_we_i,
     input logic  [4:0]  wb_waddr_i,
     input logic  [31:0] wb_wdata_i,
-    
-
 
     // //输出
+    output logic [4:0]  rs_o,
+    output logic [4:0]  rt_o,
+    output logic        reg1_read_o,
+    output logic        reg2_read_o,
+
     output logic [7:0]  aluop_o,
     output logic [2:0]  alusel_o,
     output logic [31:0] reg1_o,
@@ -223,6 +228,8 @@ module ID(
             (rt == `EXE_BLTZAL  ) ? `BLTZAL_DECODE  : `INIT_DECODE
         ) : `INIT_DECODE
     );
+
+    assign {rs_o, rt_o, reg1_read_o, reg2_read_o} = {rs, rt, reg1_read, reg2_read};
 
     assign reg1_o = (rst == 1'b1) ? `ZeroWord : 
                         (reg1_read == 1'b1) ? harzrd_reg1_data : special_num;

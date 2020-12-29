@@ -51,6 +51,10 @@ module datapath (
     logic                   id_branch_flag;
     logic [31:0]            id_branch_to_addr;
     logic [31:0]            id_mem_io_addr;
+    logic [4:0]             id_rs;
+    logic [4:0]             id_rt;
+    logic                   id_reg1_read;
+    logic                   id_reg2_read;
     
 
     // ex阶段的信号
@@ -99,14 +103,23 @@ module datapath (
     logic                   if_stall;
     logic                   if2id_stall;
     logic                   id2ex_stall;
+    logic                   id2ex_flush;
     logic                   ex2mem_stall;
     logic                   mem2wb_stall;
 
     stall_controller datapath_stall_controller(
         .ex_ok_i(ex_ok),
+        .ex_rmem_i(ex_rmem),
+        .ex_wd_i(ex_wd),
+        .ex_wreg_i(ex_wreg),
+        .id_rs_i(id_rs),
+        .id_rt_i(id_rt),
+        .id_reg1_read_i(id_reg1_read),
+        .id_reg2_read_i(id_reg2_read),
         .if2id_stall_o(if2id_stall),
         .if_stall_o(if_stall),
         .id2ex_stall_o(id2ex_stall),
+        .id2ex_flush_o(id2ex_flush),
         .ex2mem_stall_o(ex2mem_stall),
         .mem2wb_stall_o(mem2wb_stall)
     );
@@ -160,6 +173,10 @@ module datapath (
         .wb_we_i(wb_wreg),
         .wb_waddr_i(wb_wd),
         .wb_wdata_i(wb_wdata[31:0]),
+        .rs_o(id_rs),
+        .rt_o(id_rt),
+        .reg1_read_o(id_reg1_read),
+        .reg2_read_o(id_reg2_read),
         .aluop_o(id_aluop),
         .alusel_o(id_alusel),
         .reg1_o(id_reg1),
@@ -181,6 +198,7 @@ module datapath (
     id2exe datapath_id2ex(
         .rst(rst_i),
         .clk(clk_i),
+        .flush_i(id2ex_flush),
         .stall_i(id2ex_stall),
         .id_alu_sel_i(id_alusel),
         .id_alu_op_i(id_aluop),

@@ -2,6 +2,7 @@
 module id2exe(
     input logic             rst,
     input logic             clk,
+    input logic             flush_i,
     input logic             stall_i,
 
     input logic   [2:0]     id_alu_sel_i,
@@ -35,7 +36,7 @@ module id2exe(
 );
 
 always@(posedge clk) begin
-    if(rst==1'b1) begin
+    if(rst==1'b1 || flush_i == 1'b1) begin
         exe_alu_sel_o <=  3'b0;
         exe_alu_op_o  <=  8'b0;
         exe_reg1_o    <=  32'b0;
