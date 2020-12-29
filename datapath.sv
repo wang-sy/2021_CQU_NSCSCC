@@ -24,6 +24,7 @@ module datapath (
     output  logic           time_int_o,
     output  logic           rom_ce_o,
     output  logic [31:0]    rom_addr_o,
+    output  logic [31:0]    ram_wdata_o,
     output  logic [31:0]    ram_addr_o,
     output  logic [3:0]     ram_sel_o,
     output  logic           ram_we_o,
@@ -45,8 +46,11 @@ module datapath (
     logic                   id_mt_lo;
     logic                   id_mf_hi;
     logic                   id_mf_lo;
+    logic                   id_rmem;
+    logic                   id_wmem;
     logic                   id_branch_flag;
     logic [31:0]            id_branch_to_addr;
+    logic [31:0]            id_mem_io_addr;
     
 
     // ex阶段的信号
@@ -62,18 +66,26 @@ module datapath (
     logic                   ex_mt_lo;
     logic                   ex_mf_hi;
     logic                   ex_mf_lo;
+    logic                   ex_rmem;
+    logic                   ex_wmem;
+    logic [31:0]            ex_mem_io_addr;
 
 
     // mem阶段的信号
+    logic [`AluOpBus]       mem_aluop;
     logic [`RegAddrBus]     mem_wd;
     logic                   mem_wreg;
-    logic [`DoubleRegBus]   mem_wdata;
+    logic [`DoubleRegBus]   mem_wdata_i;
+    logic [`DoubleRegBus]   mem_wdata_o;
     logic                   mem_mt_hi;
     logic                   mem_mt_lo;
     logic                   mem_mf_hi;
     logic                   mem_mf_lo;
     logic [`DataBus]        mem_hi;
     logic [`DataBus]        mem_lo;
+    logic                   mem_rmem;
+    logic                   mem_wmem;
+    logic [31:0]            mem_mem_io_addr;
 
     // wb阶段的信号
     logic [`RegAddrBus]     wb_wd;
@@ -144,7 +156,7 @@ module datapath (
         .ex_wdata_i(ex_wdata[31:0]),
         .mem_we_i(mem_wreg),
         .mem_waddr_i(mem_wd),
-        .mem_wdata_i(mem_wdata[31:0]),
+        .mem_wdata_i(mem_wdata_o[31:0]),
         .wb_we_i(wb_wreg),
         .wb_waddr_i(wb_wd),
         .wb_wdata_i(wb_wdata[31:0]),
@@ -158,6 +170,9 @@ module datapath (
         .mf_lo_o(id_mf_lo),
         .branch_flag_o(id_branch_flag),
         .branch_to_addr_o(id_branch_to_addr),
+        .rmem_o(id_rmem),
+        .wmem_o(id_wmem),
+        .mem_io_addr_o(id_mem_io_addr),
         .wreg_o(id_wreg),
         .wd_o(id_wd)
     );
@@ -177,6 +192,9 @@ module datapath (
         .id_mt_lo_i(id_mt_lo),
         .id_mf_hi_i(id_mf_hi),
         .id_mf_lo_i(id_mf_lo),
+        .id_rmem_i(id_rmem),
+        .id_wmem_i(id_wmem),
+        .id_mem_io_addr_i(id_mem_io_addr),
         .exe_alu_sel_o(ex_alusel),
         .exe_alu_op_o(ex_aluop),
         .exe_reg1_o(ex_reg1),
@@ -186,7 +204,10 @@ module datapath (
         .exe_mt_hi_o(ex_mt_hi),
         .exe_mt_lo_o(ex_mt_lo),
         .exe_mf_hi_o(ex_mf_hi),
-        .exe_mf_lo_o(ex_mf_lo)
+        .exe_mf_lo_o(ex_mf_lo),
+        .exe_rmem_o(ex_rmem),
+        .exe_wmem_o(ex_wmem),
+        .exe_mem_io_addr_o(ex_mem_io_addr)
     );
 
     // EX阶段
@@ -221,13 +242,21 @@ module datapath (
         .ex_mt_lo_i(ex_mt_lo),
         .ex_mf_hi_i(ex_mf_hi),
         .ex_mf_lo_i(ex_mf_lo),
+        .ex_rmem_i(ex_rmem),
+        .ex_wmem_i(ex_wmem),
+        .ex_aluop_i(ex_aluop),
+        .ex_mem_io_addr_i(ex_mem_io_addr),
         .mem_wd_o(mem_wd),
         .mem_wreg_o(mem_wreg),
-        .mem_wdata_o(mem_wdata),
+        .mem_wdata_o(mem_wdata_i),
         .mem_mt_hi_o(mem_mt_hi),
         .mem_mt_lo_o(mem_mt_lo),
         .mem_mf_hi_o(mem_mf_hi),
-        .mem_mf_lo_o(mem_mf_lo)
+        .mem_mf_lo_o(mem_mf_lo),
+        .mem_rmem_o(mem_rmem),
+        .mem_wmem_o(mem_wmem),
+        .mem_aluop_o(mem_aluop),
+        .mem_mem_io_addr_o(mem_mem_io_addr)
     );
 
     // MEM阶段，负责进行访存操作
@@ -237,11 +266,22 @@ module datapath (
         .rst_i(rst_i),
         .wd_i(mem_wd),
         .wreg_i(mem_wreg),
-        .wdata_i(mem_wdata),
+        .wdata_i(mem_wdata_i),
         .mt_hi_i(mem_mt_hi),
         .mt_lo_i(mem_mt_lo),
+        .rmem_i(mem_rmem),
+        .wmem_i(mem_wmem),
+        .aluop_i(mem_aluop),
+        .ram_data_i(ram_data_i),
+        .mem_io_addr_i(mem_mem_io_addr),
         .hi_o(mem_hi),
-        .lo_o(mem_lo)
+        .lo_o(mem_lo),
+        .wdata_o(mem_wdata_o),
+        .ram_wdata_o(ram_wdata_o),
+        .ram_addr_o(ram_addr_o),
+        .ram_sel_o(ram_sel_o),
+        .ram_we_o(ram_we_o),
+        .ram_ce_o(ram_ce_o)
     );
 
     // 从MEM到WB的信号传递
@@ -251,7 +291,7 @@ module datapath (
         .stall_i(mem2wb_stall),
         .mem_wd_i(mem_wd),
         .mem_wreg_i(mem_wreg),
-        .mem_wdata_i(mem_wdata),
+        .mem_wdata_i(mem_wdata_o),
         .wb_wd_o(wb_wd),
         .wb_wreg_o(wb_wreg),
         .wb_wdata_o(wb_wdata)

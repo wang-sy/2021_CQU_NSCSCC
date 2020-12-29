@@ -78,6 +78,10 @@ module alu (
         .result(div_res),
         .ready(div_ready)
     );
+
+    wire [31:0] load_store_res =(aluop_i == `EXE_SB_OP) ? reg2_i :
+                                (aluop_i == `EXE_SH_OP) ? reg2_i :
+                                (aluop_i == `EXE_SW_OP) ? reg2_i : `ZeroWord;
     
     assign ok_o =   (rst_i == 1'b1) ? 1'b1 : 
                     (div_ena == 1'b1 && div_ready == 1'b0) ? 1'b0 : 1'b1;
@@ -87,6 +91,7 @@ module alu (
                         (alusel_i == `EXE_RES_LOGIC) ? {logic_res, logic_res} : 
                         (alusel_i == `EXE_RES_SHIFT) ? {shift_res, shift_res} :
                         (alusel_i == `EXE_RES_MOVE ) ? {move_res, move_res}  :
+                        (alusel_i == `EXE_RES_LOAD_STORE) ? {load_store_res, load_store_res} : 
                         (alusel_i == `EXE_RES_ARITHMETIC) ? (
                             (overflow == 1'b0) ? {arithmetic_res, arithmetic_res} : {`ZeroWord, `ZeroWord}
                         ) : (alusel_i == `EXE_RES_MUL) ? mul_res :
