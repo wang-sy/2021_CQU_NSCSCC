@@ -28,6 +28,8 @@ module ID(
     input logic         wb_we_i,
     input logic  [4:0]  wb_waddr_i,
     input logic  [31:0] wb_wdata_i,
+
+    input logic         is_in_delayslot_i,
     
     // //输出
     output logic [7:0]  aluop_o,
@@ -47,7 +49,10 @@ module ID(
     output logic [4:0]  wd_o,  //write destination
     
     output logic [31:0] exception_o, //指明异常类型
-    output logic [31:0] current_instr_addr_o //指明当前的指令地址
+    output logic [31:0] current_instr_addr_o, //指明当前的指令地址
+    output logic        is_in_delayslot_o,
+    output logic        next_is_in_delayslot_o
+
 );
 
     //寄存器堆接收到的信号
@@ -83,6 +88,8 @@ module ID(
     // 当前指令为立即数指令，或是需要使用指令中的数字作为操作数的时候
     // 就使用本资源
     wire [31:0] special_num;
+
+    assign is_in_delayslot_o = is_in_delayslot_i;
 
     assign exception_o          = { 19'b0, except_type_is_eret, instr_valid, except_type_is_syscall, 8'b0};
     assign current_instr_addr_o = pc_i;

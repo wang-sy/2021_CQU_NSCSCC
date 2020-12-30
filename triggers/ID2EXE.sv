@@ -18,6 +18,9 @@ module id2exe(
     input logic             flush_i,//qf
     input logic   [31:0]    id_exception_i,//qf
     input logic   [31:0]    id_current_instr_addr_i,//qf
+    input logic             id_in_delayslot_i, //qf
+
+    input logic             next_is_in_delayslot_i,//qf   //传回给ID级
 
     output logic  [2:0]     exe_alu_sel_o,
     output logic  [7:0]     exe_alu_op_o,
@@ -32,6 +35,12 @@ module id2exe(
 
     output logic  [31:0]    ex_exception_o,//qf
     output logic  [31:0]    ex_current_instr_addr_o//qf
+    output logic            ex_in_delayslot_o,//qf
+
+    output logic            is_in_delayslot_o//qf  //传回给ID级
+
+
+
 );
 
 always@(posedge clk) begin
@@ -89,6 +98,10 @@ always@(posedge clk) begin
         //异常信息
         ex_exception_o           <=  id_exception_i;
         ex_current_instr_addr_o  <=  id_current_instr_addr_i;
+        //传给EX级的
+        ex_in_delayslot_o        <=  id_in_delayslot_o;
+        //传回给ID级  //改为直接保存在ID级的寄存器中，就不用传来传去的了
+        is_in_delayslot_o        <=  next_is_in_delayslot_i;
     end
 end
 

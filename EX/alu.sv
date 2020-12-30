@@ -9,6 +9,7 @@ module alu (
     input logic [`DataBus]      hi_i,
     input logic [`DataBus]      lo_i,
 
+    input logic                 is_in_delayslot_i,//qf
     input logic [`DataBus]      exception_type_i,//qf
     input logic [`DataBus]      current_instr_addr_i,//qf
     
@@ -53,6 +54,26 @@ assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_excepti
                                                 ( aluop_i ==  `EXE_BGEZAL_OP|| aluop_i ==  `EXE_BLTZAL_OP   ) ? ({1'b0, reg2_i}) : ({1'b0, `ZeroWord});
 
     wire overflow = (aluop_i == `EXE_ADD_OP || aluop_i == `EXE_ADDI_OP || aluop_i ==  `EXE_SUB_OP) & (overflow_byte ^ arithmetic_res[31]);
+    
+//////////////////////////////////////此处使用的leisilei的判断方法，将改为更加简单快速的判断///////////////////
+	assign logic reg1_lt_reg2 =  ((aluop_i == `EXE_SLT_OP)     || (aluop_i == `EXE_TLT_OP) ||         /////
+	                              (aluop_i == `EXE_TLTI_OP)    || (aluop_i == `EXE_TGE_OP) ||         /////
+	                              (aluop_i == `EXE_TGEI_OP))   ?                                      /////
+						          ((reg1_i[31] && !reg2_i[31]) ||                                     /////
+							      (!reg1_i[31] && !reg2_i[31]  && result_sum[31])          ||         /////
+			                      (reg1_i[31] && reg2_i[31]    && result_sum[31]))                    /////
+			                     :(reg1_i < reg2_i);                                                 /////
+//////////////////////////////////////此处将改为更加简单快速的判断///////////////////////////////////////////
+
+    //算术溢出
+    assign overflow_exception = overflow;
+
+    // Trap指令运算
+    assign trap_exception = rst   ==   1'b1 ? 1'b0 : 
+                            ((aluop_i==`EXE_TEQ_OP||aluop_i==`EXE_TEQI_OP)&&(reg1_i == reg2_i)) ? 1'b1 : 
+                            ((aluop_i==`EXE_TGE_OP||aluop_i==`EXE_TGEI_OP||aluop_i==`EXE_TGEIU_OP||aluop_i==`EXE_TGEU_OP)&&reg1_lt_reg2==1'b0) ? 1'b1:
+                            ((aluop_i==`EXE_TLT_OP||aluop_i==`EXE_TLTI_OP||aluop_i==`EXE_TLTIU_OP||aluop_i==`EXE_TLTU_OP)&&reg1_lt_reg2==1'b1) ? 1'b1:
+                            ((aluop_i==`EXE_TNE_OP||aluop_i==`EXE_TNEI_OP)&&reg1_i != reg2_i) ? 1'b1 : 1'b0;
 
     // 这一部分是临时存在的，为了应付带符号乘法的测试
     // 在后期会将其替换为多周期乘法器以提升频率
