@@ -13,7 +13,7 @@ module exception(
 
 assign excepttype = rst==1'b1 ? 32'b0 : 
                     (((cp0_cause[15:8] & cp0_status[15:8]) != 8'h00) &&(cp0_status[1] == 1'b0) && (cp0_status[0] == 1'b1))==1'b1 ? 32'h00000001 : 
-                    (except[7] == 1'b1 || adel)==1'b1?32'h00000004 :
+                    (except[7] == 1'b1 || adel == 1'b1)==1'b1?32'h00000004 :
                     ades==1'b1?32'h00000005 :
                     Trap==1'b1?32'h0000000d :
                     CpU==1'b1?32'h0000000b :

@@ -2,12 +2,15 @@
 `include "id_defines.vh"
 //encoding:UTF-8
 module ID(
+
     // //输入
     input logic         clk,
     input logic         rst,
+
     //从IF/ID接收到信号
     input logic [31:0]  pc_i,
     input logic [31:0]  inst_i,
+
     //WB级传输进来的信号
     input logic         we_i,
     input logic  [4:0]  waddr_i,
@@ -17,15 +20,15 @@ module ID(
     input logic         ex_we_i,
     input logic  [4:0]  ex_waddr_i,
     input logic  [31:0] ex_wdata_i,
+
     input logic         mem_we_i,
     input logic  [4:0]  mem_waddr_i,
     input logic  [31:0] mem_wdata_i,
+
     input logic         wb_we_i,
     input logic  [4:0]  wb_waddr_i,
     input logic  [31:0] wb_wdata_i,
     
-
-
     // //输出
     output logic [7:0]  aluop_o,
     output logic [2:0]  alusel_o,
@@ -41,7 +44,10 @@ module ID(
     output logic [31:0] branch_to_addr_o,
 
     output logic        wreg_o, //是否有数据要写寄存器
-    output logic [4:0]  wd_o  //write destination
+    output logic [4:0]  wd_o,  //write destination
+    
+    output logic [31:0] exception_o, //指明异常类型
+    output logic [31:0] current_instr_addr_o //指明当前的指令地址
 );
 
     //寄存器堆接收到的信号
@@ -51,10 +57,13 @@ module ID(
     logic [31:0] harzrd_reg1_data;
     logic [31:0] harzrd_reg2_data;
 
+    logic        except_type_is_syscall; 
+    loguc        except_type_is_eret;
+    logic        instr_valid;
 
     //读寄存器
-    wire        reg1_read; //是否读寄存器1
-    wire        reg2_read;
+    wire         reg1_read; //是否读寄存器1
+    wire         reg2_read;
 
     //定义指令字段信号
     //op   re   rt  immediate
@@ -74,6 +83,9 @@ module ID(
     // 当前指令为立即数指令，或是需要使用指令中的数字作为操作数的时候
     // 就使用本资源
     wire [31:0] special_num;
+
+    assign exception_o          = { 19'b0, except_type_is_eret, instr_valid, except_type_is_syscall, 8'b0};
+    assign current_instr_addr_o = pc_i;
 
     regfile id_regfile(
         .clk(clk),
@@ -107,6 +119,7 @@ module ID(
         .wb_we_i(wb_we_i),
         .wb_waddr_i(wb_waddr_i),
         .wb_wdata_i(wb_wdata_i),
+
         .rdata1_o(harzrd_reg1_data),
         .rdata2_o(harzrd_reg2_data)
     );
@@ -142,7 +155,10 @@ module ID(
         mf_hi_o,
         mf_lo_o,
         branch_flag_o,
-        branch_to_addr_o
+        branch_to_addr_o,
+        except_type_is_syscall,
+        except_type_is_eret,
+        instr_valid
     } = (rst == 1'b1    ) ? `INIT_DECODE : (
         (op == `EXE_ORI)    ? `ORI_DECODE   :
         (op == `EXE_ANDI)   ? `ANDI_DECODE  :
@@ -196,7 +212,16 @@ module ID(
             (sel == `EXE_DIVU)  ? `DIVU_DECODE  : 
             // special 直接跳转指令
             (sel == `EXE_JR)    ? `JR_DECODE    :
-            (sel == `EXE_JALR)  ? `JALR_DECODE  : `INIT_DECODE
+            (sel == `EXE_JALR)  ? `JALR_DECODE  : 
+            //寄存器相互比较多trap指令
+            (sel == `EXE_TEQ)     ?   `TEQ_DECODE     :
+            (sel == `EXE_TGE)     ?   `TGE_DECODE     :
+            (sel == `EXE_TGEU)    ?   `RGEU_DECODE    :
+            (sel == `EXE_TLT)     ?   `TLT_DECODE     :
+            (sel == `EXE_TLTU)    ?   `TLTU_DECODE    :
+            (sel == `EXE_TNE)     ?   `TNE_DECODE     :
+            //系统调用指令
+            (sel == `EXE_SYSCALL) ?   `SYSCALL_DECODE : `INIT_DECODE
         ) : (op == `EXE_SPECIAL2_INST) ? (
             // special2 中的mul指令
             (sel == `EXE_MUL) ? `MUL_DECODE : `INIT_DECODE
@@ -205,8 +230,15 @@ module ID(
             (rt == `EXE_BGEZ    ) ? `BGEZ_DECODE    : 
             (rt == `EXE_BGEZAL  ) ? `BGEZAL_DECODE  : 
             (rt == `EXE_BLTZ    ) ? `BLTZ_DECODE    : 
-            (rt == `EXE_BLTZAL  ) ? `BLTZAL_DECODE  : `INIT_DECODE
-        ) : `INIT_DECODE
+            (rt == `EXE_BLTZAL  ) ? `BLTZAL_DECODE  :
+            // 和立即数比较多trap指令
+            (rt == `EXE_TEQI    ) ? `TEQI_DECODE    :
+            (rt == `EXE_TGEI    ) ? `TGEI_DECODE    :
+            (rt == `EXE_TGEIU   ) ? `TGEIU_DECODE   :
+            (rt == `EXE_TLTI    ) ? `TLTI_DECODE    :
+            (rt == `EXE_TLTIU   ) ? `TLTIU_DECODE   :
+            (rt == `EXE_TNEI    ) ? `TNEI_DECODE    : `INIT_DECODE
+        ) : (inst_i==`EXE_ERET ? `ERET_DECODE: `INIT_DECODE) : `INIT_DECODE
     );
 
     assign reg1_o = (rst == 1'b1) ? `ZeroWord : 

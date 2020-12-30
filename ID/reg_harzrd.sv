@@ -10,12 +10,15 @@ module reg_harzrd (
     input logic             ex_we_i,
     input logic     [4:0]   ex_waddr_i,
     input logic     [31:0]  ex_wdata_i,
+
     input logic             mem_we_i,
     input logic     [4:0]   mem_waddr_i,
     input logic     [31:0]  mem_wdata_i,
+
     input logic             wb_we_i,
     input logic     [4:0]   wb_waddr_i,
     input logic     [31:0]  wb_wdata_i,
+
     // 读取到的结果
     output logic    [31:0]  rdata1_o,
     output logic    [31:0]  rdata2_o
@@ -38,7 +41,4 @@ module reg_harzrd (
                         (mem_we_i == 1'b1 && mem_waddr_i == reg_addr2_i) ? mem_wdata_i : 
                         (wb_we_i == 1'b1 && wb_waddr_i == reg_addr2_i) ? wb_wdata_i : reg_data2_i;
 
-
-                        
-    
 endmodule

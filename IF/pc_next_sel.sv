@@ -7,6 +7,8 @@ module pc_next_sel (
     input logic         clk_i,
     input logic         rst_i,
     input logic [31:0]  pc_i,
+    input logic         flush_i, //qf
+    input logic [31:0]  new_pc_i,//qf
     input logic         branch_flag_i,
     input logic [31:0]  branch_to_addr_i,
 
@@ -14,5 +16,6 @@ module pc_next_sel (
 );
 
     assign pc_o =   (rst_i == 1'b1) ? `ZeroWord :
+                    (flush_i==1'b1) ? new_pc_i://qf
                     (branch_flag_i == 1'b1) ? branch_to_addr_i : pc_i + 32'd4;
 endmodule

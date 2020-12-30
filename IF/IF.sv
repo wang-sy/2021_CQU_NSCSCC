@@ -6,6 +6,8 @@ module IF (
     input logic         clk_i,
     input logic         rst_i,
     input logic         stall_i,
+    input logic         flush_i, //qf
+    input logic [31:0]  new_pc_i, //qf
 
     input logic         branch_flag_i,
     input logic [31:0]  branch_to_addr_i,
@@ -31,6 +33,8 @@ module IF (
         .clk_i(clk_i),
         .rst_i(rst_i),
         .pc_i(pc_o),
+        .flush_i(flush_i),//qf
+        .new_pc_i(new_pc_i),//qf
         .branch_flag_i(branch_flag_i),
         .branch_to_addr_i(branch_to_addr_i),
         .pc_o(pc_next)

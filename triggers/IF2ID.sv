@@ -11,6 +11,8 @@ module IF2ID (
     input logic [31:0]  if_pc_i,
     input logic [31:0]  if_inst_i,
 
+    input logic         flush_i,  //qf
+
     output logic [31:0] id_pc_o,
     output logic [31:0] id_inst_o
 );
@@ -20,6 +22,10 @@ module IF2ID (
             id_pc_o <= `ZeroWord;
             id_inst_o <= `ZeroWord;
         end
+        else if(flush_i==1'b1) begin  //qf
+            id_pc_o <= `ZeroWord;//qf
+            id_inst_o <= `ZeroWord;//qf
+        end //qf
         else if (stall_i == 1'b1) begin
             id_pc_o <= id_pc_o;
             id_inst_o <= id_inst_o;
