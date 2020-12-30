@@ -14,5 +14,6 @@ module pc_next_sel (
 );
 
     assign pc_o =   (rst_i == 1'b1) ? `ZeroWord :
+                    (flush_i==1'b1) ? new_pc_i://qf
                     (branch_flag_i == 1'b1) ? branch_to_addr_i : pc_i + 32'd4;
 endmodule

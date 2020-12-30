@@ -26,6 +26,8 @@ module ID(
     input logic  [4:0]  wb_waddr_i,
     input logic  [31:0] wb_wdata_i,
 
+    input logic         is_in_delayslot_i,  //qf
+
     // //输出
     output logic [4:0]  rs_o,
     output logic [4:0]  rt_o,
@@ -49,8 +51,27 @@ module ID(
     output logic [31:0] mem_io_addr_o,
 
     output logic        wreg_o, //是否有数据要写寄存器
-    output logic [4:0]  wd_o  //write destination
+    output logic [4:0]  wd_o,  //write destination
+
+    output logic [31:0] exception_o, //指明异常类型  //qf
+    output logic [31:0] current_instr_addr_o, //指明当前的指令地址  //qf
+    output logic        is_in_delayslot_o,//qf
+    output logic        next_is_in_delayslot_o,//qf
+
+    output logic [4:0]  rd_o
 );
+
+    assign is_in_delayslot_o = is_in_delayslot_i;//qf
+    assign current_instr_addr_o = pc_i;  //qf
+    assign next_is_in_delayslot_o = branch_flag_o;
+    assign rd_o = rd; 
+
+    logic        except_type_is_syscall; //qf
+    loguc        except_type_is_eret;//qf
+    logic        instr_valid;//qf
+
+    assign exception_o  = { 19'b0, except_type_is_eret, 2'b0, instr_valid, except_type_is_syscall, 8'b0};
+
 
     //寄存器堆接收到的信号
     logic [31:0] reg1_data;
@@ -154,7 +175,10 @@ module ID(
         branch_to_addr_o,
         rmem_o,
         wmem_o,
-        mem_io_addr_o
+        mem_io_addr_o,
+        except_type_is_syscall,
+        except_type_is_eret,
+        instr_valid
     } = (rst == 1'b1    ) ? `INIT_DECODE : (
         (op == `EXE_ORI)    ? `ORI_DECODE   :
         (op == `EXE_ANDI)   ? `ANDI_DECODE  :
@@ -216,7 +240,18 @@ module ID(
             (sel == `EXE_DIVU)  ? `DIVU_DECODE  : 
             // special 直接跳转指令
             (sel == `EXE_JR)    ? `JR_DECODE    :
-            (sel == `EXE_JALR)  ? `JALR_DECODE  : `INIT_DECODE
+            (sel == `EXE_JALR)  ? `JALR_DECODE  :
+
+            //寄存器相互比较多trap指令
+            (sel == `EXE_TEQ)     ?   `TEQ_DECODE     :
+            (sel == `EXE_TGE)     ?   `TGE_DECODE     :
+            (sel == `EXE_TGEU)    ?   `RGEU_DECODE    :
+            (sel == `EXE_TLT)     ?   `TLT_DECODE     :
+            (sel == `EXE_TLTU)    ?   `TLTU_DECODE    :
+            (sel == `EXE_TNE)     ?   `TNE_DECODE     :
+            //系统调用指令
+            (sel == `EXE_SYSCALL) ?   `SYSCALL_DECODE : `INIT_DECODE
+
         ) : (op == `EXE_SPECIAL2_INST) ? (
             // special2 中的mul指令
             (sel == `EXE_MUL) ? `MUL_DECODE : `INIT_DECODE
@@ -225,8 +260,18 @@ module ID(
             (rt == `EXE_BGEZ    ) ? `BGEZ_DECODE    : 
             (rt == `EXE_BGEZAL  ) ? `BGEZAL_DECODE  : 
             (rt == `EXE_BLTZ    ) ? `BLTZ_DECODE    : 
-            (rt == `EXE_BLTZAL  ) ? `BLTZAL_DECODE  : `INIT_DECODE
-        ) : `INIT_DECODE
+            (rt == `EXE_BLTZAL  ) ? `BLTZAL_DECODE  :
+            // 和立即数比较多trap指令
+            (rt == `EXE_TEQI    ) ? `TEQI_DECODE    :
+            (rt == `EXE_TGEI    ) ? `TGEI_DECODE    :
+            (rt == `EXE_TGEIU   ) ? `TGEIU_DECODE   :
+            (rt == `EXE_TLTI    ) ? `TLTI_DECODE    :
+            (rt == `EXE_TLTIU   ) ? `TLTIU_DECODE   :
+            (rt == `EXE_TNEI    ) ? `TNEI_DECODE    : `INIT_DECODE
+        ) : (inst_i==`EXE_ERET ? `ERET_DECODE: `INIT_DECODE) : 
+            //MFCO MFT0
+            (inst_i[31:21]==11'b01000000000 && inst_i[10:0]==11'b0000000000) ? `MFC0_DECODE : 
+            (inst_i[31:21]==11'b01000000100 && inst_i[10:0]==11'b0000000000) ? `MFT0_DECODE : `INIT_DECODE
     );
 
     assign {rs_o, rt_o, reg1_read_o, reg2_read_o} = {rs, rt, reg1_read, reg2_read};
