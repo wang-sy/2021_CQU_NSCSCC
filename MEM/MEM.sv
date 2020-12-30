@@ -16,17 +16,17 @@ module MEM (
     input logic [`DataBus]      ram_data_i,
     input logic [31:0]          mem_io_addr_i,
 
-    input logic [`RegAddrBus]   exception_type_i,
-    input logic [`RegAddrBus]   current_instr_addr_i,
-    input logic                 is_in_delayslot_i,
+    input logic [`RegAddrBus]   exception_type_i,  //qf
+    input logic [`RegAddrBus]   current_instr_addr_i,  //qf
+    input logic                 is_in_delayslot_i,  //qf
 
-	input logic [`RegAddrBus]   cp0_status_i,
-	input logic [`RegAddrBus]   cp0_cause_i,
-	input logic [`RegAddrBus]   cp0_epc_i,
+	input logic [`RegAddrBus]   cp0_status_i,  //qf
+	input logic [`RegAddrBus]   cp0_cause_i,  //qf
+	input logic [`RegAddrBus]   cp0_epc_i,  //qf
 
-    input logic                 wb_cp0_reg_we,
-	input logic [4:0]           wb_cp0_reg_write_addr,
-	input logic [`RegAddrBus]   wb_cp0_reg_data,
+    input logic                 wb_cp0_reg_we,  //qf
+	input logic [4:0]           wb_cp0_reg_write_addr,  //qf
+	input logic [`RegAddrBus]   wb_cp0_reg_data,  //qf
 
 
     output logic[`DataBus]      hi_o,
@@ -38,11 +38,11 @@ module MEM (
     output logic                ram_we_o,
     output logic                ram_ce_o,
 
-    output logic[31:0]          exception_type_o,
-	output logic[`RegAddrBus]   current_instr_address_o,
+    output logic[31:0]          exception_type_o,  //qf
+	output logic[`RegAddrBus]   current_instr_address_o,  //qf
 
-	output logic                is_in_delayslot_o,
-	output logic[`RegAddrBus]   cp0_epc_o
+	output logic                is_in_delayslot_o,  //qf
+	output logic[`RegAddrBus]   cp0_epc_o  //qf
 
 );
 

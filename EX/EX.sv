@@ -15,9 +15,20 @@ module EX (
     input logic [`DataBus]      hi_i,
     input logic [`DataBus]      lo_i,
 
+    input logic [`DataBus]      exception_type_i,//qf
+    input logic [`DataBus]      current_instr_addr_i,//qf
+    input logic                 is_in_delayslot_i,//qf
+
     output logic                ok_o,
-    output logic [`DoubleRegBus]wdata_o
+    output logic [`DoubleRegBus]wdata_o,
+
+    output logic [`DataBus]     exception_type_o,//qf
+    output logic [`DataBus]     current_instr_addr_o,//qf
+    output logic                is_in_delayslot_o//qf
+
 );
+    assign current_instr_addr_o = current_instr_addr_o;  //qf
+    assign is_in_delayslot_o    = is_in_delayslot_i;  //qf
 
     logic [`DataBus] alu_data1;
     logic [`DataBus] alu_data2;
@@ -51,8 +62,11 @@ module EX (
         .reg2_i(alu_data2),
         .hi_i(hi_i),
         .lo_i(lo_i),
+        .exception_type_i(exception_type_i),//qf
         .ok_o(ok_o),
-        .wdata_o(wdata_o)
+        .wdata_o(wdata_o),
+        .exception_type_o(exception_type_o),//qf
+
     );
 
 endmodule

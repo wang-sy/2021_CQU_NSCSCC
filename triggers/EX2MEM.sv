@@ -12,10 +12,10 @@ module EX2MEM (
     input logic                 ex_mf_hi_i,
     input logic                 ex_mf_lo_i,
 
-    input logic                 flush_i,
-    input logic [`RegAddrBus]   ex_exception_type_i,
-    input logic [`RegAddrBus]   ex_current_instr_addr_i,
-    input logic                 ex_is_in_delayslot,
+    input logic                 flush_i,  //qf
+    input logic [`RegAddrBus]   ex_exception_type_i,//qf
+    input logic [`RegAddrBus]   ex_current_instr_addr_i,//qf
+    input logic                 ex_is_in_delayslot,//qf
 
     output logic [`RegAddrBus]  mem_wd_o,
     output logic                mem_wreg_o,
@@ -71,6 +71,11 @@ module EX2MEM (
             mem_mt_lo_o <= ex_mt_lo_i;
             mem_mf_hi_o <= ex_mf_hi_i;
             mem_mf_lo_o <= ex_mf_lo_i;
+
+            mem_exception_type_o     <= ex_exception_type_i;
+            mem_current_instr_addr_o <= ex_current_instr_addr_i;
+            mem_is_in_delayslot      <= ex_is_in_delayslot;
+
         end
     end
 endmodule

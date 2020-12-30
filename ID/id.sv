@@ -29,7 +29,7 @@ module ID(
     input logic  [4:0]  wb_waddr_i,
     input logic  [31:0] wb_wdata_i,
 
-    input logic         is_in_delayslot_i,
+    input logic         is_in_delayslot_i,  //qf
     
     // //输出
     output logic [7:0]  aluop_o,
@@ -48,10 +48,10 @@ module ID(
     output logic        wreg_o, //是否有数据要写寄存器
     output logic [4:0]  wd_o,  //write destination
     
-    output logic [31:0] exception_o, //指明异常类型
-    output logic [31:0] current_instr_addr_o, //指明当前的指令地址
-    output logic        is_in_delayslot_o,
-    output logic        next_is_in_delayslot_o
+    output logic [31:0] exception_o, //指明异常类型  //qf
+    output logic [31:0] current_instr_addr_o, //指明当前的指令地址  //qf
+    output logic        is_in_delayslot_o,//qf
+    output logic        next_is_in_delayslot_o//qf
 
 );
 

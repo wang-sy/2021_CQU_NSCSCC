@@ -90,23 +90,37 @@ module datapath (
     logic                   ex2mem_stall;
     logic                   mem2wb_stall;
 
-    stall_controller datapath_stall_controller(
+    logic flush;  //qf
+    logic new_pc; //qf
+
+    stall_flush_controller datapath_stall_flush_controller(
+        .rst_i(rst_i),
         .ex_ok_i(ex_ok),
+        .cp0_epc_i(),
+        .exception_type_i(),
         .if2id_stall_o(if2id_stall),
         .if_stall_o(if_stall),
         .id2ex_stall_o(id2ex_stall),
         .ex2mem_stall_o(ex2mem_stall),
-        .mem2wb_stall_o(mem2wb_stall)
+        .mem2wb_stall_o(mem2wb_stall),
+        .flush(flush),
+        .new_pc(new_pc)
     );
     
 
     // IF为取指令模块，主要负责对PC进行更新
     // IF模块会与指令寄存器（ROM）进行交互
     // 交互后，会获取到rom_data_i，即：当前pc对应的指令
+
+    // logic flush;  //qf
+    // logic new_pc; //qf
+
     IF datapath_if(
         .clk_i(clk_i),
         .rst_i(rst_i),
         .stall_i(if_stall),
+        .flush_i(flush),  //qf
+        .new_pc_i(new_pc),  //qf  flush后的pc
         .branch_flag_i(id_branch_flag),
         .branch_to_addr_i(id_branch_to_addr),
         .pc_o(rom_addr_o),
@@ -120,6 +134,7 @@ module datapath (
         .stall_i(if2id_stall),
         .if_pc_i(rom_addr_o),
         .if_inst_i(rom_data_i),
+        .flush_i(flush),//qf
         .id_pc_o(id_pc),
         .id_inst_o(id_inst)
     );
@@ -131,6 +146,13 @@ module datapath (
     //  - 对寄存器进行读取
     //  - 对下一跳可能的值进行计算
     //  - 根据wb阶段返回的信号对寄存器进行修改
+    logic [31:0] exception_id;
+    logic [31:0] current_instr_addr_id;
+    logic        is_in_delayslot_id;
+    logic        next_is_in_delayslot_id;
+
+    logic is_in_delayslot_exe2id;
+
     ID datapath_id(
         .clk(clk_i),
         .rst(rst_i),
@@ -148,6 +170,7 @@ module datapath (
         .wb_we_i(wb_wreg),
         .wb_waddr_i(wb_wd),
         .wb_wdata_i(wb_wdata[31:0]),
+        .is_in_delayslot_i(is_in_delayslot_exe2id),  //qf   //从ID/EXE接收
         .aluop_o(id_aluop),
         .alusel_o(id_alusel),
         .reg1_o(id_reg1),
@@ -159,7 +182,12 @@ module datapath (
         .branch_flag_o(id_branch_flag),
         .branch_to_addr_o(id_branch_to_addr),
         .wreg_o(id_wreg),
-        .wd_o(id_wd)
+        .wd_o(id_wd),
+
+        .exception_o(exception_id), //qf
+        .current_instr_addr_o(current_instr_addr_id), //qf
+        .is_in_delayslot_o(is_in_delayslot_id), //qf
+        .next_is_in_delayslot_o(next_is_in_delayslot_id) //qf
     );
 
     // 从ID到EX的信号传递
@@ -177,6 +205,11 @@ module datapath (
         .id_mt_lo_i(id_mt_lo),
         .id_mf_hi_i(id_mf_hi),
         .id_mf_lo_i(id_mf_lo),
+        .flush_i(flush),  //qf
+        .id_exception_i(exception_id), //qf
+        .id_current_instr_addr_i(current_instr_addr_id), //qf
+        .id_in_delayslot_i(is_in_delayslot_id), //qf
+        .next_is_in_delayslot_i(next_is_in_delayslot_id), //qf
         .exe_alu_sel_o(ex_alusel),
         .exe_alu_op_o(ex_aluop),
         .exe_reg1_o(ex_reg1),
@@ -186,12 +219,20 @@ module datapath (
         .exe_mt_hi_o(ex_mt_hi),
         .exe_mt_lo_o(ex_mt_lo),
         .exe_mf_hi_o(ex_mf_hi),
-        .exe_mf_lo_o(ex_mf_lo)
+        .exe_mf_lo_o(ex_mf_lo),
+        .ex_exception_o(exception_type_EX), //qf
+        .ex_current_instr_addr_o(current_instr_addr_EX), //qf
+        .ex_in_delayslot_o(is_in_delayslot_EX), //qf
+        .is_in_delayslot_o(is_in_delayslot_exe2id) //qf
     );
 
     // EX阶段
     // 负责接收ID阶段的译码结果以及读取的寄存器的值
     // 并且通过译码结果进行选择，对读出的寄存器进行不同的运算，将结果写入ex_wdata
+    logic [`DataBus]      exception_type_EX;//qf
+    logic [`DataBus]      current_instr_addr_EX;//qf
+    logic                 is_in_delayslot_EX;//qf
+
     EX datapath_ex(
         .clk_i(clk_i),
         .rst_i(rst_i),
@@ -205,11 +246,21 @@ module datapath (
         .mf_lo_i(ex_mf_lo),
         .hi_i(mem_hi),
         .lo_i(mem_lo),
+        .exception_type_i(exception_type_EX),  //qf
+        .current_instr_addr_i(current_instr_addr_EX), //qf
+        .is_in_delayslot_i(is_in_delayslot_EX),  //qf
         .ok_o(ex_ok),
-        .wdata_o(ex_wdata)
+        .wdata_o(ex_wdata),
+        .exception_type_o(ex_exception_type_ex2mem),  //qf
+        .current_instr_addr_o(ex_current_instr_addr_ex2mem), //qf
+        .is_in_delayslot_o(ex_is_in_delayslot_ex2mem),  //qf
     );
 
     // 从EX到MEM的信号传递
+    logic [`RegAddrBus]   ex_exception_type_ex2mem;//qf
+    logic [`RegAddrBus]   ex_current_instr_addr_ex2mem;//qf
+    logic                 ex_is_in_delayslot_ex2mem;//qf
+
     EX2MEM datapath_ex2mem(
         .clk_i(clk_i),
         .rst_i(rst_i),
@@ -221,13 +272,23 @@ module datapath (
         .ex_mt_lo_i(ex_mt_lo),
         .ex_mf_hi_i(ex_mf_hi),
         .ex_mf_lo_i(ex_mf_lo),
+
+        .flush_i(flush),  //qf
+        .ex_exception_type_i(ex_exception_type_ex2mem),//qf
+        .ex_current_instr_addr_i(ex_current_instr_addr_ex2mem),//qf
+        .ex_is_in_delayslot(ex_is_in_delayslot_ex2mem),//qf
+
         .mem_wd_o(mem_wd),
         .mem_wreg_o(mem_wreg),
         .mem_wdata_o(mem_wdata),
         .mem_mt_hi_o(mem_mt_hi),
         .mem_mt_lo_o(mem_mt_lo),
         .mem_mf_hi_o(mem_mf_hi),
-        .mem_mf_lo_o(mem_mf_lo)
+        .mem_mf_lo_o(mem_mf_lo),
+
+        .mem_exception_type_o(),
+        .mem_current_instr_addr_o(),
+        .mem_is_in_delayslot()
     );
 
     // MEM阶段，负责进行访存操作

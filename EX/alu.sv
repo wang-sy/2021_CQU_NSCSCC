@@ -9,22 +9,18 @@ module alu (
     input logic [`DataBus]      hi_i,
     input logic [`DataBus]      lo_i,
 
-    input logic                 is_in_delayslot_i,//qf
     input logic [`DataBus]      exception_type_i,//qf
-    input logic [`DataBus]      current_instr_addr_i,//qf
     
     output logic                ok_o,
     output logic [`DoubleRegBus]wdata_o,
 
     output logic [`DataBus]     exception_type_o,//qf
-    output logic [`DataBus]     current_instr_addr_o,//qf
-    output logic                is_in_delayslot_o//qf
 );
 
 logic trap_exception;  //自陷异常
 logic overflow_exception; //溢出异常
 
-assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_exception，exception_type_i[9:8],8'b0};
+assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_exception,exception_type_i[9:8],8'b0};
 
 //                              条件                            结果
     wire [31:0]logic_res = ( aluop_i == `EXE_ORI_OP  || aluop_i == `EXE_OR_OP )   ? (reg1_i | reg2_i   )  :
