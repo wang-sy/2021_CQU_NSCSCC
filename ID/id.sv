@@ -179,7 +179,7 @@ module ID(
         except_type_is_syscall,
         except_type_is_eret,
         instr_valid
-    } = (rst == 1'b1    ) ? `INIT_DECODE : (
+    } = (rst == 1'b1    )   ? `INIT_DECODE  : (
         (op == `EXE_ORI)    ? `ORI_DECODE   :
         (op == `EXE_ANDI)   ? `ANDI_DECODE  :
         (op == `EXE_XORI)   ? `XORI_DECODE  :
@@ -245,7 +245,7 @@ module ID(
             //寄存器相互比较多trap指令
             (sel == `EXE_TEQ)     ?   `TEQ_DECODE     :
             (sel == `EXE_TGE)     ?   `TGE_DECODE     :
-            (sel == `EXE_TGEU)    ?   `RGEU_DECODE    :
+            // (sel == `EXE_TGEU)    ?   `RGEU_DECODE    :
             (sel == `EXE_TLT)     ?   `TLT_DECODE     :
             (sel == `EXE_TLTU)    ?   `TLTU_DECODE    :
             (sel == `EXE_TNE)     ?   `TNE_DECODE     :

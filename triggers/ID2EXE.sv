@@ -43,7 +43,7 @@ module id2exe(
     output logic  [31:0]    exe_mem_io_addr_o,
 
     output logic  [31:0]    ex_exception_o,//qf
-    output logic  [31:0]    ex_current_instr_addr_o//qf
+    output logic  [31:0]    ex_current_instr_addr_o,//qf
     output logic            ex_in_delayslot_o,//qf
     output logic            is_in_delayslot_o,//qf  //传回给ID级
     output logic   [4:0 ]   rd_o

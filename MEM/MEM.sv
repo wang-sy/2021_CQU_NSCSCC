@@ -67,14 +67,14 @@ module MEM (
     logic [`RegAddrBus] CP0_Epc_Newest;
     
     //最新的Staus寄存器
-    assign CP0_Status_Newest = rst_i == 1'b1 ? 32'b0 ; 
+    assign CP0_Status_Newest = rst_i == 1'b1 ? 32'b0 :
                                (wb_cp0_reg_we==1'b1 && wb_cp0_reg_write_addr==`CP0_REG_STATUS) ? wb_cp0_reg_data : cp0_status_i;
     //最新的Cause寄存器
-    assign CP0_Cause_Newest    = rst_i == 1'b1 ? 32'b0 ; 
+    assign CP0_Cause_Newest    = rst_i == 1'b1 ? 32'b0 : 
                                (wb_cp0_reg_we==1'b1 && wb_cp0_reg_write_addr==`CP0_REG_CAUSE) ? 
                                {{cp0_cause_i[31:24]},{wb_cp0_reg_data[23:22]},{cp0_cause_i[21:10]},{wb_cp0_reg_data[9:8]},{cp0_cause_i[7:0]}} : cp0_cause_i;
     //最新的Epc寄存器
-    assign CP0_Epc_Newest      = rst_i == 1'b1 ? 32'b0 ; 
+    assign CP0_Epc_Newest      = rst_i == 1'b1 ? 32'b0 : 
                                (wb_cp0_reg_we==1'b1 && wb_cp0_reg_write_addr==`CP0_REG_EPC) ? wb_cp0_reg_data : cp0_epc_i;
     //输出最新cp0_epc
     assign cp0_epc_o = CP0_Epc_Newest;
@@ -108,7 +108,8 @@ module MEM (
 
     // 对io进行控制
     // 有异常就取消对MEMORY的写操作
-    assign logic wmem_i_last = wmem_i & (~(|exception_type_o));
+    logic  wmem_i_last;
+    assign wmem_i_last = wmem_i & (~(|exception_type_o));
 
     // 对io进行控制
     mem_io_controller mem_mem_io_controller(

@@ -59,7 +59,7 @@ assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_excepti
                             ( aluop_i == `EXE_MTLO_OP ) ? lo_i : 
                             ( aluop_i == `EXE_MFC0_OP ) ? cp0_reg_data_hazard : `ZeroWord;
 
-    assign {cp0_reg_we_o, cp0_reg_write_addr_o, cp0_reg_data_o} = aluop_i == `EXE_MTCO_OP ? {rd, 1'b1, reg1_i};
+    assign {cp0_reg_we_o, cp0_reg_write_addr_o, cp0_reg_data_o} = (aluop_i == `EXE_MTC0_OP) ? {1'b1, rd, reg1_i} : {1'b0,5'b0,32'b0};
     
     wire [31:0]arithmetic_res;
     wire overflow_byte;
@@ -79,17 +79,18 @@ assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_excepti
     assign overflow_exception = overflow;
 
     //////////////////////////////////////此处使用的leisilei的判断方法，将改为更加简单快速的判断///////////////////
-	assign logic reg1_lt_reg2 =  ((aluop_i == `EXE_SLT_OP)     || (aluop_i == `EXE_TLT_OP) ||         /////
+    logic  reg1_lt_reg2;
+	assign reg1_lt_reg2 =  ((aluop_i == `EXE_SLT_OP)     || (aluop_i == `EXE_TLT_OP) ||         /////
 	                              (aluop_i == `EXE_TLTI_OP)    || (aluop_i == `EXE_TGE_OP) ||         /////
 	                              (aluop_i == `EXE_TGEI_OP))   ?                                      /////
 						          ((reg1_i[31] && !reg2_i[31]) ||                                     /////
-							      (!reg1_i[31] && !reg2_i[31]  && result_sum[31])          ||         /////
-			                      (reg1_i[31] && reg2_i[31]    && result_sum[31]))                    /////
+							      (!reg1_i[31] && !reg2_i[31]  && arithmetic_res[31])          ||         /////
+			                      (reg1_i[31] && reg2_i[31]    && arithmetic_res[31]))                    /////
 			                     :(reg1_i < reg2_i);                                                 /////
 //////////////////////////////////////此处将改为更加简单快速的判断///////////////////////////////////////////
 
     // Trap指令运算
-    assign trap_exception = rst   ==   1'b1 ? 1'b0 : 
+    assign trap_exception = rst_i   ==   1'b1 ? 1'b0 : 
                             ((aluop_i==`EXE_TEQ_OP||aluop_i==`EXE_TEQI_OP)&&(reg1_i == reg2_i)) ? 1'b1 : 
                             ((aluop_i==`EXE_TGE_OP||aluop_i==`EXE_TGEI_OP||aluop_i==`EXE_TGEIU_OP||aluop_i==`EXE_TGEU_OP)&&reg1_lt_reg2==1'b0) ? 1'b1:
                             ((aluop_i==`EXE_TLT_OP||aluop_i==`EXE_TLTI_OP||aluop_i==`EXE_TLTIU_OP||aluop_i==`EXE_TLTU_OP)&&reg1_lt_reg2==1'b1) ? 1'b1:
