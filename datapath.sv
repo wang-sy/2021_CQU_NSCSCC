@@ -21,7 +21,6 @@ module datapath (
     input   logic [31:0]    ram_data_i,
     input   logic [5:0]     int_i,  //赛宇 坑我 不给宽度
 
-    output  logic           time_int_o,
     output  logic           rom_ce_o,
     output  logic [31:0]    rom_addr_o,
     output  logic [31:0]    ram_wdata_o,
@@ -111,6 +110,69 @@ module datapath (
     logic controller_flush;
     logic [31:0] controller_new_pc;
 
+
+////////////////////////////////////////////////////////////////////////////////////////
+    logic                ex2mem_cp0_reg_we;//qf
+    logic [4:0]          ex2mem_cp0_reg_write_addr;//qf
+    logic [31:0]         ex2mem_cp0_reg_data; //qf
+
+    logic [31:0] cp0_data_o;
+    logic [31:0] cp0_count_o;
+    logic [31:0] cp0_compare_o;
+    logic [31:0] cp0_status_o;
+    logic [31:0] cp0_cause_o;
+    logic [31:0] cp0_epc_o;
+    logic [31:0] cp0_config_o;
+    logic [31:0] cp0_prid_o;
+    logic        cp0_timer_int_o;
+
+    logic [31:0] id_exception_o;
+    logic [31:0] id_current_instr_addr_o;
+    logic  id_is_in_delayslot_o;
+    logic  id_next_is_in_delayslot_o;
+
+    logic [4:0]  id_rd_o;
+    logic [4:0]  id2exe_rd_o;
+    logic [31:0] id2exe_exception_o;
+    logic [31:0] id2exe_current_instr_addr_o;
+    logic        id2exe_in_delayslot_o;
+
+    logic id2exe_is_in_delayslot_o;
+
+    logic [31:0] ex_exception_o;
+    logic [31:0] ex_current_instr_addr_o;
+    logic        ex_in_delayslot_o;
+    logic [4:0]  ex_cp0_reg_read_addr;
+
+    logic        ex_cp0_reg_we;//qf
+    logic [4:0]  ex_cp0_reg_write_addr;//qf
+    logic [31:0] ex_cp0_reg_data; //qf
+    logic [31:0] ex2mem_exception_o;
+    logic [31:0] ex2mem_current_instr_addr_o;
+    logic        ex2mem_in_delayslot_o;
+
+    logic [31:0] mem_exception_type_o;
+    logic        mem_wb_cp0_reg_we;
+    logic [4:0] mem_wb_cp0_reg_write_addr;
+    logic [31:0] mem_wb_cp0_reg_data;
+
+    logic                mem_cp0_reg_we;//qf
+    logic [4:0]          mem_cp0_reg_write_addr;//qf
+    logic [31:0]         mem_cp0_reg_data; //qf
+    logic [31:0]         mem_current_instr_addr_o;
+    logic                mem_in_delayslot_o;
+    logic [31:0]         mem_cp0_epc_o;
+
+    logic                mem2wb_cp0_reg_we;//qf
+    logic [4:0]          mem2wb_cp0_reg_write_addr;//qf
+    logic [31:0]         mem2wb_cp0_reg_data; //qf
+
+    logic                wb_cp0_reg_we_control;//qf
+    logic [4:0]          wb_cp0_reg_write_addr_control;//qf
+    logic [31:0]         wb_cp0_reg_data_control; //qf
+
+////////////////////////////////////////////////////////////////////////////////////////
+
     stall_flush_controller datapath_stall_flush_controller(
         .rst_i(rst_i),
         .ex_ok_i(ex_ok),
@@ -133,16 +195,6 @@ module datapath (
         .flush(controller_flush),//
         .new_pc(controller_new_pc)//
     );
-
-    logic [31:0] cp0_data_o;
-    logic [31:0] cp0_count_o;
-    logic [31:0] cp0_compare_o;
-    logic [31:0] cp0_status_o;
-    logic [31:0] cp0_cause_o;
-    logic [31:0] cp0_epc_o;
-    logic [31:0] cp0_config_o;
-    logic [31:0] cp0_prid_o;
-    logic        cp0_timer_int_o;
 
     cp0_regfile datapath_cp0_regfile(
 	    .clk(clk_i),
@@ -210,11 +262,6 @@ module datapath (
     //  - 对寄存器进行读取
     //  - 对下一跳可能的值进行计算
     //  - 根据wb阶段返回的信号对寄存器进行修改
-    logic [31:0] id_exception_o;
-    logic [31:0] id_current_instr_addr_o;
-    logic [31:0] id_is_in_delayslot_o;
-    logic [31:0] id_next_is_in_delayslot_o;
-
 
     ID datapath_id(
         .clk(clk_i),
@@ -272,14 +319,11 @@ module datapath (
         .rd_o(id_rd_o)
     );
 
-    logic [4:0]  id_rd_o;
-
     // 从ID到EX的信号传递
-    logic id2exe_is_in_delayslot_o;
     id2exe datapath_id2ex(
         .rst(rst_i),
         .clk(clk_i),
-        .flush_i(id2ex_flush),
+        .flush_i( id2ex_flush || controller_flush),
         .stall_i(id2ex_stall),
 
         .id_alu_sel_i(id_alusel),
@@ -296,7 +340,6 @@ module datapath (
         .id_wmem_i(id_wmem),
         .id_mem_io_addr_i(id_mem_io_addr),
 
-        .flush_i(controller_flush),
         .id_exception_i(id_exception_o),
         .id_current_instr_addr_i(id_current_instr_addr_o),
         .id_in_delayslot_i(id_is_in_delayslot_o),
@@ -326,22 +369,11 @@ module datapath (
 
         .rd_o(id2exe_rd_o)
     );
-    logic [4:0]  id2exe_rd_o;
-
-    logic [31:0] id2exe_exception_o;
-    logic [31:0] id2exe_current_instr_addr_o;
-    logic        id2exe_in_delayslot_o;
 
     // EX阶段
     // 负责接收ID阶段的译码结果以及读取的寄存器的值
     // 并且通过译码结果进行选择，对读出的寄存器进行不同的运算，将结果写入ex_wdata
     
-    logic [31:0] ex_exception_o;
-    logic [31:0] ex_current_instr_addr_o;
-    logic        ex_in_delayslot_o;
-
-    logic [31:0] ex_cp0_reg_read_addr;
-
     EX datapath_ex(
         .clk_i(clk_i),
         .rst_i(rst_i),
@@ -389,15 +421,6 @@ module datapath (
         .cp0_reg_write_addr_o(ex_cp0_reg_write_addr),//qf
         .cp0_reg_data_o(ex_cp0_reg_data)//qf
     );
-
-    logic                ex_cp0_reg_we;//qf
-    logic [4:0]          ex_cp0_reg_write_addr;//qf
-    logic [31:0]         ex_cp0_reg_data; //qf
-
-
-    logic [31:0] ex2mem_exception_o;
-    logic [31:0] ex2mem_current_instr_addr_o;
-    logic        ex2mem_in_delayslot_o;
 
     // 从EX到MEM的信号传递
     EX2MEM datapath_ex2mem(
@@ -448,18 +471,10 @@ module datapath (
 
     );
 
-    logic                ex2mem_cp0_reg_we;//qf
-    logic [4:0]          ex2mem_cp0_reg_write_addr;//qf
-    logic [31:0]         ex2mem_cp0_reg_data; //qf
-
-
 
     // MEM阶段，负责进行访存操作
     // 访存操作主要分为两种：1、对内存进行读取；2、对内存进行写操作
-    logic [31:0] mem_exception_type_o;
-    logic        mem_wb_cp0_reg_we;
-    logic [31:0] mem_wb_cp0_reg_write_addr;
-    logic [31:0] mem_wb_cp0_reg_data;
+
     MEM datapath_mem(
         .clk_i(clk_i),
         .rst_i(rst_i),
@@ -510,17 +525,9 @@ module datapath (
 
         .cp0_reg_we_o(mem_cp0_reg_we),//qf
         .cp0_reg_write_addr_o(mem_cp0_reg_write_addr),//qf
-        .cp0_reg_data_o(mem_cp0_reg_data),//qf
+        .cp0_reg_data_o(mem_cp0_reg_data)//qf
 
     );
-
-    logic                mem_cp0_reg_we;//qf
-    logic [4:0]          mem_cp0_reg_write_addr;//qf
-    logic [31:0]         mem_cp0_reg_data; //qf
-
-    logic [31:0]         mem_current_instr_addr_o;
-    logic                mem_in_delayslot_o;
-    logic [31:0]         mem_cp0_epc_o;
 
     // 从MEM到WB的信号传递
     MEM2WB datapath_mem2wb(
@@ -547,35 +554,22 @@ module datapath (
         .wb_cp0_reg_data(mem2wb_cp0_reg_data) //qf
     );
 
-    logic                mem2wb_cp0_reg_we;//qf
-    logic [4:0]          mem2wb_cp0_reg_write_addr;//qf
-    logic [31:0]         mem2wb_cp0_reg_data; //qf
-
-    // 调用WB模块
-    // WB模块主要负责接收前面传来的
-    // wb_wd, wb_wreg, wb_wdata三个信号，并判断是否需要写回regfile
-    // 根据判断的结果发出相应的控制信号
-
-    logic                wb_cp0_reg_we_control;//qf
-    logic [4:0]          wb_cp0_reg_write_addr_control;//qf
-    logic [31:0]         wb_cp0_reg_data_control; //qf
-
     wb datapath_wb(
         .clk(clk_i),
         .rst(rst_i),
 
-        .mem_wd(wb_wd),
-        .mem_reg(wb_wreg),
-        .mem_wdata(wb_wdata),
+        .wb_wd(wb_wd),
+        .wb_reg(wb_wreg),
+        .wb_wdata(wb_wdata),
 
         .wb_cp0_reg_we(mem2wb_cp0_reg_we),//qf
         .wb_cp0_reg_write_addr(mem2wb_cp0_reg_write_addr),//qf
         .wb_cp0_reg_data(mem2wb_cp0_reg_data), //qf
 
 //区分64为与32位
-        .wb_wd(wb_wd_control),
-        .wb_reg(wb_wreg_control),
-        .wb_wdata(wb_wdata_control),
+        .wb_wd_control(wb_wd_control),
+        .wb_reg_control(wb_wreg_control),
+        .wb_wdata_control(wb_wdata_control),
 
         .wb_cp0_reg_we_control(wb_cp0_reg_we_control),//qf
         .wb_cp0_reg_write_addr_control(wb_cp0_reg_write_addr_control),//qf

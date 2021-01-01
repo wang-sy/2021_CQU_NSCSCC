@@ -16,17 +16,17 @@ module MEM (
     input logic [`DataBus]      ram_data_i,
     input logic [31:0]          mem_io_addr_i,
 
-    input logic [`RegAddrBus]   exception_type_i,  //qf
-    input logic [`RegAddrBus]   current_instr_addr_i,  //qf
+    input logic [`DataBus]   exception_type_i,  //qf
+    input logic [`DataBus]   current_instr_addr_i,  //qf
     input logic                 is_in_delayslot_i,  //qf
 
-	input logic [`RegAddrBus]   cp0_status_i,  //qf
-	input logic [`RegAddrBus]   cp0_cause_i,  //qf
-	input logic [`RegAddrBus]   cp0_epc_i,  //qf
+	input logic [`DataBus]   cp0_status_i,  //qf
+	input logic [`DataBus]   cp0_cause_i,  //qf
+	input logic [`DataBus]   cp0_epc_i,  //qf
 
     input logic                 wb_cp0_reg_we,  //qf
 	input logic [4:0]           wb_cp0_reg_write_addr,  //qf
-	input logic [`RegAddrBus]   wb_cp0_reg_data,  //qf
+	input logic [`DataBus]   wb_cp0_reg_data,  //qf
 
     input logic                 cp0_reg_we_i,//qf
     input logic [4:0]           cp0_reg_write_addr_i,//qf
@@ -56,7 +56,7 @@ module MEM (
 );
 
     assign is_in_delayslot_o        = is_in_delayslot_i;
-    assign current_instr_address_o  = current_instr_address_i;
+    assign current_instr_address_o  = current_instr_addr_i;
     
     assign cp0_reg_we_o             = cp0_reg_we_i;
     assign cp0_reg_write_addr_o     = cp0_reg_write_addr_i;
@@ -66,17 +66,17 @@ module MEM (
     logic [`RegAddrBus] CP0_Cause_Newest;
     logic [`RegAddrBus] CP0_Epc_Newest;
     
-    //最新的Staus寄存器
+    //�?新的Staus寄存�?
     assign CP0_Status_Newest = rst_i == 1'b1 ? 32'b0 :
                                (wb_cp0_reg_we==1'b1 && wb_cp0_reg_write_addr==`CP0_REG_STATUS) ? wb_cp0_reg_data : cp0_status_i;
-    //最新的Cause寄存器
+    //�?新的Cause寄存�?
     assign CP0_Cause_Newest    = rst_i == 1'b1 ? 32'b0 : 
                                (wb_cp0_reg_we==1'b1 && wb_cp0_reg_write_addr==`CP0_REG_CAUSE) ? 
                                {{cp0_cause_i[31:24]},{wb_cp0_reg_data[23:22]},{cp0_cause_i[21:10]},{wb_cp0_reg_data[9:8]},{cp0_cause_i[7:0]}} : cp0_cause_i;
-    //最新的Epc寄存器
+    //�?新的Epc寄存�?
     assign CP0_Epc_Newest      = rst_i == 1'b1 ? 32'b0 : 
                                (wb_cp0_reg_we==1'b1 && wb_cp0_reg_write_addr==`CP0_REG_EPC) ? wb_cp0_reg_data : cp0_epc_i;
-    //输出最新cp0_epc
+    //输出�?新cp0_epc
     assign cp0_epc_o = CP0_Epc_Newest;
 
     //exception_type_o
@@ -90,7 +90,7 @@ module MEM (
 
     /*assign {wd_o, wreg_o, wdata_o} = (rst_i == 1'b1) ? {`NOPRegAddr, 1'b0, `ZeroWord} :
                                      {wd_i, wreg_i, wdata_i};*/
-    // mem阶段的hilo寄存器
+    // mem阶段的hilo寄存�?
     hilo_reg mem_hilo_reg(
         .clk_i(clk_i),
         .rst_i(rst_i),

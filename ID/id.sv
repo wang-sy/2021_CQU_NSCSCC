@@ -6,7 +6,7 @@ module ID(
     input logic         clk,
     input logic         rst,
 
-    //从IF/ID接收到信号
+    //从IF/ID接收到信�?
     input logic [31:0]  pc_i,
     input logic [31:0]  inst_i,
 
@@ -54,7 +54,7 @@ module ID(
     output logic [4:0]  wd_o,  //write destination
 
     output logic [31:0] exception_o, //指明异常类型  //qf
-    output logic [31:0] current_instr_addr_o, //指明当前的指令地址  //qf
+    output logic [31:0] current_instr_addr_o, //指明当前的指令地�?  //qf
     output logic        is_in_delayslot_o,//qf
     output logic        next_is_in_delayslot_o,//qf
 
@@ -67,7 +67,7 @@ module ID(
     assign rd_o = rd; 
 
     logic        except_type_is_syscall; //qf
-    loguc        except_type_is_eret;//qf
+    logic        except_type_is_eret;//qf
     logic        instr_valid;//qf
 
     assign exception_o  = { 19'b0, except_type_is_eret, 2'b0, instr_valid, except_type_is_syscall, 8'b0};
@@ -87,7 +87,7 @@ module ID(
 
     //定义指令字段信号
     //op   re   rt  immediate
-    // 在判断一些指令的时候，还需要用到后六位
+    // 在判断一些指令的时�?�，还需要用到后六位
     wire [5:0]  op = inst_i[31:26];
     wire [4:0]  rs = inst_i[25:21];
     wire [4:0]  rt = inst_i[20:16];
@@ -100,7 +100,7 @@ module ID(
     wire [31:0] unsi_imm = {16'b0,inst_i[15:0]};
     wire [31:0] lui_imm = {inst_i[15:0], 16'b0};
     wire [31:0] sa_imm = {27'b0, sa}; // 专门用于shift指令的立即数
-    // 当前指令为立即数指令，或是需要使用指令中的数字作为操作数的时候
+    // 当前指令为立即数指令，或是需要使用指令中的数字作为操作数的时�?
     // 就使用本资源
     wire [31:0] special_num;
 
@@ -111,7 +111,7 @@ module ID(
         .raddr1(rs),// 寄存端口1的读地址
         .raddr2(rt),
 
-        .we(we_i),// 写使能
+        .we(we_i),// 写使�?
         .waddr(waddr_i),// 写寄存器地址
         .wdata(wdata_i), //  写寄存器数据
 
@@ -120,7 +120,7 @@ module ID(
     );
 
     // 对读取出来的结果进行冒险决策
-    // harzrd_reg1_data 才是当前寄存器中真正的值
+    // harzrd_reg1_data 才是当前寄存器中真正的�??
     reg_harzrd id_reg_harzrd(
         .rst_i(rst),
         .reg_addr1_i(rs),
@@ -141,7 +141,7 @@ module ID(
     );
 
     logic do_branch;
-    // 用于判断是否进入branch分支的模块
+    // 用于判断是否进入branch分支的模�?
     branch_controller id_branch_controller(
         .aluop_i(aluop_o),
         .reg1_i(harzrd_reg1_data),
@@ -149,7 +149,7 @@ module ID(
         .do_branch_o(do_branch)
     );
 
-    // 用于J类型的指令
+    // 用于J类型的指�?
     wire [31:0] pc_puls8 = pc_i + 32'd8;
     wire [31:0] pc_puls4 = pc_i + 32'd4;
     wire [31:0] j_to_addr = {pc_puls4[31:28], inst_i[25:0] ,2'b0};
@@ -158,7 +158,7 @@ module ID(
     wire [31:0] mem_io_addr = harzrd_reg1_data + sign_imm;
 
     // nop和ssnop不需要特殊实现，直接默认译码即可
-    // 当前，将sync和pref当作空指令处理
+    // 当前，将sync和pref当作空指令处�?
     assign { 
         aluop_o,
         alusel_o,
@@ -256,7 +256,7 @@ module ID(
             // special2 中的mul指令
             (sel == `EXE_MUL) ? `MUL_DECODE : `INIT_DECODE
         ) : (op == `EXE_REGIMM_INST) ? (
-            // 对branch指令的具体类型进行选择，需要判断rt
+            // 对branch指令的具体类型进行�?�择，需要判断rt
             (rt == `EXE_BGEZ    ) ? `BGEZ_DECODE    : 
             (rt == `EXE_BGEZAL  ) ? `BGEZAL_DECODE  : 
             (rt == `EXE_BLTZ    ) ? `BLTZ_DECODE    : 
@@ -268,10 +268,10 @@ module ID(
             (rt == `EXE_TLTI    ) ? `TLTI_DECODE    :
             (rt == `EXE_TLTIU   ) ? `TLTIU_DECODE   :
             (rt == `EXE_TNEI    ) ? `TNEI_DECODE    : `INIT_DECODE
-        ) : (inst_i==`EXE_ERET ? `ERET_DECODE: `INIT_DECODE) : 
+        ) : inst_i==`EXE_ERET ? `ERET_DECODE : 
             //MFCO MFT0
             (inst_i[31:21]==11'b01000000000 && inst_i[10:0]==11'b0000000000) ? `MFC0_DECODE : 
-            (inst_i[31:21]==11'b01000000100 && inst_i[10:0]==11'b0000000000) ? `MFT0_DECODE : `INIT_DECODE
+            (inst_i[31:21]==11'b01000000100 && inst_i[10:0]==11'b0000000000) ? `MFT0_DECODE : `INIT_DECODE//qf
     );
 
     assign {rs_o, rt_o, reg1_read_o, reg2_read_o} = {rs, rt, reg1_read, reg2_read};

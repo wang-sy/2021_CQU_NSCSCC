@@ -6,7 +6,9 @@
 module pc_next_sel (
     input logic         clk_i,
     input logic         rst_i,
+    input logic         flush_i,
     input logic [31:0]  pc_i,
+    input logic [31:0]  new_pc_i,
     input logic         branch_flag_i,
     input logic [31:0]  branch_to_addr_i,
 

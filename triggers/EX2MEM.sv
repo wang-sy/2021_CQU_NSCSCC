@@ -17,8 +17,8 @@ module EX2MEM (
     input logic  [31:0]         ex_mem_io_addr_i,
 
     input logic                 flush_i,  //qf
-    input logic [`RegAddrBus]   ex_exception_type_i,//qf
-    input logic [`RegAddrBus]   ex_current_instr_addr_i,//qf
+    input logic [31:0]          ex_exception_type_i,//qf
+    input logic [31:0]   ex_current_instr_addr_i,//qf
     input logic                 ex_is_in_delayslot,//qf
 
     input logic                 ex_cp0_reg_we,//qf
@@ -37,8 +37,8 @@ module EX2MEM (
     output logic [`AluOpBus]    mem_aluop_o,
     output logic  [31:0]        mem_mem_io_addr_o,
 
-    output logic [`RegAddrBus]  mem_exception_type_o,  //qf
-    output logic [`RegAddrBus]  mem_current_instr_addr_o, //qf
+    output logic [31:0]         mem_exception_type_o,  //qf
+    output logic [31:0]         mem_current_instr_addr_o, //qf
     output logic                mem_is_in_delayslot, //qf
 
     output logic                mem_cp0_reg_we,//qf
