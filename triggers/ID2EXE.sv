@@ -27,6 +27,9 @@ module id2exe(
     
     input logic   [4:0 ]    rd_i,
 
+    input logic [`RegAddrBus]      reg1_addr_i,
+    input logic [`RegAddrBus]      reg2_addr_i,
+
     output logic  [2:0]     exe_alu_sel_o,
     output logic  [7:0]     exe_alu_op_o,
     output logic  [31:0]    exe_reg1_o,
@@ -45,8 +48,11 @@ module id2exe(
     output logic  [31:0]    ex_current_instr_addr_o,//qf
     output logic            ex_in_delayslot_o,//qf
     output logic            is_in_delayslot_o,//qf  //传回给ID�?
-    output logic   [4:0 ]   rd_o
+    output logic   [4:0 ]   rd_o,
 
+    
+    output logic [`RegAddrBus]      reg1_addr_o,
+    output logic [`RegAddrBus]      reg2_addr_o
 
 );
 
@@ -72,6 +78,10 @@ always@(posedge clk) begin
 
         is_in_delayslot_o        <= 1'd0;//qf  //传回给ID�?
         rd_o                     <=5'b0;
+
+        reg1_addr_o<=5'b0;
+        reg2_addr_o<=5'b0;
+
     end 
     else if (stall_i == 1'b1) begin
         exe_alu_sel_o <=  exe_alu_sel_o;
@@ -88,12 +98,16 @@ always@(posedge clk) begin
         exe_wmem_o    <=  exe_wmem_o;  
         exe_mem_io_addr_o <= exe_mem_io_addr_o;
 
-        ex_exception_o           <= 32'd0;//qf
-        ex_current_instr_addr_o  <= 32'd0;//qf
-        ex_in_delayslot_o        <= 1'd0;//qf
+        ex_exception_o           <= ex_exception_o;//qf
+        ex_current_instr_addr_o  <= ex_current_instr_addr_o;//qf
+        ex_in_delayslot_o        <= ex_in_delayslot_o;//qf
 
-        is_in_delayslot_o        <= 1'd0;//qf  //传回给ID�?
+        is_in_delayslot_o        <= is_in_delayslot_o;//qf  //传回给ID�?
         rd_o<=rd_o;
+
+        reg1_addr_o<=reg1_addr_i;
+        reg2_addr_o<=reg2_addr_i;
+
     end
     else begin
         exe_alu_sel_o            <=  id_alu_sel_i;
@@ -116,6 +130,9 @@ always@(posedge clk) begin
 
         is_in_delayslot_o        <= next_is_in_delayslot_i;//qf  //传回给ID�?
         rd_o<=rd_i;
+
+        reg1_addr_o<=reg1_addr_i;
+        reg2_addr_o<=reg2_addr_i;
     end
 end
 

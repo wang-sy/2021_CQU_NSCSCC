@@ -7,6 +7,9 @@ module EX (
     input logic [`AluOpBus]     aluop_i,
     input logic [`AluSelBus]    alusel_i,
 
+    input logic [`RegAddrBus]      reg1_addr_i,
+    input logic [`RegAddrBus]      reg2_addr_i,
+
     input logic [`DataBus]      reg1_i,
     input logic [`DataBus]      reg2_i,
     
@@ -33,6 +36,13 @@ module EX (
     input logic [`DataBus]      wb_cp0_reg_data,//qf
     input [4:0]                 rd,//这信号还是无中生有
 
+    input logic             mem_we_i,
+    input logic     [4:0]   mem_waddr_i,
+    input logic     [31:0]  mem_wdata_i,
+
+    input logic             wb_we_i,
+    input logic     [4:0]   wb_waddr_i,
+    input logic     [31:0]  wb_wdata_i,
 
 
     output logic                ok_o,
@@ -58,6 +68,10 @@ module EX (
     logic [`DataBus] alu_data1;
     logic [`DataBus] alu_data2;
 
+    logic [`DataBus] alu_data1_hazard;
+    logic [`DataBus] alu_data2_hazard;
+
+
     // 对进入alu的数据进行选择
     // 当前阶段主要对：
     //  - 寄存器的值
@@ -76,6 +90,29 @@ module EX (
     );
 
 
+
+    ex_reg_harzrd ex_ex_reg_harzrd (
+        .rst_i(rst_i),
+
+        .reg_addr1_i(reg1_addr_i),
+        .reg_addr2_i(reg2_addr_i),
+
+        .reg_data1_i(alu_data1),
+        .reg_data2_i(alu_data2),
+
+        .mem_we_i(mem_we_i),
+        .mem_waddr_i(mem_waddr_i),
+        .mem_wdata_i(mem_wdata_i),
+
+        .wb_we_i(wb_we_i),
+        .wb_waddr_i(wb_waddr_i),
+        .wb_wdata_i(wb_wdata_i),
+
+        .rdata1_o(alu_data1_hazard),
+        .rdata2_o(alu_data2_hazard)
+    );
+
+
     // alu运算单元: 通过前面传来的信号进行运算，将结果赋值给wdata_o
     // 在当前阶段div指令执行时需要多个周期，因此会输出一个ok信号，在ok为0时，需要其他流水级stall
     alu ex_alu(
@@ -83,13 +120,13 @@ module EX (
         .rst_i(rst_i),
         .aluop_i(aluop_i),
         .alusel_i(alusel_i),
-        .reg1_i(alu_data1),
-        .reg2_i(alu_data2),
+        .reg1_i(alu_data1_hazard),
+        .reg2_i(alu_data2_hazard),
         .hi_i(hi_i),
         .lo_i(lo_i),
         .exception_type_i(exception_type_i),//qf
 
-        .cp0_reg_data_i(),  //qf
+        .cp0_reg_data_i(cp0_reg_data_i),  //qf
 
         .mem_cp0_reg_we(mem_cp0_reg_we),//qf
         .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr),//qf

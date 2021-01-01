@@ -58,13 +58,19 @@ module ID(
     output logic        is_in_delayslot_o,//qf
     output logic        next_is_in_delayslot_o,//qf
 
-    output logic [4:0]  rd_o
+    output logic [4:0]  rd_o,
+
+    output logic [`RegAddrBus]      reg1_addr_o,
+    output logic [`RegAddrBus]      reg2_addr_o
 );
 
     assign is_in_delayslot_o = is_in_delayslot_i;//qf
     assign current_instr_addr_o = pc_i;  //qf
     assign next_is_in_delayslot_o = branch_flag_o;
     assign rd_o = rd; 
+
+    assign reg1_addr_o=rs;
+    assign reg2_addr_o=rt;
 
     logic        except_type_is_syscall; //qf
     logic        except_type_is_eret;//qf

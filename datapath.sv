@@ -262,6 +262,8 @@ module datapath (
     //  - 对寄存器进行读取
     //  - 对下一跳可能的值进行计算
     //  - 根据wb阶段返回的信号对寄存器进行修改
+    logic [4:0] id_reg1_addr_o;
+    logic [4:0] id_reg2_addr_o;
 
     ID datapath_id(
         .clk(clk_i),
@@ -316,8 +318,14 @@ module datapath (
         .is_in_delayslot_o(id_is_in_delayslot_o),//
         .next_is_in_delayslot_o(id_next_is_in_delayslot_o),//
 
-        .rd_o(id_rd_o)
+        .rd_o(id_rd_o),
+        
+        .reg1_addr_o(id_reg1_addr_o),
+        .reg2_addr_o(id_reg2_addr_o)
     );
+
+    logic [4:0] id2exe_reg1_addr_o;
+    logic [4:0] id2exe_reg2_addr_o;
 
     // 从ID到EX的信号传递
     id2exe datapath_id2ex(
@@ -347,6 +355,9 @@ module datapath (
         .next_is_in_delayslot_i(id_next_is_in_delayslot_o),
  
         .rd_i(id_rd_o),
+        
+        .reg1_addr_i(id_reg1_addr_o),
+        .reg2_addr_i(id_reg2_addr_o),
 
         .exe_alu_sel_o(ex_alusel),
         .exe_alu_op_o(ex_aluop),
@@ -367,7 +378,10 @@ module datapath (
         .ex_in_delayslot_o(id2exe_in_delayslot_o),
         .is_in_delayslot_o(id2exe_is_in_delayslot_o),
 
-        .rd_o(id2exe_rd_o)
+        .rd_o(id2exe_rd_o),
+
+        .reg1_addr_o(id2exe_reg1_addr_o),
+        .reg2_addr_o(id2exe_reg2_addr_o)
     );
 
     // EX阶段
@@ -397,6 +411,17 @@ module datapath (
         .is_in_delayslot_i(id2exe_in_delayslot_o),
 
         .cp0_reg_data_i(cp0_data_o),//qf
+
+        .reg1_addr_i(id2exe_reg1_addr_o),
+        .reg2_addr_i(id2exe_reg2_addr_o),
+
+        .mem_we_i(mem_wreg),
+        .mem_waddr_i(mem_wd),
+        .mem_wdata_i(mem_wdata_o[31:0]),
+
+        .wb_we_i(wb_wreg),
+        .wb_waddr_i(wb_wd),
+        .wb_wdata_i(wb_wdata[31:0]),
 
         .mem_cp0_reg_we(mem_cp0_reg_we),//qf
         .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr),//qf

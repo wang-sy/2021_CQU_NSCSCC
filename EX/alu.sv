@@ -59,7 +59,7 @@ assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_excepti
                             ( aluop_i == `EXE_MTLO_OP ) ? lo_i : 
                             ( aluop_i == `EXE_MFC0_OP ) ? cp0_reg_data_hazard : `ZeroWord;
 
-    assign {cp0_reg_we_o, cp0_reg_write_addr_o, cp0_reg_data_o} = (aluop_i == `EXE_MTC0_OP) ? {1'b1, rd, reg1_i} : {1'b0,5'b0,32'b0};
+    assign {cp0_reg_we_o, cp0_reg_write_addr_o, cp0_reg_data_o} = (aluop_i == `EXE_MTC0_OP) ? {1'b1, rd, reg2_i} : {1'b0,5'b0,32'b0};
     
     wire [31:0]arithmetic_res;
     wire overflow_byte;
