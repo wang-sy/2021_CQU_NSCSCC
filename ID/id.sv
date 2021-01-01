@@ -70,7 +70,7 @@ module ID(
     logic        except_type_is_eret;//qf
     logic        instr_valid;//qf
 
-    assign exception_o  = { 19'b0, except_type_is_eret, 2'b0, instr_valid, except_type_is_syscall, 8'b0};
+    assign exception_o  = { 19'b0, except_type_is_eret, 2'b0, ~instr_valid, except_type_is_syscall, 8'b0};
 
 
     //寄存器堆接收到的信号
