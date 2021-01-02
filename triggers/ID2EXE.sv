@@ -30,6 +30,9 @@ module id2exe(
     input logic [`RegAddrBus]      reg1_addr_i,
     input logic [`RegAddrBus]      reg2_addr_i,
 
+    input logic reg1_read_i,
+    input logic reg2_read_i,
+
     output logic  [2:0]     exe_alu_sel_o,
     output logic  [7:0]     exe_alu_op_o,
     output logic  [31:0]    exe_reg1_o,
@@ -52,7 +55,11 @@ module id2exe(
 
     
     output logic [`RegAddrBus]      reg1_addr_o,
-    output logic [`RegAddrBus]      reg2_addr_o
+    output logic [`RegAddrBus]      reg2_addr_o,
+
+    output logic reg1_read_o,
+    output logic reg2_read_o
+
 
 );
 
@@ -82,6 +89,9 @@ always@(posedge clk) begin
         reg1_addr_o<=5'b0;
         reg2_addr_o<=5'b0;
 
+        reg1_read_o<=1'b0;
+        reg2_read_o<=1'b0;
+
     end 
     else if (stall_i == 1'b1) begin
         exe_alu_sel_o <=  exe_alu_sel_o;
@@ -108,6 +118,9 @@ always@(posedge clk) begin
         reg1_addr_o<=reg1_addr_i;
         reg2_addr_o<=reg2_addr_i;
 
+        reg1_read_o<=reg1_read_o;
+        reg2_read_o<=reg2_read_o;
+
     end
     else begin
         exe_alu_sel_o            <=  id_alu_sel_i;
@@ -133,6 +146,10 @@ always@(posedge clk) begin
 
         reg1_addr_o<=reg1_addr_i;
         reg2_addr_o<=reg2_addr_i;
+
+        reg1_read_o<=reg1_read_i;
+        reg2_read_o<=reg2_read_i;
+
     end
 end
 

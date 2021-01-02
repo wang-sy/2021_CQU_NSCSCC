@@ -38,6 +38,9 @@ module alu (
 logic trap_exception;  //自陷异常
 logic overflow_exception; //溢出异常
 
+logic div_ready;
+logic [63:0]div_res;
+
 assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_exception,exception_type_i[9:8],8'b0};
 
 //                              条件                            结果
@@ -116,8 +119,6 @@ assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_excepti
                     ) : 1'b0;
 
     wire div_signed = (aluop_i == `EXE_DIV_OP) ? 1'b1 : 1'b0;
-    logic div_ready;
-    logic [63:0]div_res;
 
     // 除法器，直接使用了雷斯磊书中的
     // 除法需要多周期，在进行除法的过程中需要将其他的流水级进行stall

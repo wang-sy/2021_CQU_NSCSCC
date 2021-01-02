@@ -44,6 +44,8 @@ module EX (
     input logic     [4:0]   wb_waddr_i,
     input logic     [31:0]  wb_wdata_i,
 
+    input logic reg1_read_i,
+    input logic reg2_read_i,
 
     output logic                ok_o,
     output logic [`DoubleRegBus]wdata_o,
@@ -99,6 +101,9 @@ module EX (
 
         .reg_data1_i(alu_data1),
         .reg_data2_i(alu_data2),
+
+        .reg1_read_i(reg1_read_i),
+        .reg2_read_i(reg2_read_i),
 
         .mem_we_i(mem_we_i),
         .mem_waddr_i(mem_waddr_i),

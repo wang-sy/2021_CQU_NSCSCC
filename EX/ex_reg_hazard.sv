@@ -9,6 +9,9 @@ module ex_reg_harzrd (
     input logic     [31:0]  reg_data1_i,
     input logic     [31:0]  reg_data2_i,
 
+    input logic             reg1_read_i,
+    input logic             reg2_read_i,
+
     // 用于判断冒险的数据
 
     input logic             mem_we_i,
@@ -32,11 +35,11 @@ module ex_reg_harzrd (
     // 4、都不是的情况下，就将读取结果作为最终结果
 
     assign rdata1_o =   (rst_i == 1'b1) ? `ZeroWord :
-                        (mem_we_i == 1'b1 && mem_waddr_i == reg_addr1_i) ? mem_wdata_i :
-                        (wb_we_i == 1'b1 && wb_waddr_i == reg_addr1_i) ? wb_wdata_i : reg_data1_i;
+                        (mem_we_i == 1'b1 && mem_waddr_i == reg_addr1_i && reg1_read_i==1'b1) ? mem_wdata_i :
+                        (wb_we_i == 1'b1 && wb_waddr_i == reg_addr1_i && reg1_read_i==1'b1) ? wb_wdata_i : reg_data1_i;
     
     assign rdata2_o =   (rst_i == 1'b1) ? `ZeroWord :
-                        (mem_we_i == 1'b1 && mem_waddr_i == reg_addr2_i) ? mem_wdata_i : 
-                        (wb_we_i == 1'b1 && wb_waddr_i == reg_addr2_i) ? wb_wdata_i : reg_data2_i;
+                        (mem_we_i == 1'b1 && mem_waddr_i == reg_addr2_i && reg2_read_i==1'b1) ? mem_wdata_i : 
+                        (wb_we_i == 1'b1 && wb_waddr_i == reg_addr2_i && reg2_read_i==1'b1) ? wb_wdata_i : reg_data2_i;
 
 endmodule

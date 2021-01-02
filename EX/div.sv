@@ -38,7 +38,7 @@ module div(
 
    reg [31:0]                nnum2;
    reg [5:0]                 nnum2_exp;
-
+ //lr为96位，端口为128位 看见了改一下
    nt nt_iterator(lr, nnum2, lr_temp, lr_ready);
 
    always @(posedge clk, posedge rst) begin

@@ -43,10 +43,10 @@ module MEM (
     output logic                ram_ce_o,
 
     output logic[31:0]          exception_type_o,  //qf
-	output logic[`RegAddrBus]   current_instr_address_o,  //qf
+	output logic[31:0]   current_instr_address_o,  //qf
 
 	output logic                is_in_delayslot_o,  //qf
-	output logic[`RegAddrBus]   cp0_epc_o,  //qf
+	output logic[31:0]   cp0_epc_o,  //qf
 
     output logic                cp0_reg_we_o,//qf
     output logic [4:0]          cp0_reg_write_addr_o,//qf

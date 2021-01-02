@@ -64,6 +64,12 @@ module ID(
     output logic [`RegAddrBus]      reg2_addr_o
 );
 
+    logic        except_type_is_syscall; //qf
+    logic        except_type_is_eret;//qf
+    logic        instr_valid;//qf
+
+    assign exception_o  = { 19'b0, except_type_is_eret, 2'b0, ~instr_valid, except_type_is_syscall, 8'b0};
+
     assign is_in_delayslot_o = is_in_delayslot_i;//qf
     assign current_instr_addr_o = pc_i;  //qf
     assign next_is_in_delayslot_o = branch_flag_o;
@@ -71,13 +77,6 @@ module ID(
 
     assign reg1_addr_o=rs;
     assign reg2_addr_o=rt;
-
-    logic        except_type_is_syscall; //qf
-    logic        except_type_is_eret;//qf
-    logic        instr_valid;//qf
-
-    assign exception_o  = { 19'b0, except_type_is_eret, 2'b0, ~instr_valid, except_type_is_syscall, 8'b0};
-
 
     //寄存器堆接收到的信号
     logic [31:0] reg1_data;
@@ -277,7 +276,7 @@ module ID(
         ) : inst_i==`EXE_ERET ? `ERET_DECODE : 
             //MFCO MFT0
             (inst_i[31:21]==11'b01000000000 && inst_i[10:0]==11'b0000000000) ? `MFC0_DECODE : 
-            (inst_i[31:21]==11'b01000000100 && inst_i[10:0]==11'b0000000000) ? `MFT0_DECODE : `INIT_DECODE//qf
+            (inst_i[31:21]==11'b01000000100 && inst_i[10:0]==11'b0000000000) ? `MTC0_DECODE : `INIT_DECODE//qf
     );
 
     assign {rs_o, rt_o, reg1_read_o, reg2_read_o} = {rs, rt, reg1_read, reg2_read};

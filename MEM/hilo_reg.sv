@@ -1,8 +1,8 @@
 `include "defines.vh"
 // hilo寄存器
 module hilo_reg (
-    input logic [31:0]  clk_i,
-    input logic [31:0]  rst_i,
+    input logic  clk_i,
+    input logic  rst_i,
 
     input logic [31:0]  new_hi_i,
     input logic         w_hi_i,

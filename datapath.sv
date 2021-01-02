@@ -97,7 +97,7 @@ module datapath (
     logic [`DoubleRegBus]   wb_wdata;
     logic [`RegAddrBus]     wb_wd_control;
     logic                   wb_wreg_control;
-    logic [`DataBus]        wb_wdata_control;
+    logic [`DoubleRegBus]        wb_wdata_control;
 
     // 各阶段的stall状态
     logic                   if_stall;
@@ -274,7 +274,7 @@ module datapath (
 
         .we_i(wb_wreg_control),
         .waddr_i(wb_wd_control),
-        .wdata_i(wb_wdata_control),
+        .wdata_i(wb_wdata_control[31:0]),
 
         .ex_we_i(ex_wreg),
         .ex_waddr_i(ex_wd),
@@ -359,6 +359,9 @@ module datapath (
         .reg1_addr_i(id_reg1_addr_o),
         .reg2_addr_i(id_reg2_addr_o),
 
+        .reg1_read_i(id_reg1_read),
+        .reg2_read_i(id_reg2_read),
+
         .exe_alu_sel_o(ex_alusel),
         .exe_alu_op_o(ex_aluop),
         .exe_reg1_o(ex_reg1),
@@ -381,8 +384,15 @@ module datapath (
         .rd_o(id2exe_rd_o),
 
         .reg1_addr_o(id2exe_reg1_addr_o),
-        .reg2_addr_o(id2exe_reg2_addr_o)
+        .reg2_addr_o(id2exe_reg2_addr_o),
+
+        .reg1_read_o(id2exe_reg1_read),
+        .reg2_read_o(id2exe_reg2_read)
+
     );
+
+    logic id2exe_reg1_read;
+    logic id2exe_reg2_read;
 
     // EX阶段
     // 负责接收ID阶段的译码结果以及读取的寄存器的值
@@ -422,6 +432,10 @@ module datapath (
         .wb_we_i(wb_wreg),
         .wb_waddr_i(wb_wd),
         .wb_wdata_i(wb_wdata[31:0]),
+
+        .reg1_read_i(id2exe_reg1_read),
+        .reg2_read_i(id2exe_reg2_read),
+
 
         .mem_cp0_reg_we(mem_cp0_reg_we),//qf
         .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr),//qf
