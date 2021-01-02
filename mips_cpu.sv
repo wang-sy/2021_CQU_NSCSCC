@@ -1,7 +1,7 @@
 module mips_cpu (
     input   logic           rst_i,
     input   logic           clk_i,
-    input   logic           int_i
+    input   logic  [5:0]    int_i
 );
 
     
