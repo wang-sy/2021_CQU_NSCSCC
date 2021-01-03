@@ -1,33 +1,33 @@
 `include "tlbdefines.vh"
 module TLB(
-	input  logic        clk,
+    input  logic        clk,
 
-	input  logic [2:0]  tlb_typeM, 	   	
+    input  logic [2:0]  tlb_typeM, 	   	
 
-	input  logic [31:0] inst_vaddr,
-	input  logic [31:0] data_vaddr,
+    input  logic [31:0] inst_vaddr,
+    input  logic [31:0] data_vaddr,
 
-	input  logic [31:0] EntryHi_in,
-	input  logic [31:0] PageMask_in,
-	input  logic [31:0] EntryLo0_in,
-	input  logic [31:0] EntryLo1_in,
-	input  logic [31:0] Index_in,
-	input  logic [31:0] Random_in,
+    input  logic [31:0] EntryHi_in,
+    input  logic [31:0] PageMask_in,
+    input  logic [31:0] EntryLo0_in,
+    input  logic [31:0] EntryLo1_in,
+    input  logic [31:0] Index_in,
+    input  logic [31:0] Random_in,
 
-	output logic [31:0] EntryHi_out,
-	output logic [31:0] PageMask_out,
-	output logic [31:0] EntryLo0_out,
-	output logic [31:0] EntryLo1_out,
-	output logic [31:0] Index_out,
+    output logic [31:0] EntryHi_out,
+    output logic [31:0] PageMask_out,
+    output logic [31:0] EntryLo0_out,
+    output logic [31:0] EntryLo1_out,
+    output logic [31:0] Index_out,
 
     output logic        inst_V_flag,//inst_addr_valid
     output logic        data_V_flag,//data_addr_valid
-	output logic        data_D_flag,
+    output logic        data_D_flag,
 
-	output logic [31:0] inst_paddr_o,
-	output logic [31:0] data_paddr_o,
-	output logic        inst_found,
-	output logic        data_found
+    output logic [31:0] inst_paddr_o,
+    output logic [31:0] data_paddr_o,
+    output logic        inst_found,
+    output logic        data_found
 );
 
 //TLB instr
