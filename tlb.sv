@@ -20,6 +20,8 @@ module TLB(
 	output logic [31:0] EntryLo1_out,
 	output logic [31:0] Index_out,
 
+    output logic        inst_V_flag,//inst_addr_valid
+    output logic        data_V_flag,//data_addr_valid
 	output logic        data_D_flag,
 
 	output logic [31:0] inst_paddr_o,
@@ -77,17 +79,10 @@ generate
     for(i=0;i<`TLB_LINE;i++)
     begin
         assign inst_hit[i] = 
-            (
-                (//match
-                    (EntryHi0[i][`ASID] === current_ASID)       | 
-                    (  inst_vaddr[12]  & EntryLo1[i][`GLOBAL])  | 
-                    ((~inst_vaddr[12]) & EntryLo0[i][`GLOBAL])
-                )
-                &
-                (
-                    (  inst_vaddr[12]  & EntryLo1[i][`VALID]) |
-                    ((~inst_vaddr[12]) & EntryLo0[i][`VALID])
-                )
+            (//match
+                (EntryHi0[i][`ASID] === current_ASID)       | 
+                (  inst_vaddr[12]  & EntryLo1[i][`GLOBAL])  | 
+                ((~inst_vaddr[12]) & EntryLo0[i][`GLOBAL])
             )
             &
             (
@@ -142,6 +137,11 @@ assign inst_paddr_o = {
     ,
     inst_vaddr[11:0]
 };
+
+assign inst_V_flag = 
+    inst_direct |
+    (inst_hit_exist & (inst_vaddr[12] ? EntryLo1[inst_hit_idx][`VALID] : EntryLo0[inst_hit_idx][`VALID]) );
+
 //---- data
 logic data_hit [`TLB_LINE-1:0];
 logic data_hit_exist;
@@ -151,17 +151,10 @@ generate
     for(j=0;j<`TLB_LINE;j++)
     begin
         assign data_hit[j] = 
-            (
-                (//match
-                    (EntryHi0[j][`ASID] === current_ASID)       | 
-                    (  data_vaddr[12]  & EntryLo1[j][`GLOBAL])  | 
-                    ((~data_vaddr[12]) & EntryLo0[j][`GLOBAL])
-                )
-                &
-                (
-                    (  data_vaddr[12]  & EntryLo1[j][`VALID]) |
-                    ((~data_vaddr[12]) & EntryLo0[j][`VALID])
-                )
+            (//match
+                (EntryHi0[j][`ASID] === current_ASID)       | 
+                (  data_vaddr[12]  & EntryLo1[j][`GLOBAL])  | 
+                ((~data_vaddr[12]) & EntryLo0[j][`GLOBAL])
             )
             &
             (
@@ -221,9 +214,13 @@ assign data_paddr_o = {
 assign inst_found = inst_direct | inst_hit_exist;
 assign data_found = data_direct | data_hit_exist;
 
+assign data_V_flag = 
+    data_direct |
+    (data_hit_exist & (data_vaddr[12] ? EntryLo1[data_hit_idx][`VALID] : EntryLo0[data_hit_idx][`VALID]) );
+
 assign data_D_flag = 
     data_direct |
-    (data_hit_exist & (data_vaddr[12] ? EntryLo1[data_hit_idx][`DIRTY] : EntryLo0[data_hit_idx][`DIRTY]));
+    (data_hit_exist & (data_vaddr[12] ? EntryLo1[data_hit_idx][`DIRTY] : EntryLo0[data_hit_idx][`DIRTY]) );
 
 //TODO: NE, TLBP, TLBR 
 endmodule

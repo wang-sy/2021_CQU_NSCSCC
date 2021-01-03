@@ -31,6 +31,7 @@ module test13(
     wire [31:0] EntryHi_out, PageMask_out, EntryLo0_out, EntryLo1_out;
     wire [31:0] Index_out;
     wire [31:0] inst_paddr_o, data_paddr_o;
+    wire inst_V_flag, data_V_flag;
     wire data_D_flag;
     wire inst_found, data_found;
     TLB tlb(
@@ -49,6 +50,8 @@ module test13(
         .EntryLo0_out(EntryLo0_out),
         .EntryLo1_out(EntryLo1_out),
         .Index_out(Index_out),
+        .inst_V_flag(inst_V_flag),
+        .data_V_flag(data_V_flag),
         .data_D_flag(data_D_flag),
         .inst_paddr_o(inst_paddr_o),
         .data_paddr_o(data_paddr_o),
@@ -73,8 +76,8 @@ module test13(
         data_vaddr = 32'ha2336666;
         //Test kseg1 Direct
         #4
-        inst_vaddr = 32'h00001123;
-        data_vaddr = 32'h00000666;
+        inst_vaddr = 32'h00003123;
+        data_vaddr = 32'h00002666;
         //Test non Valid bit shouldn't match
         #4
         for(i=0;i<32;i++) begin
@@ -90,7 +93,7 @@ module test13(
         //Test TLBWI
         Index_in = 12;
         PageMask_in = 0;
-        EntryHi_in = 0;
+        EntryHi_in = 32'h00002000;
         EntryLo0_in = {26'b11011,6'b111011};//Test unset dirty
         EntryLo1_in = {26'b11010,6'b111111};
         #4
@@ -98,10 +101,8 @@ module test13(
         tlb_typeM = `TLBWR;
         Index_in = 0;
         Random_in = 12;
-        PageMask_in = 0;
-        EntryHi_in = 0;
         EntryLo0_in = {26'b11011,6'b111111};//Test set dirty
-        EntryLo1_in = {26'b11010,6'b111111};
+        EntryLo1_in = {26'b11010,6'b111101};//Test set invalid
         #4
         //Test no action
         tlb_typeM = 0;
