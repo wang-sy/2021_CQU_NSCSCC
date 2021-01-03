@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="test13_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="test13" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="144001fs"></ZoomEndTime>
+      <Cursor1Time time="144000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="533"></NameColumnWidth>
+      <ValueColumnWidth column_width="243"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="12" />
+   <wvobject fp_name="/test13/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test13/tlb_typeM" type="array">
+      <obj_property name="ElementShortName">tlb_typeM[2:0]</obj_property>
+      <obj_property name="ObjectShortName">tlb_typeM[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test13/inst_vaddr" type="array">
+      <obj_property name="ElementShortName">inst_vaddr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">inst_vaddr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test13/data_vaddr" type="array">
+      <obj_property name="ElementShortName">data_vaddr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">data_vaddr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="group1100" type="group">
+      <obj_property name="label">CP0_in</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/test13/EntryHi_in" type="array">
+         <obj_property name="ElementShortName">EntryHi_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">EntryHi_in[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/PageMask_in" type="array">
+         <obj_property name="ElementShortName">PageMask_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">PageMask_in[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/EntryLo0_in" type="array">
+         <obj_property name="ElementShortName">EntryLo0_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">EntryLo0_in[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/EntryLo1_in" type="array">
+         <obj_property name="ElementShortName">EntryLo1_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">EntryLo1_in[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/Index_in" type="array">
+         <obj_property name="ElementShortName">Index_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Index_in[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/Random_in" type="array">
+         <obj_property name="ElementShortName">Random_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Random_in[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group1101" type="group">
+      <obj_property name="label">CP0_out</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/test13/EntryHi_out" type="array">
+         <obj_property name="ElementShortName">EntryHi_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">EntryHi_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/PageMask_out" type="array">
+         <obj_property name="ElementShortName">PageMask_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">PageMask_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/EntryLo0_out" type="array">
+         <obj_property name="ElementShortName">EntryLo0_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">EntryLo0_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/EntryLo1_out" type="array">
+         <obj_property name="ElementShortName">EntryLo1_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">EntryLo1_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/Index_out" type="array">
+         <obj_property name="ElementShortName">Index_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Index_out[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/test13/inst_paddr_o" type="array">
+      <obj_property name="ElementShortName">inst_paddr_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">inst_paddr_o[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test13/data_paddr_o" type="array">
+      <obj_property name="ElementShortName">data_paddr_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">data_paddr_o[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test13/data_D_flag" type="logic">
+      <obj_property name="ElementShortName">data_D_flag</obj_property>
+      <obj_property name="ObjectShortName">data_D_flag</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test13/inst_found" type="logic">
+      <obj_property name="ElementShortName">inst_found</obj_property>
+      <obj_property name="ObjectShortName">inst_found</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test13/data_found" type="logic">
+      <obj_property name="ElementShortName">data_found</obj_property>
+      <obj_property name="ObjectShortName">data_found</obj_property>
+   </wvobject>
+   <wvobject fp_name="group505" type="group">
+      <obj_property name="label">TLB_inner</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/test13/tlb/TLBP" type="logic">
+         <obj_property name="ElementShortName">TLBP</obj_property>
+         <obj_property name="ObjectShortName">TLBP</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/TLBR" type="logic">
+         <obj_property name="ElementShortName">TLBR</obj_property>
+         <obj_property name="ObjectShortName">TLBR</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/TLBWI" type="logic">
+         <obj_property name="ElementShortName">TLBWI</obj_property>
+         <obj_property name="ObjectShortName">TLBWI</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/TLBWR" type="logic">
+         <obj_property name="ElementShortName">TLBWR</obj_property>
+         <obj_property name="ObjectShortName">TLBWR</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/PageMask" type="array">
+         <obj_property name="ElementShortName">PageMask[31:0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">PageMask[31:0][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/EntryHi0" type="array">
+         <obj_property name="ElementShortName">EntryHi0[31:0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">EntryHi0[31:0][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/EntryLo0" type="array">
+         <obj_property name="ElementShortName">EntryLo0[31:0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">EntryLo0[31:0][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/EntryLo1" type="array">
+         <obj_property name="ElementShortName">EntryLo1[31:0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">EntryLo1[31:0][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/TLB_WritePos" type="array">
+         <obj_property name="ElementShortName">TLB_WritePos[4:0]</obj_property>
+         <obj_property name="ObjectShortName">TLB_WritePos[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/TLB_Write_en" type="logic">
+         <obj_property name="ElementShortName">TLB_Write_en</obj_property>
+         <obj_property name="ObjectShortName">TLB_Write_en</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/inst_direct" type="logic">
+         <obj_property name="ElementShortName">inst_direct</obj_property>
+         <obj_property name="ObjectShortName">inst_direct</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/data_direct" type="logic">
+         <obj_property name="ElementShortName">data_direct</obj_property>
+         <obj_property name="ObjectShortName">data_direct</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/current_ASID" type="array">
+         <obj_property name="ElementShortName">current_ASID[7:0]</obj_property>
+         <obj_property name="ObjectShortName">current_ASID[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/inst_hit" type="array">
+         <obj_property name="ElementShortName">inst_hit[31:0]</obj_property>
+         <obj_property name="ObjectShortName">inst_hit[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/inst_hit_exist" type="logic">
+         <obj_property name="ElementShortName">inst_hit_exist</obj_property>
+         <obj_property name="ObjectShortName">inst_hit_exist</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/inst_hit_idx" type="array">
+         <obj_property name="ElementShortName">inst_hit_idx[4:0]</obj_property>
+         <obj_property name="ObjectShortName">inst_hit_idx[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/data_hit" type="array">
+         <obj_property name="ElementShortName">data_hit[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data_hit[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/data_hit_exist" type="logic">
+         <obj_property name="ElementShortName">data_hit_exist</obj_property>
+         <obj_property name="ObjectShortName">data_hit_exist</obj_property>
+      </wvobject>
+      <wvobject fp_name="/test13/tlb/data_hit_idx" type="array">
+         <obj_property name="ElementShortName">data_hit_idx[4:0]</obj_property>
+         <obj_property name="ObjectShortName">data_hit_idx[4:0]</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>
