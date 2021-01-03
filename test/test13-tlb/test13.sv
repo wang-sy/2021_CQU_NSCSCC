@@ -109,6 +109,20 @@ module test13(
         EntryHi_in = 0;
         EntryLo0_in = 0;
         EntryLo1_in = 0;
+        inst_vaddr = 0;
+        data_vaddr = 0;
+        #4
+        //Test TLBP
+        tlb_typeM = `TLBP;
+        EntryHi_in = 32'h00002000;
+        #4
+        //Test TLBR
+        tlb_typeM = `TLBR;
+        Index_in = 12;
+        EntryHi_in = 0;
+        #4
+        //Test TLBR in different index
+        Index_in = 13;
         #4
         $finish;
     end

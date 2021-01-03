@@ -50,12 +50,16 @@ logic TLB_Write_en;
 assign TLB_Write_en = (TLBWI | TLBWR) & (~Index_in[5]);//阅读了龙芯给的开源代码，由于index给了六位，但超出的部分是不写入的。
 assign TLB_WritePos = TLBWR ? Random_in[`TLB_WIDTH-1:0] : Index_in[`TLB_WIDTH-1:0];
 
+logic [31:0] PageMaskTrimed;
+assign PageMaskTrimed = PageMask_in & {3'd0,16'hffff,13'd0};
+logic EntryG;
+assign EntryG = EntryLo0_in[`GLOBAL] & EntryLo1_in[`GLOBAL];//根据MIPS文档，Lo0和Lo1的G位都为1才是Global
 always @(posedge clk) begin
     if (TLB_Write_en) begin
-        PageMask[TLB_WritePos] <= PageMask_in;
-        EntryHi0[TLB_WritePos] <= EntryHi_in;
-        EntryLo0[TLB_WritePos] <= EntryLo0_in;
-        EntryLo1[TLB_WritePos] <= EntryLo1_in;
+        PageMask[TLB_WritePos] <= PageMaskTrimed;
+        EntryHi0[TLB_WritePos] <= EntryHi_in  & {~PageMaskTrimed[31:13],5'd0,8'hff};
+        EntryLo0[TLB_WritePos] <= {1'b0,EntryLo0_in[30:1],EntryG};
+        EntryLo1[TLB_WritePos] <= {1'b0,EntryLo1_in[30:1],EntryG};
     end
 end
 
@@ -122,16 +126,23 @@ assign inst_paddr_o = {
     )
     :
     (
+        inst_hit_exist ? 
         (
-            (inst_vaddr[12] ? EntryLo1[inst_hit_idx][25:6] : EntryLo0[inst_hit_idx][25:6])
-            &
-            {1'b1,~PageMask[inst_hit_idx][31:13]}
+            (
+                (inst_vaddr[12] ? EntryLo1[inst_hit_idx][25:6] : EntryLo0[inst_hit_idx][25:6])
+                &
+                {1'b1,~PageMask[inst_hit_idx][31:13]}
+            )
+            |
+            (
+                inst_vaddr[31:12]
+                &
+                {1'b0,PageMask[inst_hit_idx][31:13]}
+            )
         )
-        |
+        :
         (
-            inst_vaddr[31:12]
-            &
-            {1'b0,PageMask[inst_hit_idx][31:13]}
+            20'd0
         )
     )
     ,
@@ -143,9 +154,13 @@ assign inst_V_flag =
     (inst_hit_exist & (inst_vaddr[12] ? EntryLo1[inst_hit_idx][`VALID] : EntryLo0[inst_hit_idx][`VALID]) );
 
 //---- data
+//对于TLBP指令的查找，交由data部分进行处理。
+//TODO: 龙芯文档上在TLBP指令有提到TLB[i] 140，与ASID相等是or的关系，猜测是Lo0的Global位，尚不确定。
 logic data_hit [`TLB_LINE-1:0];
 logic data_hit_exist;
 logic [`TLB_WIDTH-1:0] data_hit_idx;
+logic [31:0] data_vaddr_tofind;
+assign data_vaddr_tofind = TLBP ? EntryHi_in : data_vaddr;
 genvar j;
 generate
     for(j=0;j<`TLB_LINE;j++)
@@ -153,13 +168,13 @@ generate
         assign data_hit[j] = 
             (//match
                 (EntryHi0[j][`ASID] === current_ASID)       | 
-                (  data_vaddr[12]  & EntryLo1[j][`GLOBAL])  | 
-                ((~data_vaddr[12]) & EntryLo0[j][`GLOBAL])
+                (  data_vaddr_tofind[12]  & EntryLo1[j][`GLOBAL])  | 
+                ((~data_vaddr_tofind[12]) & EntryLo0[j][`GLOBAL])
             )
             &
             (
                 ((~PageMask[j][31:13]) & EntryHi0[j][31:13]) ===
-                ((~PageMask[j][31:13]) & data_vaddr [31:13])
+                ((~PageMask[j][31:13]) & data_vaddr_tofind[31:13])
             )
             ;
     end
@@ -195,16 +210,23 @@ assign data_paddr_o = {
     )
     :
     (
+        data_hit_exist & !TLBP ?
         (
-            (data_vaddr[12] ? EntryLo1[data_hit_idx][25:6] : EntryLo0[data_hit_idx][25:6])
-            &
-            {1'b1,~PageMask[data_hit_idx][31:13]}
+            (
+                (data_vaddr[12] ? EntryLo1[data_hit_idx][25:6] : EntryLo0[data_hit_idx][25:6])
+                &
+                {1'b1,~PageMask[data_hit_idx][31:13]}
+            )
+            |
+            (
+                data_vaddr[31:12]
+                &
+                {1'b0,PageMask[data_hit_idx][31:13]}
+            )
         )
-        |
+        :
         (
-            data_vaddr[31:12]
-            &
-            {1'b0,PageMask[data_hit_idx][31:13]}
+            20'd0
         )
     )
     ,
@@ -212,15 +234,36 @@ assign data_paddr_o = {
 };
 
 assign inst_found = inst_direct | inst_hit_exist;
-assign data_found = data_direct | data_hit_exist;
+assign data_found = data_direct | data_hit_exist | TLBP;
 
 assign data_V_flag = 
     data_direct |
+    TLBP        |
     (data_hit_exist & (data_vaddr[12] ? EntryLo1[data_hit_idx][`VALID] : EntryLo0[data_hit_idx][`VALID]) );
 
 assign data_D_flag = 
     data_direct |
     (data_hit_exist & (data_vaddr[12] ? EntryLo1[data_hit_idx][`DIRTY] : EntryLo0[data_hit_idx][`DIRTY]) );
 
-//TODO: NE, TLBP, TLBR 
+//TLBP
+assign Index_out = TLBP ? 
+    (
+        data_hit_exist ? 
+        (
+            {27'd0,data_hit_idx}
+        )
+        :
+        (
+            {1'b1,31'd0}
+        )
+    ) 
+    :
+    32'd0;
+
+//TLBR
+assign PageMask_out = TLBR ? PageMask[TLB_WritePos] : 32'd0;
+assign EntryHi_out = TLBR ? EntryHi0[TLB_WritePos] : 32'd0;
+assign EntryLo0_out = TLBR? EntryLo0[TLB_WritePos] : 32'd0;
+assign EntryLo1_out = TLBR? EntryLo1[TLB_WritePos] : 32'd0;
+//TODO: NE
 endmodule
