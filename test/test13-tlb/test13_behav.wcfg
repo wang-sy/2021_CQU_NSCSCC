@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="21674fs"></ZoomStartTime>
-      <ZoomEndTime time="173675fs"></ZoomEndTime>
-      <Cursor1Time time="150000fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="164001fs"></ZoomEndTime>
+      <Cursor1Time time="0fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="533"></NameColumnWidth>
-      <ValueColumnWidth column_width="227"></ValueColumnWidth>
+      <ValueColumnWidth column_width="219"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="14" />
+   <WVObjectSize size="16" />
    <wvobject fp_name="/test13/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -116,10 +116,17 @@
       <obj_property name="ElementShortName">data_found</obj_property>
       <obj_property name="ObjectShortName">data_found</obj_property>
    </wvobject>
+   <wvobject fp_name="/test13/inst_uncached" type="logic">
+      <obj_property name="ElementShortName">inst_uncached</obj_property>
+      <obj_property name="ObjectShortName">inst_uncached</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test13/data_uncached" type="logic">
+      <obj_property name="ElementShortName">data_uncached</obj_property>
+      <obj_property name="ObjectShortName">data_uncached</obj_property>
+   </wvobject>
    <wvobject fp_name="group505" type="group">
       <obj_property name="label">TLB_inner</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/test13/tlb/TLBP" type="logic">
          <obj_property name="ElementShortName">TLBP</obj_property>
          <obj_property name="ObjectShortName">TLBP</obj_property>

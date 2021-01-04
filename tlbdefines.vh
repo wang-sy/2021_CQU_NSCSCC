@@ -12,3 +12,4 @@
 `define GLOBAL 0
 `define VALID 1
 `define DIRTY 2
+`define UNCACHE 5

@@ -27,7 +27,10 @@ module TLB(
     output logic [31:0] inst_paddr_o,
     output logic [31:0] data_paddr_o,
     output logic        inst_found,
-    output logic        data_found
+    output logic        data_found,
+
+    output logic        inst_uncached,
+    output logic        data_uncached
 );
 
 //TLB instr
@@ -265,5 +268,35 @@ assign PageMask_out = TLBR ? PageMask[TLB_WritePos] : 32'd0;
 assign EntryHi_out = TLBR ? EntryHi0[TLB_WritePos] : 32'd0;
 assign EntryLo0_out = TLBR? EntryLo0[TLB_WritePos] : 32'd0;
 assign EntryLo1_out = TLBR? EntryLo1[TLB_WritePos] : 32'd0;
+
+assign inst_uncached = 
+    inst_direct ? (
+        inst_vaddr[31:29] == `kseg1
+    )
+    :
+    (
+        inst_hit_exist ?
+        (
+            inst_vaddr[12] ? EntryLo1[inst_hit_idx][`UNCACHE] : EntryLo0[inst_hit_idx][`UNCACHE]
+        )
+        :
+        1'b0
+    );
+assign data_uncached = 
+    data_direct ? (
+        data_vaddr[31:29] == `kseg1
+    )
+    :
+    (
+        data_hit_exist ?
+        (
+            data_vaddr[12] ? EntryLo1[data_hit_idx][`UNCACHE] : EntryLo0[data_hit_idx][`UNCACHE]
+        )
+        :
+        1'b0
+    );
+
+//running ucore passed!!!
+
 //TODO: NE
 endmodule

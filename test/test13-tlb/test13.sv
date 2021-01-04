@@ -34,6 +34,7 @@ module test13(
     wire inst_V_flag, data_V_flag;
     wire data_D_flag;
     wire inst_found, data_found;
+    wire inst_uncached, data_uncached;
     TLB tlb(
         .clk(clk),
         .tlb_typeM(tlb_typeM),
@@ -56,7 +57,9 @@ module test13(
         .inst_paddr_o(inst_paddr_o),
         .data_paddr_o(data_paddr_o),
         .inst_found(inst_found),
-        .data_found(data_found)
+        .data_found(data_found),
+        .inst_uncached(inst_uncached),
+        .data_uncached(data_uncached)
     );
     always #2 clk = ~clk;
     reg [5:0] i;
