@@ -7,8 +7,8 @@ module EX (
     input logic [`AluOpBus]     aluop_i,
     input logic [`AluSelBus]    alusel_i,
 
-    input logic [`RegAddrBus]      reg1_addr_i,
-    input logic [`RegAddrBus]      reg2_addr_i,
+    input logic [`RegAddrBus]   reg1_addr_i,
+    input logic [`RegAddrBus]   reg2_addr_i,
 
     input logic [`DataBus]      reg1_i,
     input logic [`DataBus]      reg2_i,

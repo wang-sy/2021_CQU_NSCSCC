@@ -18,13 +18,12 @@ module pc_reg (
 );
 
     assign ce_o = ~ rst_i;
-    logic  first_stall;
 
     // 当需要重置时，将PC刷新
     // 当需要stall时，保持PC不变
     always @ (posedge clk_i) begin
         if(rst_i == 1'b1) begin
-            pc_o <= `ZeroWord;
+            pc_o <= 32'hbfc00000;
         end
         else if(stall_i) begin
                 pc_o <= pc_o;

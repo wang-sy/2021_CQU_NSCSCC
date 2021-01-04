@@ -20,6 +20,8 @@ module datapath (
     input   logic [31:0]    rom_data_i,
     input   logic [31:0]    ram_data_i,
     input   logic [5:0]     int_i,  //赛宇 坑我 不给宽度
+    input   logic           inst_stall_i,
+    input   logic           data_stall_i,
 
     output  logic           rom_ce_o,
     output  logic [31:0]    rom_addr_o,
@@ -28,8 +30,20 @@ module datapath (
     output  logic [3:0]     ram_sel_o,
     output  logic           ram_we_o,
     output  logic           ram_ce_o,
-    output  logic           time_int_o //定时中断，暂未进行信号赋值
+    output  logic           time_int_o,  //定时中断，暂未进行信号赋值
+    output  logic           stall_all_o, // 全局流水线停顿，在进行（乘除法运算、id取指时可能出现）
+    
+    //debug interface
+    output wire[31:0]   debug_wb_pc,
+    output wire[3:0]    debug_wb_rf_wen,
+    output wire[4:0]    debug_wb_rf_wnum,
+    output wire[31:0]   debug_wb_rf_wdata
 );
+
+    assign debug_wb_pc          = wb_pc;
+    assign debug_wb_rf_wen      = {4{wb_wreg & ~mem2wb_stall}};
+    assign debug_wb_rf_wnum     = wb_wd;
+    assign debug_wb_rf_wdata    = wb_wdata[31:0];
 
     // id阶段的信号
     logic [31:0] id_pc;
@@ -58,6 +72,7 @@ module datapath (
     
 
     // ex阶段的信号
+    logic [31:0]            ex_pc;
     logic [`AluOpBus]       ex_aluop;
     logic [`AluSelBus]      ex_alusel;
     logic [`DataBus]        ex_reg1;
@@ -76,6 +91,7 @@ module datapath (
 
 
     // mem阶段的信号
+    logic [31:0]            mem_pc;
     logic [`AluOpBus]       mem_aluop;
     logic [`RegAddrBus]     mem_wd;
     logic                   mem_wreg;
@@ -92,12 +108,13 @@ module datapath (
     logic [31:0]            mem_mem_io_addr;
 
     // wb阶段的信号
+    logic [31:0]            wb_pc;
     logic [`RegAddrBus]     wb_wd;
     logic                   wb_wreg;
     logic [`DoubleRegBus]   wb_wdata;
     logic [`RegAddrBus]     wb_wd_control;
     logic                   wb_wreg_control;
-    logic [`DoubleRegBus]        wb_wdata_control;
+    logic [`DoubleRegBus]   wb_wdata_control;
 
     // 各阶段的stall状态
     logic                   if_stall;
@@ -150,6 +167,7 @@ module datapath (
     logic [31:0] ex2mem_exception_o;
     logic [31:0] ex2mem_current_instr_addr_o;
     logic        ex2mem_in_delayslot_o;
+    logic        ex2mem_flush;
 
     logic [31:0] mem_exception_type_o;
     logic        mem_wb_cp0_reg_we;
@@ -170,6 +188,9 @@ module datapath (
     logic                wb_cp0_reg_we_control;//qf
     logic [4:0]          wb_cp0_reg_write_addr_control;//qf
     logic [31:0]         wb_cp0_reg_data_control; //qf
+    
+    logic id2exe_reg1_read;
+    logic id2exe_reg2_read;
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -178,20 +199,22 @@ module datapath (
         .ex_ok_i(ex_ok),
         .cp0_epc_i(mem_cp0_epc_o),//
         .exception_type_i(mem_exception_type_o),//
-        .ex_rmem_i(ex_rmem),
-        .ex_wd_i(ex_wd),
-        .ex_wreg_i(ex_wreg),
-        .id_rs_i(id_rs),
-        .id_rt_i(id_rt),
-        .id_reg1_read_i(id_reg1_read),
-        .id_reg2_read_i(id_reg2_read),
+        .inst_stall_i(inst_stall_i),
+        .data_stall_i(data_stall_i),
+        .mem_wd_i(mem_wd),
+        .mem_rmem_i(mem_rmem),
+        .id2exe_reg1_addr_i(id2exe_reg1_addr_o),
+        .id2exe_reg2_addr_i(id2exe_reg2_addr_o),
+        .id2exe_reg1_read_ena_i(id2exe_reg1_read),
+        .id2exe_reg2_read_ena_i(id2exe_reg2_read),
 
         .if2id_stall_o(if2id_stall),
         .if_stall_o(if_stall),
         .id2ex_stall_o(id2ex_stall),
-        .id2ex_flush_o(id2ex_flush),
+        .ex2mem_flush_o(ex2mem_flush),
         .ex2mem_stall_o(ex2mem_stall),
         .mem2wb_stall_o(mem2wb_stall),
+        .stall_all_o(stall_all_o),
         .flush(controller_flush),//
         .new_pc(controller_new_pc)//
     );
@@ -331,7 +354,7 @@ module datapath (
     id2exe datapath_id2ex(
         .rst(rst_i),
         .clk(clk_i),
-        .flush_i( id2ex_flush || controller_flush),
+        .flush_i(controller_flush),
         .stall_i(id2ex_stall),
 
         .id_alu_sel_i(id_alusel),
@@ -347,6 +370,7 @@ module datapath (
         .id_rmem_i(id_rmem),
         .id_wmem_i(id_wmem),
         .id_mem_io_addr_i(id_mem_io_addr),
+        .id_pc_i(id_pc),
 
         .id_exception_i(id_exception_o),
         .id_current_instr_addr_i(id_current_instr_addr_o),
@@ -375,6 +399,7 @@ module datapath (
         .exe_rmem_o(ex_rmem),
         .exe_wmem_o(ex_wmem),
         .exe_mem_io_addr_o(ex_mem_io_addr),
+        .exe_pc_o(ex_pc),
 
         .ex_exception_o(id2exe_exception_o),
         .ex_current_instr_addr_o(id2exe_current_instr_addr_o),
@@ -391,8 +416,6 @@ module datapath (
 
     );
 
-    logic id2exe_reg1_read;
-    logic id2exe_reg2_read;
 
     // EX阶段
     // 负责接收ID阶段的译码结果以及读取的寄存器的值
@@ -478,8 +501,9 @@ module datapath (
         .ex_wmem_i(ex_wmem),
         .ex_aluop_i(ex_aluop),
         .ex_mem_io_addr_i(ex_mem_io_addr),
+        .ex_pc_i(ex_pc),
 
-        .flush_i(controller_flush),
+        .flush_i(controller_flush | ex2mem_flush),
         .ex_exception_type_i(ex_exception_o),
         .ex_current_instr_addr_i(ex_current_instr_addr_o),
         .ex_is_in_delayslot(ex_in_delayslot_o),
@@ -499,6 +523,7 @@ module datapath (
         .mem_wmem_o(mem_wmem),
         .mem_aluop_o(mem_aluop),
         .mem_mem_io_addr_o(mem_mem_io_addr),
+        .mem_pc_o(mem_pc),
 
         .mem_exception_type_o(ex2mem_exception_o),
         .mem_current_instr_addr_o(ex2mem_current_instr_addr_o),
@@ -577,6 +602,7 @@ module datapath (
         .mem_wd_i(mem_wd),
         .mem_wreg_i(mem_wreg),
         .mem_wdata_i(mem_wdata_o),
+        .mem_pc_i(mem_pc),
 
         .flush_i(controller_flush),
 
@@ -587,6 +613,7 @@ module datapath (
         .wb_wd_o(wb_wd),
         .wb_wreg_o(wb_wreg),
         .wb_wdata_o(wb_wdata),
+        .wb_pc_o(wb_pc),
 
         .wb_cp0_reg_we(mem2wb_cp0_reg_we),//qf
         .wb_cp0_reg_write_addr(mem2wb_cp0_reg_write_addr),//qf
