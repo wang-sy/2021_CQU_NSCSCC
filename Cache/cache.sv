@@ -69,18 +69,18 @@ module cache (
     input  [1 :0] cpu_data_size    , // datasize
     input  [31:0] cpu_data_addr    , // goal_addr
     input  [31:0] cpu_data_wdata   , // write in data
-    output [31:0] cpu_data_rdata   , // 返回的数据
-    output        cpu_data_addr_ok , // 返回的使能信号，如果是1，则代表请求的地址有效
-    output        cpu_data_data_ok , // 返回的使能信号，如果是1，则代表请求的操作已经完成
+    output [31:0] cpu_data_rdata   , // 返回的数�?
+    output        cpu_data_addr_ok , // 返回的使能信号，如果�?1，则代表请求的地�?有效
+    output        cpu_data_data_ok , // 返回的使能信号，如果�?1，则代表请求的操作已经完�?
 
     //axi interface
     output         cache_data_req     , // 是否发出请求
-    output         cache_data_wr      , // 是否需要写
+    output         cache_data_wr      , // 是否�?要写
     output  [1 :0] cache_data_size    , // 写的大小
     output  [31:0] cache_data_addr    , // 目标地址
-    output  [31:0] cache_data_wdata   , // 写入的数据
-    input   [31:0] cache_data_rdata   , // 输入，axibridge 返回的数据
-    input          cache_data_addr_ok , // 输出的地址是否有效
+    output  [31:0] cache_data_wdata   , // 写入的数�?
+    input   [31:0] cache_data_rdata   , // 输入，axibridge 返回的数�?
+    input          cache_data_addr_ok , // 输出的地�?是否有效
     input          cache_data_data_ok   // 读写操作是否完成
 );
     */
@@ -93,7 +93,7 @@ module cache (
 
     d_cache m_d_cache(
         .p_a(cpu_data_addr), // 地址
-        .p_dout(cpu_data_wdata), // 写入的数据
+        .p_dout(cpu_data_wdata), // 写入的数�?
         .p_din(cpu_data_rdata), // 读取到的数据
         .p_strobe(cpu_data_req), // 是否发出请求
         .p_wen(d_cache_in_wen), // wen
@@ -102,12 +102,12 @@ module cache (
         .p_ready(d_cache_ok), // 是否完成
         .clk(clk), 
         .clrn(~rst),
-        .m_a(cache_data_addr),  // 操作的地址
-        .m_dout(cache_data_rdata), // 读取的数据
-        .m_din(cache_data_wdata), // 写入的数据
-        .m_strobe(cache_data_req), // 是否向内存发出请求
+        .m_a(cache_data_addr),  // 操作的地�?
+        .m_dout(cache_data_rdata), // 读取的数�?
+        .m_din(cache_data_wdata), // 写入的数�?
+        .m_strobe(cache_data_req), // 是否向内存发出请�?
         .m_wen(d_cache_out_wen), // wen
-        .m_size(cache_data_size), // 操作的大小
+        .m_size(cache_data_size), // 操作的大�?
         .m_rw(cache_data_wr), // 是否是写请求
         .m_ready(cache_data_data_ok) // 内存是否ok
     );

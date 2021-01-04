@@ -1,130 +1,133 @@
-module nt(input [95:0] x0, input [31:0] num,
-          output reg [191:0] x1, output reg ready);
-   always @(*) begin
-      ready = 0;
-      x1 = (x0 * ((2 << 96) - num * x0)) >> 96;
-      ready = 1;
-   end
-endmodule // nt
+//////////////////////////////////////////////////////////////////////
+////                                                              ////
+//// Copyright (C) 2014 leishangwen@163.com                       ////
+////                                                              ////
+//// This source file may be used and distributed without         ////
+//// restriction provided that this copyright statement is not    ////
+//// removed from the file and that any derivative work contains  ////
+//// the original copyright notice and the associated disclaimer. ////
+////                                                              ////
+//// This source file is free software; you can redistribute it   ////
+//// and/or modify it under the terms of the GNU Lesser General   ////
+//// Public License as published by the Free Software Foundation; ////
+//// either version 2.1 of the License, or (at your option) any   ////
+//// later version.                                               ////
+////                                                              ////
+//// This source is distributed in the hope that it will be       ////
+//// useful, but WITHOUT ANY WARRANTY; without even the implied   ////
+//// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR      ////
+//// PURPOSE.  See the GNU Lesser General Public License for more ////
+//// details.                                                     ////
+////                                                              ////
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+// Module:  div
+// File:    div.v
+// Author:  Lei Silei
+// E-mail:  leishangwen@163.com
+// Description: 除法模块
+// Revision: 1.0
+//////////////////////////////////////////////////////////////////////
+
+`include "defines.vh"
+
 module div(
-         input clk, rst, signed_div,
-         input [31:0]      a, b,
-         input             start, annul,
-         output reg [63:0] result,
-         output reg        ready
-      );
 
-   parameter coef = 33'h1e1e1e1e1,
-     incept = 66'h2d2d2d2d2d2d2e000;
+	input	wire										clk,
+	input wire										rst,
+	
+	input wire                    signed_div_i,
+	input wire[31:0]              opdata1_i,
+	input wire[31:0]		   				opdata2_i,
+	input wire                    start_i,
+	input wire                    annul_i,
+	
+	output reg[63:0]             result_o,
+	output reg			             ready_o
+);
 
-   reg [31:0]                num1, num2;
+	wire[32:0] div_temp;
+	reg[5:0] cnt;
+	reg[64:0] dividend;
+	reg[1:0] state;
+	reg[31:0] divisor;	 
+	reg[31:0] temp_op1;
+	reg[31:0] temp_op2;
+	
+	assign div_temp = {1'b0,dividend[63:32]} - {1'b0,divisor};
 
-   reg [127:0]               lr;
-   wire [191:0]              lr_temp;
-
-   integer                   i;
-   parameter nt_it_total = 4, align_it_total = 4;
-   reg [2:0]                 nt_it, align_it;
-
-   parameter S_START = 0,
-     S_APPROX = 1,
-     S_NT = 2,
-     S_MULT = 3,
-     S_RESULT = 4,
-     S_READY = 5,
-     S_ALIGN = 6;
-
-   reg [3:0]                 state;
-
-   reg [31:0]                nnum2;
-   reg [5:0]                 nnum2_exp;
- //lr为96位，端口为128位 看见了改一下
-   nt nt_iterator(lr, nnum2, lr_temp, lr_ready);
-
-   always @(posedge clk, posedge rst) begin
-      if (rst) begin
-         state <= S_START;
-         ready <= 0;
-         nt_it <= 0;
-         align_it <= 0;
-      end else
-        case (state)
-          S_START: begin
-             if (start) begin
-                ready <= 0;
-                nt_it <= 0;
-                align_it <= 0;
-                if (signed_div && a[31] == 1'b1)
-                  num1 <= ~a + 1;
-                else
-                  num1 <= a;
-
-                if (signed_div && b[31] == 1'b1)
-                  num2 = ~b + 1;
-                else
-                  num2 = b;
-                nnum2_exp <= 32;
-                nnum2 <= num2;
+	always @ (posedge clk) begin
+		if (rst == `RstEnable) begin
+			state <= `DivFree;
+			ready_o <= `DivResultNotReady;
+			result_o <= {`ZeroWord,`ZeroWord};
+		end else begin
+		  case (state)
+		  	`DivFree:			begin               //DivFree状态
+		  		if(start_i == `DivStart && annul_i == 1'b0) begin
+		  			if(opdata2_i == `ZeroWord) begin
+		  				state <= `DivByZero;
+		  			end else begin
+		  				state <= `DivOn;
+		  				cnt <= 6'b000000;
+		  				if(signed_div_i == 1'b1 && opdata1_i[31] == 1'b1 ) begin
+		  					temp_op1 = ~opdata1_i + 1;
+		  				end else begin
+		  					temp_op1 = opdata1_i;
+		  				end
+		  				if(signed_div_i == 1'b1 && opdata2_i[31] == 1'b1 ) begin
+		  					temp_op2 = ~opdata2_i + 1;
+		  				end else begin
+		  					temp_op2 = opdata2_i;
+		  				end
+		  				dividend <= {`ZeroWord,`ZeroWord};
+              dividend[32:1] <= temp_op1;
+              divisor <= temp_op2;
              end
-             state <= start ? S_ALIGN : S_START;
-          end
-          S_ALIGN: begin
-             for (i = 0; i < 8 && nnum2[31] == 0; i = i + 1) begin
-                nnum2_exp = nnum2_exp - 1;
-                nnum2 = nnum2 << 1;
+          end else begin
+						ready_o <= `DivResultNotReady;
+						result_o <= {`ZeroWord,`ZeroWord};
+				  end          	
+		  	end
+		  	`DivByZero:		begin               //DivByZero状态
+         	dividend <= {`ZeroWord,`ZeroWord};
+          state <= `DivEnd;		 		
+		  	end
+		  	`DivOn:				begin               //DivOn状态
+		  		if(annul_i == 1'b0) begin
+		  			if(cnt != 6'b100000) begin
+               if(div_temp[32] == 1'b1) begin
+                  dividend <= {dividend[63:0] , 1'b0};
+               end else begin
+                  dividend <= {div_temp[31:0] , dividend[31:0] , 1'b1};
+               end
+               cnt <= cnt + 1;
+             end else begin
+               if((signed_div_i == 1'b1) && ((opdata1_i[31] ^ opdata2_i[31]) == 1'b1)) begin
+                  dividend[31:0] <= (~dividend[31:0] + 1);
+               end
+               if((signed_div_i == 1'b1) && ((opdata1_i[31] ^ dividend[64]) == 1'b1)) begin              
+                  dividend[64:33] <= (~dividend[64:33] + 1);
+               end
+               state <= `DivEnd;
+               cnt <= 6'b000000;            	
              end
-             align_it = align_it + 1;
-             if (nnum2[31] != 0 || align_it == 4)
-               state <= annul ? S_START : S_APPROX;
-             else
-               state <= annul ? S_START : S_ALIGN;
-          end
-          S_APPROX: begin
-             lr <= incept - coef * nnum2;
-             state <= annul ? S_START : S_NT;
-          end
-          S_NT: begin
-             state <= annul ? S_START : S_NT;
-             if (lr_ready) begin
-                lr <= lr_temp;
-                nt_it = nt_it + 1;
-                if (nt_it == nt_it_total)
-                  state <= annul ? S_START : S_MULT;
-             end
-          end
-          S_MULT: begin
-             lr <= num1 * lr;
-             state <= annul ? S_START : S_RESULT;
-          end
-          S_RESULT: begin
-             result = 0;
-             if (signed_div && a[31] != b[31])
-               result[31:0] = ~((lr >> 64) >> nnum2_exp) + 1;
-             else
-               result[31:0] = (lr >> 64) >> nnum2_exp;
-
-             if (signed_div)
-               result[63:32] = $signed(a) - $signed(b) * $signed(result[31:0]);
-             else
-               result[63:32] = a - b * result[31:0];
-
-             if (signed_div ?
-                 ($signed(result[63:32]) >= $signed(num2)) :
-                 (result[63:32] >= num2)) begin
-                result[31:0] <= result[31:0] + 1;
-                result[63:32] <= result[63:32] - b;
-             end
-             state <= annul ? S_START : S_READY;
-          end
-          S_READY: begin
-             ready <= 1;
-             if (!start) begin
-                state <= S_START;
-                ready <= 0;
-             end
-          end
-          default: state <= S_START;
-        endcase
-   end
+		  		end else begin
+		  			state <= `DivFree;
+		  		end	
+		  	end
+		  	`DivEnd:			begin               //DivEnd状态
+        	result_o <= {dividend[64:33], dividend[31:0]};  
+          ready_o <= `DivResultReady;
+          if(start_i == `DivStop) begin
+          	state <= `DivFree;
+						ready_o <= `DivResultNotReady;
+						result_o <= {`ZeroWord,`ZeroWord};       	
+          end		  	
+		  	end
+		  endcase
+		end
+	end
 
 endmodule

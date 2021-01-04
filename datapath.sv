@@ -168,6 +168,7 @@ module datapath (
     logic [31:0] ex2mem_current_instr_addr_o;
     logic        ex2mem_in_delayslot_o;
     logic        ex2mem_flush;
+    logic        id2ex_flush;
 
     logic [31:0] mem_exception_type_o;
     logic        mem_wb_cp0_reg_we;
@@ -207,14 +208,22 @@ module datapath (
         .id2exe_reg2_addr_i(id2exe_reg2_addr_o),
         .id2exe_reg1_read_ena_i(id2exe_reg1_read),
         .id2exe_reg2_read_ena_i(id2exe_reg2_read),
+        .id_alu_op_i(id_aluop),
+        .id_reg1_addr_i(id_reg1_addr_o),
+        .id_reg2_addr_i(id_reg2_addr_o),
+        .id_reg1_read_ena_i(id_reg1_read),
+        .id_reg2_read_ena_i(id_reg2_read),
+        .ex_wreg_i(ex_wreg),
+        .ex_wd_i(ex_wd),
 
         .if2id_stall_o(if2id_stall),
         .if_stall_o(if_stall),
         .id2ex_stall_o(id2ex_stall),
-        .ex2mem_flush_o(ex2mem_flush),
         .ex2mem_stall_o(ex2mem_stall),
         .mem2wb_stall_o(mem2wb_stall),
         .stall_all_o(stall_all_o),
+        .ex2mem_flush_o(ex2mem_flush),
+        .id2ex_flush_o(id2ex_flush),
         .flush(controller_flush),//
         .new_pc(controller_new_pc)//
     );
@@ -354,7 +363,7 @@ module datapath (
     id2exe datapath_id2ex(
         .rst(rst_i),
         .clk(clk_i),
-        .flush_i(controller_flush),
+        .flush_i(controller_flush | id2ex_flush),
         .stall_i(id2ex_stall),
 
         .id_alu_sel_i(id_alusel),

@@ -28,6 +28,15 @@
 `define AHB_BUSY 2'b01
 `define AHB_WAIT_FOR_STALL 2'b11
 
+`define DivFree 2'b00
+`define DivByZero 2'b01
+`define DivOn 2'b10
+`define DivEnd 2'b11
+`define DivResultReady 1'b1
+`define DivResultNotReady 1'b0
+`define DivStart 1'b1
+`define DivStop 1'b0
+
 //specific inst macro definition
 //logic inst
 `define EXE_NOP			6'b000000

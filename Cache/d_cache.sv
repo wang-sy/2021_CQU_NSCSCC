@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module d_cache #(parameter A_WIDTH = 32,
     parameter C_INDEX = 6)(
         input wire[A_WIDTH-1:0] p_a,
@@ -53,13 +55,7 @@ module d_cache #(parameter A_WIDTH = 32,
     assign rst = ~clrn;
     assign data_data_ok = m_ready;
     assign data_rdata= m_dout ;
-    assign m_a = flag ? (aluoutM[31:28] == 4'ha ? {4'h0,aluoutM[27:0]} :
-                aluoutM[31:28] == 4'hb ? {4'h1,aluoutM[27:0]} :
-                aluoutM[31:28] == 4'h9 ? {4'h1,aluoutM[27:0]} :
-                aluoutM[31:28] == 4'h8 ? {4'h0,aluoutM[27:0]} :
-                aluoutM[31:28] == 4'h0 ? {4'h0,aluoutM[27:0]} :
-                aluoutM[31:28] == 4'h1 ? {4'h1,aluoutM[27:0]} :
-                32'd0) : data_addr;
+    assign m_a = flag ? (aluoutM[31:28] == 4'ha ? {4'h0,aluoutM[27:0]} : aluoutM[31:28] == 4'hb ? {4'h1,aluoutM[27:0]} : aluoutM[31:28] == 4'h9 ? {4'h1,aluoutM[27:0]} : aluoutM[31:28] == 4'h8 ? {4'h0,aluoutM[27:0]} : aluoutM[31:28] == 4'h0 ? {4'h0,aluoutM[27:0]} :aluoutM[31:28] == 4'h1 ? {4'h1,aluoutM[27:0]} : 32'd0) : data_addr;
     assign m_din = flag ? p_dout : data_wdata;
     assign m_strobe = flag ? p_strobe : data_req;
     assign m_wen = flag? p_wen : data_wen;
@@ -105,7 +101,7 @@ module d_cache #(parameter A_WIDTH = 32,
     wire    [T_WIDTH-1:0]   tagout;
     wire    [31:0]          c_out;
 
-    //cache å†?ç´¢å??
+    //cache ????????????
     wire [C_INDEX-1:0]  index   =   aluoutM[C_INDEX+1:2];
     wire [T_WIDTH-1:0]  tag     =   aluoutM[A_WIDTH-1:C_INDEX+2];
     wire                valid   =   d_valid[index];
@@ -131,12 +127,13 @@ module d_cache #(parameter A_WIDTH = 32,
                         dram_rd_req ?  dram_rd_addr : 32'b0;
     assign data_wdata = dram_wr_data;
     //assign dram_rd_data = data_rdata;
-    assign dram_wr_val = dram_wr_req ? data_data_ok : 0; 
+    assign dram_wr_val = dram_wr_req ? data_data_ok : 0;
     assign dram_rd_val = dram_rd_req ? data_data_ok : 0; 
-
+ 
     assign data_wen = 4'b1111;
     assign data_size = 2'b10;
 
+// cpu/dram writes data_cache   ???cache
     always@(posedge clk)
     begin
         if(rst)                     //init cache memery
@@ -157,8 +154,9 @@ module d_cache #(parameter A_WIDTH = 32,
             d_data2[index]  <=  data_rdata[23:16];
             d_data3[index]  <=  data_rdata[15:8];
             d_data4[index]  <=  data_rdata[7:0];
+
         end
-        else if( cache_hit & memenM & memwriteM )       //hit å¹¶ä¸? å†™cache
+        else if( cache_hit & memenM & memwriteM )       //hit ??????? ???cache
         begin
             // wirte dirty bit
             //D_SRAM[index][51]     <=  1'b1;
@@ -195,7 +193,7 @@ module d_cache #(parameter A_WIDTH = 32,
         end
     end
 
-    // data_cache writes dram   cacheå†™å†?å­˜çš?æ?°æ?
+    // data_cache writes dram   cache????????????????????��????
     //assign dram_wr_data = D_SRAM[index][31:0];
     assign dram_wr_data =c_out;
 

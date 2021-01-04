@@ -58,8 +58,8 @@ assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_excepti
                                       (wb_cp0_reg_we == 1'b1 && wb_cp0_reg_write_addr == rd) ? wb_cp0_reg_data : cp0_reg_data_i;
 
     wire [31:0]move_res =   ( aluop_i == `EXE_MOVN_OP || aluop_i == `EXE_MOVZ_OP || aluop_i == `EXE_MTHI_OP || aluop_i == `EXE_MTLO_OP) ? reg1_i : 
-                            ( aluop_i == `EXE_MTHI_OP ) ? hi_i :
-                            ( aluop_i == `EXE_MTLO_OP ) ? lo_i : 
+                            ( aluop_i == `EXE_MFHI_OP ) ? hi_i :
+                            ( aluop_i == `EXE_MFLO_OP ) ? lo_i : 
                             ( aluop_i == `EXE_MFC0_OP ) ? cp0_reg_data_hazard : `ZeroWord;
 
     assign {cp0_reg_we_o, cp0_reg_write_addr_o, cp0_reg_data_o} = (aluop_i == `EXE_MTC0_OP) ? {1'b1, rd, reg2_i} : {1'b0,5'b0,32'b0};
@@ -125,18 +125,23 @@ assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_excepti
     div ex_alu_div(
         .clk(clk_i),
         .rst(rst_i),
-        .signed_div(div_signed),
-        .a(reg1_i),
-        .b(reg2_i),
-        .start(div_ena),
-        .annul(1'b0), // 除法取消
-        .result(div_res),
-        .ready(div_ready)
+        .signed_div_i(div_signed),
+        .opdata1_i(reg1_i),
+        .opdata2_i(reg2_i),
+        .start_i(div_ena),
+        .annul_i(1'b0), // 除法取消
+        .result_o(div_res),
+        .ready_o(div_ready)
     );
 
-    wire [31:0] load_store_res =(aluop_i == `EXE_SB_OP) ? reg2_i :
-                                (aluop_i == `EXE_SH_OP) ? reg2_i :
-                                (aluop_i == `EXE_SW_OP) ? reg2_i : `ZeroWord;
+    wire [31:0] load_store_res =(aluop_i == `EXE_LB_OP) ? reg1_i + reg2_i   :
+                                (aluop_i == `EXE_LBU_OP)? reg1_i + reg2_i   :
+                                (aluop_i == `EXE_LH_OP) ? reg1_i + reg2_i   :
+                                (aluop_i == `EXE_LHU_OP)? reg1_i + reg2_i   :
+                                (aluop_i == `EXE_LW_OP) ? reg1_i + reg2_i   :
+                                (aluop_i == `EXE_SB_OP) ? reg2_i            :
+                                (aluop_i == `EXE_SH_OP) ? reg2_i            :
+                                (aluop_i == `EXE_SW_OP) ? reg2_i            : `ZeroWord;
     
     assign ok_o =   (rst_i == 1'b1) ? 1'b1 : 
                     (div_ena == 1'b1 && div_ready == 1'b0) ? 1'b0 : 1'b1;
