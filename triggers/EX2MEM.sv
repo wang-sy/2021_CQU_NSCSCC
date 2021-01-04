@@ -15,6 +15,7 @@ module EX2MEM (
     input logic                 ex_wmem_i,
     input logic [`AluOpBus]     ex_aluop_i,
     input logic  [31:0]         ex_mem_io_addr_i,
+    input logic [31:0]          ex_pc_i,
 
     input logic                 flush_i,  //qf
     input logic [31:0]          ex_exception_type_i,//qf
@@ -36,6 +37,7 @@ module EX2MEM (
     output logic                mem_wmem_o,
     output logic [`AluOpBus]    mem_aluop_o,
     output logic  [31:0]        mem_mem_io_addr_o,
+    output logic [31:0]         mem_pc_o,
 
     output logic [31:0]         mem_exception_type_o,  //qf
     output logic [31:0]         mem_current_instr_addr_o, //qf
@@ -59,6 +61,7 @@ module EX2MEM (
             mem_wmem_o  <= 1'b0;
             mem_aluop_o <= 8'd0;
             mem_mem_io_addr_o <= 32'd0;
+            mem_pc_o    <= 32'd0;
             mem_exception_type_o<= 32'b0;//qf
             mem_current_instr_addr_o<= 32'b0;//qf
             mem_is_in_delayslot<=1'b0; //qf
@@ -78,6 +81,7 @@ module EX2MEM (
             mem_rmem_o  <= 1'b0;
             mem_wmem_o  <= 1'b0;
             mem_aluop_o <= 8'd0;
+            mem_pc_o    <= 32'd0;
             mem_mem_io_addr_o <= 32'd0;
             mem_exception_type_o<= 32'b0;//qf
             mem_current_instr_addr_o<= 32'b0;//qf
@@ -97,6 +101,7 @@ module EX2MEM (
             mem_rmem_o  <= mem_rmem_o;
             mem_wmem_o  <= mem_wmem_o;
             mem_aluop_o <= mem_aluop_o;
+            mem_pc_o    <= mem_pc_o;
             mem_mem_io_addr_o <= mem_mem_io_addr_o;
             mem_exception_type_o<= mem_exception_type_o;//qf
             mem_current_instr_addr_o<= mem_current_instr_addr_o;//qf
@@ -118,6 +123,7 @@ module EX2MEM (
             mem_rmem_o  <= ex_rmem_i;
             mem_wmem_o  <= ex_wmem_i;
             mem_aluop_o <= ex_aluop_i;
+            mem_pc_o    <= ex_pc_i;
             mem_mem_io_addr_o <= ex_mem_io_addr_i;
             mem_exception_type_o<= ex_exception_type_i;//qf
             mem_current_instr_addr_o<= ex_current_instr_addr_i;//qf

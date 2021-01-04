@@ -18,12 +18,13 @@ module id2exe(
     input logic             id_rmem_i,
     input logic             id_wmem_i,
     input logic  [31:0]     id_mem_io_addr_i,
+    input logic  [31:0]     id_pc_i,
     
     input logic   [31:0]    id_exception_i,//qf
     input logic   [31:0]    id_current_instr_addr_i,//qf
     input logic             id_in_delayslot_i, //qf
 
-    input logic             next_is_in_delayslot_i,//qf   //传回给ID�?
+    input logic             next_is_in_delayslot_i,//qf   //传回给ID�?
     
     input logic   [4:0 ]    rd_i,
 
@@ -46,11 +47,12 @@ module id2exe(
     output logic            exe_rmem_o,
     output logic            exe_wmem_o,
     output logic  [31:0]    exe_mem_io_addr_o,
+    output logic  [31:0]    exe_pc_o,
 
     output logic  [31:0]    ex_exception_o,//qf
     output logic  [31:0]    ex_current_instr_addr_o,//qf
     output logic            ex_in_delayslot_o,//qf
-    output logic            is_in_delayslot_o,//qf  //传回给ID�?
+    output logic            is_in_delayslot_o,//qf  //传回给ID�?
     output logic   [4:0 ]   rd_o,
 
     
@@ -78,12 +80,13 @@ always@(posedge clk) begin
         exe_rmem_o               <=  1'b0;
         exe_wmem_o               <=  1'b0;
         exe_mem_io_addr_o        <= 32'd0;
+        exe_pc_o                 <=  32'b0;
 
         ex_exception_o           <= 32'd0;//qf
         ex_current_instr_addr_o  <= 32'd0;//qf
         ex_in_delayslot_o        <= 1'd0;//qf
 
-        is_in_delayslot_o        <= 1'd0;//qf  //传回给ID�?
+        is_in_delayslot_o        <= 1'd0;//qf  //传回给ID�?
         rd_o                     <=5'b0;
 
         reg1_addr_o<=5'b0;
@@ -107,16 +110,17 @@ always@(posedge clk) begin
         exe_rmem_o    <=  exe_rmem_o;
         exe_wmem_o    <=  exe_wmem_o;  
         exe_mem_io_addr_o <= exe_mem_io_addr_o;
+        exe_pc_o      <=  exe_pc_o;
 
         ex_exception_o           <= ex_exception_o;//qf
         ex_current_instr_addr_o  <= ex_current_instr_addr_o;//qf
         ex_in_delayslot_o        <= ex_in_delayslot_o;//qf
 
-        is_in_delayslot_o        <= is_in_delayslot_o;//qf  //传回给ID�?
+        is_in_delayslot_o        <= is_in_delayslot_o;//qf  //传回给ID�?
         rd_o<=rd_o;
 
-        reg1_addr_o<=reg1_addr_i;
-        reg2_addr_o<=reg2_addr_i;
+        reg1_addr_o<=reg1_addr_o;
+        reg2_addr_o<=reg2_addr_o;
 
         reg1_read_o<=reg1_read_o;
         reg2_read_o<=reg2_read_o;
@@ -136,12 +140,13 @@ always@(posedge clk) begin
         exe_rmem_o               <=  id_rmem_i;
         exe_wmem_o               <=  id_wmem_i;  
         exe_mem_io_addr_o        <= id_mem_io_addr_i;
+        exe_pc_o                 <=  id_pc_i;
 
         ex_exception_o           <=id_exception_i;//qf
         ex_current_instr_addr_o  <= id_current_instr_addr_i;//qf
         ex_in_delayslot_o        <= id_in_delayslot_i;//qf
 
-        is_in_delayslot_o        <= next_is_in_delayslot_i;//qf  //传回给ID�?
+        is_in_delayslot_o        <= next_is_in_delayslot_i;//qf  //传回给ID�?
         rd_o<=rd_i;
 
         reg1_addr_o<=reg1_addr_i;
