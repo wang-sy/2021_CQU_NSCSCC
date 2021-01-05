@@ -38,6 +38,8 @@ module alu (
 logic trap_exception;  //自陷异常
 logic overflow_exception; //溢出异常
 
+logic div_ready;
+logic [63:0]div_res;
 
 assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_exception,exception_type_i[9:8],8'b0};
 
@@ -97,37 +99,18 @@ assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_excepti
                             ((aluop_i==`EXE_TLT_OP||aluop_i==`EXE_TLTI_OP||aluop_i==`EXE_TLTIU_OP||aluop_i==`EXE_TLTU_OP)&&reg1_lt_reg2==1'b1) ? 1'b1:
                             ((aluop_i==`EXE_TNE_OP||aluop_i==`EXE_TNEI_OP)&&reg1_i != reg2_i) ? 1'b1 : 1'b0;
 
+
     // 这一部分是临时存在的，为了应付带符号乘法的测试
     // 在后期会将其替换为多周期乘法器以提升频率
-    // wire [31:0] unsign_reg1 = (reg1_i[31] == 1'b1) ? ~(reg1_i - 1) : reg1_i;
-    // wire [31:0] unsign_reg2 = (reg2_i[31] == 1'b1) ? ~(reg2_i - 1) : reg2_i;
-    // wire [1:0] not_positive = {reg1_i[31] == 1'b1, reg2_i[31] == 1'b1};
+    wire [31:0] unsign_reg1 = (reg1_i[31] == 1'b1) ? ~(reg1_i - 1) : reg1_i;
+    wire [31:0] unsign_reg2 = (reg2_i[31] == 1'b1) ? ~(reg2_i - 1) : reg2_i;
+    wire [1:0] not_positive = {reg1_i[31] == 1'b1, reg2_i[31] == 1'b1};
 
-    // wire [63:0]mul_res =    (aluop_i == `EXE_MULT_OP)   ?  (
-    //                             (not_positive == 2'b11 || not_positive == 2'b00) ? (unsign_reg1 * unsign_reg2) : 
-    //                             ( (~(unsign_reg1 * unsign_reg2)) + 1)
-    //                         )  :
-    //                         (aluop_i == `EXE_MULTU_OP)  ?  ({1'b0, reg1_i} * {1'b0, reg2_i})    : ({`ZeroWord, `ZeroWord});
-
-    // Multiplier IP, Pipeline stages = 5.
-    wire mul_ena = (rst_i == 1'b1) ? 1'b0 :
-                    (aluop_i == `EXE_MULT_OP || aluop_i == `EXE_MULTU_OP) ? (
-                        (mul_ready == 1'b0) ? 1'b1 : 1'b0
-                    ) : 1'b0;
-    wire mul_signed = (aluop_i == `EXE_MULT_OP) ? 1'b1 : 1'b0;
-    logic mul_ready;
-    logic [63:0] mul_res;
-
-    mul_ip ex_alu_mul(
-        .clk(clk_i),
-        .rst(rst_i),
-        .signed_mul(mul_signed),
-        .a(reg1_i),
-        .b(reg2_i),
-        .ena(mul_ena),
-        .res(mul_res),
-        .ready(mul_ready)
-    );
+    wire [63:0]mul_res =    (aluop_i == `EXE_MULT_OP)   ?  (
+                                (not_positive == 2'b11 || not_positive == 2'b00) ? (unsign_reg1 * unsign_reg2) : 
+                                ( (~(unsign_reg1 * unsign_reg2)) + 1)
+                            )  :
+                            (aluop_i == `EXE_MULTU_OP)  ?  ({1'b0, reg1_i} * {1'b0, reg2_i})    : ({`ZeroWord, `ZeroWord});
 
     
     wire  div_ena = (rst_i == 1'b1) ? 1'b0 :
@@ -136,43 +119,32 @@ assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_excepti
                     ) : 1'b0;
 
     wire div_signed = (aluop_i == `EXE_DIV_OP) ? 1'b1 : 1'b0;
-    logic div_ready;
-    logic [63:0]div_res;
 
     // 除法器，直接使用了雷斯磊书中的
     // 除法需要多周期，在进行除法的过程中需要将其他的流水级进行stall
-    // div ex_alu_div(
-    //     .clk(clk_i),
-    //     .rst(rst_i),
-    //     .signed_div(div_signed),
-    //     .a(reg1_i),
-    //     .b(reg2_i),
-    //     .start(div_ena),
-    //     .annul(1'b0), // 除法取消
-    //     .result(div_res),
-    //     .ready(div_ready)
-    // );
-
-    // Divider IP, Pipeline stages = 16.
-    div_ip ex_alu_div(
+    div ex_alu_div(
         .clk(clk_i),
         .rst(rst_i),
-        .signed_div(div_signed),
-        .a(reg1_i),
-        .b(reg2_i),
-        .ena(div_ena),
-        .res(div_res),
-        .ready(div_ready)
-        );
+        .signed_div_i(div_signed),
+        .opdata1_i(reg1_i),
+        .opdata2_i(reg2_i),
+        .start_i(div_ena),
+        .annul_i(1'b0), // 除法取消
+        .result_o(div_res),
+        .ready_o(div_ready)
+    );
 
-    wire [31:0] load_store_res =(aluop_i == `EXE_SB_OP) ? reg2_i :
-                                (aluop_i == `EXE_SH_OP) ? reg2_i :
-                                (aluop_i == `EXE_SW_OP) ? reg2_i : `ZeroWord;
+    wire [31:0] load_store_res =(aluop_i == `EXE_LB_OP) ? reg1_i + reg2_i   :
+                                (aluop_i == `EXE_LBU_OP)? reg1_i + reg2_i   :
+                                (aluop_i == `EXE_LH_OP) ? reg1_i + reg2_i   :
+                                (aluop_i == `EXE_LHU_OP)? reg1_i + reg2_i   :
+                                (aluop_i == `EXE_LW_OP) ? reg1_i + reg2_i   :
+                                (aluop_i == `EXE_SB_OP) ? reg2_i            :
+                                (aluop_i == `EXE_SH_OP) ? reg2_i            :
+                                (aluop_i == `EXE_SW_OP) ? reg2_i            : `ZeroWord;
     
     assign ok_o =   (rst_i == 1'b1) ? 1'b1 : 
-                    (mul_ena == 1'b1 && mul_ready == 1'b0) ? 1'b0 : 
-                    (div_ena == 1'b1 && div_ready == 1'b0) ? 1'b0 : 
-                    1'b1;
+                    (div_ena == 1'b1 && div_ready == 1'b0) ? 1'b0 : 1'b1;
 
 
     assign wdata_o =    (rst_i == 1'b1) ? {`ZeroWord, `ZeroWord} : 
