@@ -19,11 +19,13 @@ module d_cache #(parameter A_WIDTH = 32,
         output wire[3:0] m_wen,
 		output wire[1:0] m_size,
         output wire m_rw,
+        output wire d_cache_abslute, // 此信号表明告诉外面的小桥，是否需要对dcache的输出进行转换
         input wire m_ready
     );
   
     wire flag;    
     assign flag =  (aluoutM[31:28] == 4'ha || aluoutM[31:28] == 4'hb|| aluoutM[31:28] == 4'h9|| aluoutM[31:28] == 4'h8|| aluoutM[31:28] == 4'h0|| aluoutM[31:28] == 4'h1) ? 1'b1 : 1'b0;
+    assign d_cache_abslute = flag;
     wire                memwriteM;          //p_rw
     wire [3:0]          sel;                //p_wen
     wire [1:0]    data_sram_size;     //P_size

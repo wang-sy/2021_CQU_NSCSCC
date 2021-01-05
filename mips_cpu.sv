@@ -200,6 +200,7 @@ module mycpu_top (
         .cpu_data_size      (cache_data_size),
         .cpu_data_addr      (cache_data_addr),
         .cpu_data_wdata     (cache_data_wdata),
+        .cpu_data_wen       (cpu_ram_sel),
         // cpu side read dada
         .cpu_data_rdata     (cache_data_rdata),
         .cpu_data_addr_ok   (cache_data_addr_ok),

@@ -15,6 +15,7 @@ module cache (
     input  [1 :0] cpu_data_size    ,
     input  [31:0] cpu_data_addr    ,
     input  [31:0] cpu_data_wdata   ,
+    input  [3:0]  cpu_data_wen     ,
     output [31:0] cpu_data_rdata   ,
     output        cpu_data_addr_ok ,
     output        cpu_data_data_ok ,
@@ -88,8 +89,12 @@ module cache (
     wire d_cache_ok;
     assign {cpu_data_addr_ok, cpu_data_data_ok} = {d_cache_ok, d_cache_ok};
 
-    wire [3:0]d_cache_in_wen;
+    wire [3:0]d_cache_in_wen = cpu_data_wen;
     wire [3:0]d_cache_out_wen;
+    wire d_cache_abslute;
+    wire [3:0]d_cache_out_wen;
+    wire [1:0]d_cache_out_size;
+    wire [31:0]d_cache_out_addr; 
 
     d_cache m_d_cache(
         .p_a(cpu_data_addr), // 地址
@@ -102,14 +107,28 @@ module cache (
         .p_ready(d_cache_ok), // 是否完成
         .clk(clk), 
         .clrn(~rst),
-        .m_a(cache_data_addr),  // 操作的地�?
+        .m_a(d_cache_out_addr),  // 操作的地�?
         .m_dout(cache_data_rdata), // 读取的数�?
         .m_din(cache_data_wdata), // 写入的数�?
         .m_strobe(cache_data_req), // 是否向内存发出请�?
         .m_wen(d_cache_out_wen), // wen
-        .m_size(cache_data_size), // 操作的大�?
+        .m_size(d_cache_out_size), // 操作的大�?
         .m_rw(cache_data_wr), // 是否是写请求
+        .d_cache_abslute(d_cache_abslute),
         .m_ready(cache_data_data_ok) // 内存是否ok
     );
+
+    // 对d_cache的请求进行二次处理
+    assign cache_data_addr = (cache_data_wr) ? (
+                                (cpu_data_wen == 4'b0001 || cpu_data_wen == 4'b0011 || cpu_data_wen == 4'b1111)    ? {d_cache_out_addr[31:2], 2'b00} : 
+                                (cpu_data_wen == 4'b0010)                                                          ? {d_cache_out_addr[31:2], 2'b01} :
+                                (cpu_data_wen == 4'b0100 || cpu_data_wen == 4'b1100)                               ? {d_cache_out_addr[31:2], 2'b10} :
+                                (cpu_data_wen == 4'b1000)                                                          ? {d_cache_out_addr[31:2], 2'b11} : 32'd0
+                            ) : d_cache_out_addr;
+                                                                                 
+                             
+    assign cache_data_size = cpu_data_size;
+
+
 
 endmodule
