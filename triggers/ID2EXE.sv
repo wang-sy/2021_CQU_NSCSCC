@@ -34,6 +34,9 @@ module id2exe(
     input logic reg1_read_i,
     input logic reg2_read_i,
 
+    input logic [31:0] id_inst_i,
+    output logic [31:0] id_inst_o,
+
     output logic  [2:0]     exe_alu_sel_o,
     output logic  [7:0]     exe_alu_op_o,
     output logic  [31:0]    exe_reg1_o,
@@ -94,7 +97,7 @@ always@(posedge clk) begin
 
         reg1_read_o<=1'b0;
         reg2_read_o<=1'b0;
-
+id_inst_o<=32'b0;
     end 
     else if (stall_i == 1'b1) begin
         exe_alu_sel_o <=  exe_alu_sel_o;
@@ -124,7 +127,7 @@ always@(posedge clk) begin
 
         reg1_read_o<=reg1_read_o;
         reg2_read_o<=reg2_read_o;
-
+id_inst_o<=id_inst_o;
     end
     else begin
         exe_alu_sel_o            <=  id_alu_sel_i;
@@ -154,7 +157,7 @@ always@(posedge clk) begin
 
         reg1_read_o<=reg1_read_i;
         reg2_read_o<=reg2_read_i;
-
+id_inst_o<=id_inst_i;
     end
 end
 

@@ -32,6 +32,8 @@ module MEM (
     input logic [4:0]           cp0_reg_write_addr_i,//qf
     input logic [31:0]          cp0_reg_data_i,//qf
 
+    input logic [31:0]          inst_i,
+
 
     output logic[`DataBus]      hi_o,
     output logic[`DataBus]      lo_o,
@@ -50,8 +52,9 @@ module MEM (
 
     output logic                cp0_reg_we_o,//qf
     output logic [4:0]          cp0_reg_write_addr_o,//qf
-    output logic [31:0]         cp0_reg_data_o //qf
+    output logic [31:0]         cp0_reg_data_o, //qf
 
+    output logic [31:0]         bad_addr_o////qfqf
 
 );
 
@@ -79,9 +82,22 @@ module MEM (
     //输出�?新cp0_epc
     assign cp0_epc_o = CP0_Epc_Newest;
 
+    module ade_exception(
+        .op_i(inst_i[31:26])                  ,
+        .addr_i(mem_io_addr_i)                ,
+        .pc_i(current_instr_addr_i)           ,
+
+        .adelM_o(adelM_o)                     ,
+        .adesM_o(adesM_o)                     ,
+        .bad_addr_o(bad_addr_o)
+    );
+    logic adelM_o,adesM_o;
+
     //exception_type_o
     exception exception_type(
         .rst_i(rst_i),
+        .adel(adelM_o),
+        .ades(adesM_o),
         .exception_type_i(exception_type_i),
         .cp0_status_i(cp0_status_i),
         .cp0_cause_i(cp0_cause_i),

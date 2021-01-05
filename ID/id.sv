@@ -61,7 +61,9 @@ module ID(
     output logic [4:0]  rd_o,
 
     output logic [`RegAddrBus]      reg1_addr_o,
-    output logic [`RegAddrBus]      reg2_addr_o
+    output logic [`RegAddrBus]      reg2_addr_o,
+
+    output logic [31:0] inst_o
 );
 
     logic        except_type_is_syscall; //qf
@@ -69,7 +71,7 @@ module ID(
     logic        except_type_is_break;
     logic        instr_valid;//qf
 
-    assign exception_o  = { 19'b0, except_type_is_eret, 1'b0, except_type_is_break, ~instr_valid, except_type_is_syscall, 8'b0};
+    assign exception_o  = { 18'b0,except_type_is_break, except_type_is_eret, 2'b0, ~instr_valid, except_type_is_syscall, 8'b0};
 
     assign is_in_delayslot_o = is_in_delayslot_i;//qf
     assign current_instr_addr_o = pc_i;  //qf
