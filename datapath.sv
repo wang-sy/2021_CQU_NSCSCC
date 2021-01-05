@@ -32,7 +32,8 @@ module datapath (
     output  logic           ram_ce_o,
     output  logic           time_int_o,  //定时中断，暂未进行信号赋值
     output  logic           stall_all_o, // 全局流水线停顿，在进行（乘除法运算、id取指时可能出现）
-    
+    output  logic           cpu_flush_o,
+
     //debug interface
     output wire[31:0]   debug_wb_pc,
     output wire[3:0]    debug_wb_rf_wen,
@@ -40,10 +41,18 @@ module datapath (
     output wire[31:0]   debug_wb_rf_wdata
 );
 
-    assign debug_wb_pc          = wb_pc;
-    assign debug_wb_rf_wen      = {4{wb_wreg & ~mem2wb_stall}};
-    assign debug_wb_rf_wnum     = wb_wd;
-    assign debug_wb_rf_wdata    = wb_wdata[31:0];
+    debug_controller datapath_debug_controller(
+        .clk_i(clk_i),
+        .rst_i(rst_i),
+        .debug_pc_i(wb_pc),
+        .debug_wena_i(wb_wreg),
+        .debug_wd_i(wb_wd),
+        .debug_wdata_i(wb_wdata[31:0]),
+        .debug_wb_pc_o(debug_wb_pc),
+        .debug_wb_rf_wen_o(debug_wb_rf_wen),
+        .debug_wb_rf_wnum_o(debug_wb_rf_wnum),
+        .debug_wb_rf_wdata_o(debug_wb_rf_wdata)
+    );
 
     // id阶段的信号
     logic [31:0] id_pc;
@@ -192,6 +201,8 @@ module datapath (
     
     logic id2exe_reg1_read;
     logic id2exe_reg2_read;
+
+    assign cpu_flush_o = controller_flush;
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -577,13 +588,20 @@ module datapath (
         .cp0_cause_i(cp0_status_o),
         .cp0_epc_i(cp0_epc_o),
 
-        .wb_cp0_reg_we(mem_wb_cp0_reg_we),
-        .wb_cp0_reg_write_addr(mem_wb_cp0_reg_write_addr),
-        .wb_cp0_reg_data(mem_wb_cp0_reg_data),
+        .wb_cp0_reg_we(mem2wb_cp0_reg_we),
+        .wb_cp0_reg_write_addr(mem2wb_cp0_reg_write_addr),
+        .wb_cp0_reg_data(mem2wb_cp0_reg_data),
+
+
+        // .wb_cp0_reg_we(mem2wb_cp0_reg_we),//qf
+        // .wb_cp0_reg_write_addr(mem2wb_cp0_reg_write_addr),//qf
+        // .wb_cp0_reg_data(mem2wb_cp0_reg_data) //qf
+
 
         .cp0_reg_we_i(ex2mem_cp0_reg_we),//qf
         .cp0_reg_write_addr_i(ex2mem_cp0_reg_write_addr),//qf
         .cp0_reg_data_i(ex2mem_cp0_reg_data),//qf
+
 
 
         .hi_o(mem_hi),

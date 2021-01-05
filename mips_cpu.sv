@@ -112,7 +112,7 @@ module mycpu_top (
     logic           cache_data_addr_ok_to_axi_interface;
     logic           cache_data_data_ok_to_axi_interface;
 
-
+    logic           cpu_flush;
 
     datapath my_datapath(
         .rst_i(rst_i),
@@ -131,6 +131,7 @@ module mycpu_top (
         .ram_we_o(cpu_ram_we),
         .ram_ce_o(cpu_ram_ce),
         .stall_all_o(stall_all),
+        .cpu_flush_o(cpu_flush),
         .debug_wb_pc(debug_wb_pc),
         .debug_wb_rf_wen(debug_wb_rf_wen),
         .debug_wb_rf_wnum(debug_wb_rf_wnum),
@@ -184,6 +185,7 @@ module mycpu_top (
         .clk(aclk), 
         .rst(rst_i),
         // cpu side 
+        .cpu_flush_i        (cpu_flush),
         .cpu_inst_req       (cache_inst_req), // 对于指令的读请求
         .cpu_inst_wr        (cache_inst_wr), // 对于指令的写请求
         .cpu_inst_size      (cache_inst_size), // 请求的指令大小

@@ -1,6 +1,7 @@
 module cache (
     input wire clk, rst,
     //mips core
+    input         cpu_flush_i       ,
     input         cpu_inst_req     ,
     input         cpu_inst_wr      ,
     input  [1 :0] cpu_inst_size    ,
@@ -39,8 +40,32 @@ module cache (
     input          cache_data_addr_ok ,
     input          cache_data_data_ok
 );
+    logic i_cache_ready;
+    logic cache_miss;
 
-    i_cache i_cache(
+    i_cache ICACHE(
+        .clk(clk),
+        .clrn(~rst),
+        .p_flush(cpu_flush_i),
+        .p_a(cpu_inst_addr),
+        .p_din(cpu_inst_rdata),
+        .p_strobe(cpu_inst_req),
+        .p_ready(i_cache_ready),
+        .cache_miss(cache_miss),
+        .m_a(cache_inst_addr),
+        .m_dout(cache_inst_rdata),
+        .m_strobe(cache_inst_req),
+        .m_ready(cache_inst_data_ok)
+    );
+
+    assign cpu_inst_addr_ok = i_cache_ready;
+    assign cpu_inst_data_ok = i_cache_ready;
+
+    assign  cache_inst_wr = 0;
+    assign  cache_inst_size = 0;
+    assign  cache_inst_wdata = 0;
+
+    /* i_cache i_cache(
         .clk(clk), .rst(rst),
         .cpu_inst_req     (cpu_inst_req     ),
         .cpu_inst_wr      (cpu_inst_wr      ),
@@ -59,7 +84,7 @@ module cache (
         .cache_inst_rdata   (cache_inst_rdata   ),
         .cache_inst_addr_ok (cache_inst_addr_ok ),
         .cache_inst_data_ok (cache_inst_data_ok )
-    );
+    ); */
 
     /*
     module d_cache (
