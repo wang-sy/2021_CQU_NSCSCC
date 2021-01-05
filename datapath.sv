@@ -198,8 +198,12 @@ module datapath (
     stall_flush_controller datapath_stall_flush_controller(
         .rst_i(rst_i),
         .ex_ok_i(ex_ok),
-        .cp0_epc_i(mem_cp0_epc_o),//
-        .exception_type_i(mem_exception_type_o),//
+        .cp0_epc_i(mem_cp0_epc_o),//ex2mem_exception_o
+
+        // .exception_type_i(mem_exception_type_o),//
+        .exception_type_i(ex2mem_exception_o),//
+        .exception_type_encode_i(mem_exception_type_o),
+
         .inst_stall_i(inst_stall_i),
         .data_stall_i(data_stall_i),
         .mem_wd_i(mem_wd),
@@ -613,7 +617,7 @@ module datapath (
         .mem_wdata_i(mem_wdata_o),
         .mem_pc_i(mem_pc),
 
-        .flush_i(controller_flush),
+        .flush_i(controller_flush),//controller_flush),
 
         .mem_cp0_reg_we(mem_cp0_reg_we),//qf
         .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr),//qf

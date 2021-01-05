@@ -25,6 +25,10 @@ module IF (
         .rst_i(rst_i),
         .stall_i(stall_i),
         .pc_i(pc_next),
+
+        .flush_i(flush_i),//qf
+        .new_pc_i(new_pc_i),//qf
+
         .pc_o(pc_o),
         .ce_o(ce_o)
     );
@@ -34,8 +38,6 @@ module IF (
         .clk_i(clk_i),
         .rst_i(rst_i),
         .pc_i(pc_o),
-        .flush_i(flush_i),//qf
-        .new_pc_i(new_pc_i),//qf
         .branch_flag_i(branch_flag_i),
         .branch_to_addr_i(branch_to_addr_i),
         .pc_o(pc_next)

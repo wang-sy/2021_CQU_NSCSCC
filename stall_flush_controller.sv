@@ -5,6 +5,8 @@ module stall_flush_controller (
     input   logic[31:0]     cp0_epc_i, //qf
     input   logic[31:0]     exception_type_i,  //qf
 
+    input   logic[31:0]     exception_type_encode_i,
+
     // 用于判断第二种，load类型需要停掉的冒险
     input   logic           inst_stall_i,
     input   logic           data_stall_i,
@@ -42,12 +44,14 @@ module stall_flush_controller (
     assign flush = rst_i == 1'b1 ? 1'b0 : (exception_type_i != 32'b0);
 
     assign new_pc = rst_i==1'b1 ? 32'b0 : 
-                    (exception_type_i == 32'h0000001) ? 32'h00000020 :
-                    (exception_type_i == 32'h0000008) ? 32'h00000040 :
-                    (exception_type_i == 32'h000000a) ? 32'h00000040 :
-                    (exception_type_i == 32'h000000d) ? 32'h00000040 :
-                    (exception_type_i == 32'h000000c) ? 32'h00000040 :
-                    (exception_type_i == 32'h000000e) ? cp0_epc_i    : 32'h0;
+                    (exception_type_encode_i == 32'h0000001) ? 32'hBFC00380 :
+                    (exception_type_encode_i == 32'h0000008) ? 32'hBFC00380 :
+                    (exception_type_encode_i == 32'h0000010) ? 32'hBFC00200:
+                    (exception_type_encode_i == 32'h0000012) ? 32'hBFC00200 :
+                    (exception_type_encode_i == 32'h000000a) ? 32'hBFC00380 :
+                    (exception_type_encode_i == 32'h000000d) ? 32'hBFC00380 :
+                    (exception_type_encode_i == 32'h000000c) ? 32'hBFC00380 :
+                    (exception_type_encode_i == 32'h000000e) ? cp0_epc_i    : 32'h0;
 
     assign stall_all_o = inst_stall_i | data_stall_i | ~ex_ok_i;
 
