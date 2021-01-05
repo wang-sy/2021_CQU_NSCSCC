@@ -26,6 +26,11 @@ module EX2MEM (
     input logic [4:0]           ex_cp0_reg_write_addr,//qf
     input logic [31:0]          ex_cp0_reg_data,//qf
 
+    
+    input logic [31:0] id_inst_i,
+    output logic [31:0] id_inst_o,
+
+
     output logic[`RegAddrBus]   mem_wd_o,
     output logic                mem_wreg_o,
     output logic[`DoubleRegBus] mem_wdata_o,
@@ -69,6 +74,7 @@ module EX2MEM (
             mem_cp0_reg_we<=1'b0;//qf
             mem_cp0_reg_write_addr<=32'b0;//qf
             mem_cp0_reg_data<=32'b0;//qf
+            id_inst_o<=32'b0;
         end
         else if (flush_i == 1'b1) begin
             mem_wd_o <= `RegNumLog2'd0;
@@ -89,6 +95,7 @@ module EX2MEM (
             mem_cp0_reg_we<=1'b0;//qf
             mem_cp0_reg_write_addr<=32'b0;//qf
             mem_cp0_reg_data<=32'b0;//qf
+            id_inst_o<=32'b0;
         end
         else if(stall_i == 1'b1) begin
             mem_wd_o <= mem_wd_o;
@@ -110,6 +117,7 @@ module EX2MEM (
             mem_cp0_reg_we<=mem_cp0_reg_we;//qf
             mem_cp0_reg_write_addr<=mem_cp0_reg_write_addr;//qf
             mem_cp0_reg_data<=mem_cp0_reg_data;//qf
+            id_inst_o<=id_inst_o;
 
         end
         else begin
@@ -132,6 +140,7 @@ module EX2MEM (
             mem_cp0_reg_we <= ex_cp0_reg_we;//qf
             mem_cp0_reg_write_addr <= ex_cp0_reg_write_addr;//qf
             mem_cp0_reg_data <= ex_cp0_reg_data;//qf
+            id_inst_o<=id_inst_i;
         end
     end
 endmodule

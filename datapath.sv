@@ -255,6 +255,10 @@ module datapath (
 
 	    .excepttype_i(mem_exception_type_o),//
 	    .int_i(int_i),//
+
+        .bad_addr_i(mem2wb_bad_addr),
+
+
 	    .current_inst_addr_i(mem_current_instr_addr_o),//
 	    .is_in_delayslot_i(mem_in_delayslot_o),//
 
@@ -368,8 +372,13 @@ module datapath (
         .rd_o(id_rd_o),
         
         .reg1_addr_o(id_reg1_addr_o),
-        .reg2_addr_o(id_reg2_addr_o)
+        .reg2_addr_o(id_reg2_addr_o),
+        
+        .inst_o(id_inst_o)
     );
+    logic [31:0] id_inst_o;
+    logic [31:0] id2exe_inst_o;
+    
 
     logic [4:0] id2exe_reg1_addr_o;
     logic [4:0] id2exe_reg2_addr_o;
@@ -401,6 +410,9 @@ module datapath (
         .id_in_delayslot_i(id_is_in_delayslot_o),
 
         .next_is_in_delayslot_i(id_next_is_in_delayslot_o),
+
+        .id_inst_i(id_inst_o),
+        .id_inst_o(id2exe_inst_o),
  
         .rd_i(id_rd_o),
         
@@ -536,6 +548,10 @@ module datapath (
         .ex_cp0_reg_write_addr(ex_cp0_reg_write_addr),//qf
         .ex_cp0_reg_data(ex_cp0_reg_data),//qf
 
+        .id_inst_i(id2exe_inst_o),
+        .id_inst_o(exe2mem_inst_o),
+ 
+
         .mem_wd_o(mem_wd),
         .mem_wreg_o(mem_wreg),
         .mem_wdata_o(mem_wdata_i),
@@ -562,6 +578,7 @@ module datapath (
 
     // MEM阶段，负责进行访存操作
     // 访存操作主要分为两种：1、对内存进行读取；2、对内存进行写操作
+    logic [31:0] mem_bad_addr;
 
     MEM datapath_mem(
         .clk_i(clk_i),
@@ -588,10 +605,11 @@ module datapath (
         .cp0_cause_i(cp0_status_o),
         .cp0_epc_i(cp0_epc_o),
 
+        .inst_i(exe2mem_inst_o),
+
         .wb_cp0_reg_we(mem2wb_cp0_reg_we),
         .wb_cp0_reg_write_addr(mem2wb_cp0_reg_write_addr),
         .wb_cp0_reg_data(mem2wb_cp0_reg_data),
-
 
         // .wb_cp0_reg_we(mem2wb_cp0_reg_we),//qf
         // .wb_cp0_reg_write_addr(mem2wb_cp0_reg_write_addr),//qf
@@ -601,8 +619,6 @@ module datapath (
         .cp0_reg_we_i(ex2mem_cp0_reg_we),//qf
         .cp0_reg_write_addr_i(ex2mem_cp0_reg_write_addr),//qf
         .cp0_reg_data_i(ex2mem_cp0_reg_data),//qf
-
-
 
         .hi_o(mem_hi),
         .lo_o(mem_lo),
@@ -620,9 +636,13 @@ module datapath (
 
         .cp0_reg_we_o(mem_cp0_reg_we),//qf
         .cp0_reg_write_addr_o(mem_cp0_reg_write_addr),//qf
-        .cp0_reg_data_o(mem_cp0_reg_data)//qf
+        .cp0_reg_data_o(mem_cp0_reg_data),//qf
+
+        .bad_addr_o(mem_bad_addr)
 
     );
+
+    logic [31:0] mem2wb_bad_addr;
 
     // 从MEM到WB的信号传递
     MEM2WB datapath_mem2wb(
@@ -637,6 +657,8 @@ module datapath (
 
         .flush_i(controller_flush),//controller_flush),
 
+        .mem_bad_addr_i(mem_bad_addr),
+
         .mem_cp0_reg_we(mem_cp0_reg_we),//qf
         .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr),//qf
         .mem_cp0_reg_data(mem_cp0_reg_data),//qf
@@ -648,6 +670,9 @@ module datapath (
 
         .wb_cp0_reg_we(mem2wb_cp0_reg_we),//qf
         .wb_cp0_reg_write_addr(mem2wb_cp0_reg_write_addr),//qf
+
+        .mem_bad_addr_o(mem2wb_bad_addr),
+
         .wb_cp0_reg_data(mem2wb_cp0_reg_data) //qf
     );
 

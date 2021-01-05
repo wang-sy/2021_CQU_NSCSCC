@@ -61,7 +61,9 @@ module ID(
     output logic [4:0]  rd_o,
 
     output logic [`RegAddrBus]      reg1_addr_o,
-    output logic [`RegAddrBus]      reg2_addr_o
+    output logic [`RegAddrBus]      reg2_addr_o,
+
+    output logic [31:0] inst_o
 );
 
     logic        except_type_is_syscall; //qf

@@ -17,6 +17,8 @@ module cp0_regfile(
 	input  logic[`RegBus]           current_inst_addr_i,
 	input  logic                    is_in_delayslot_i,
 
+    input  logic [31:0]             bad_addr_i,
+
 	//  //output
 	output logic[`RegBus]           data_o,
 	output logic[`RegBus]           count_o,
@@ -26,6 +28,8 @@ module cp0_regfile(
 	output logic[`RegBus]           epc_o,
 	output logic[`RegBus]           config_o,
 	output logic[`RegBus]           prid_o,
+    output logic[`RegBus]           badvaddr,
+
 	
 	output logic                    timer_int_o
 );
@@ -79,8 +83,34 @@ always @ (posedge clk) begin
                 end
                 status_o[1] <= 1'b1;
                 cause_o[6:2] <= 5'b00000;
-                
             end
+            32'h00000004:begin
+					if(is_in_delayslot_i == `InDelaySlot) begin
+						/* code */
+						epc_o <= current_inst_addr_i - 4;
+						cause_o[31] <= 1'b1;
+					end else begin
+						epc_o <= current_inst_addr_i;
+						cause_o[31] <= 1'b0;
+					end
+					status_o[1] <= 1'b1;
+					cause_o[6:2] <= 5'b00100;
+					badvaddr <= bad_addr_i;
+				end
+			32'h00000005:begin
+					if(is_in_delayslot_i == `InDelaySlot) begin
+						/* code */
+						epc_o <= current_inst_addr_i - 4;
+						cause_o[31] <= 1'b1;
+					end else begin
+						epc_o <= current_inst_addr_i;
+						cause_o[31] <= 1'b0;
+					end
+					status_o[1] <= 1'b1;
+					cause_o[6:2] <= 5'b00101;
+					badvaddr <= bad_addr_i;
+			end
+
             32'h00000008:		begin
                 if(status_o[1] == 1'b0) begin
                     if(is_in_delayslot_i == `InDelaySlot ) begin

@@ -41,12 +41,12 @@ module stall_flush_controller (
     output  logic[31:0]     new_pc  //qf
 );
 
-    // assign flush = rst_i == 1'b1 ? 1'b0 : (exception_type_i != 32'b0);
-
     assign flush = rst_i == 1'b1 ? 1'b0 : (exception_type_encode_i != 32'b0);
 
     assign new_pc = rst_i==1'b1 ? 32'b0 : 
                     (exception_type_encode_i == 32'h0000001) ? 32'hBFC00380 :
+                    (exception_type_encode_i == 32'h0000004) ? 32'hBFC00380 :
+                    (exception_type_encode_i == 32'h0000005) ? 32'hBFC00380 :
                     (exception_type_encode_i == 32'h0000008) ? 32'hBFC00380 :
                     (exception_type_encode_i == 32'h0000009) ? 32'hBFC00380:
                     (exception_type_encode_i == 32'h0000010) ? 32'hBFC00200:
