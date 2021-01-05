@@ -46,6 +46,7 @@ module stall_flush_controller (
     assign new_pc = rst_i==1'b1 ? 32'b0 : 
                     (exception_type_encode_i == 32'h0000001) ? 32'hBFC00380 :
                     (exception_type_encode_i == 32'h0000008) ? 32'hBFC00380 :
+                    (exception_type_encode_i == 32'h0000009) ? 32'hBFC00380:
                     (exception_type_encode_i == 32'h0000010) ? 32'hBFC00200:
                     (exception_type_encode_i == 32'h0000012) ? 32'hBFC00200 :
                     (exception_type_encode_i == 32'h000000a) ? 32'hBFC00380 :

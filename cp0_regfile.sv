@@ -94,6 +94,20 @@ always @ (posedge clk) begin
                 status_o[1] <= 1'b1;
                 cause_o[6:2] <= 5'b01000;			
             end
+            
+            32'h00000009:begin
+                if(is_in_delayslot_i == `InDelaySlot) begin
+                    /* code */
+                    epc_o <= current_inst_addr_i - 4;
+                    cause_o[31] <= 1'b1;
+                end else begin
+                    epc_o <= current_inst_addr_i;
+                    cause_o[31] <= 1'b0;
+                end
+                status_o[1] <= 1'b1;
+                cause_o[6:2] <= 5'b01001;
+			end
+
             32'h0000000a:		begin
                 if(status_o[1] == 1'b0) begin
                     if(is_in_delayslot_i == `InDelaySlot ) begin

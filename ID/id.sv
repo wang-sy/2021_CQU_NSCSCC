@@ -66,9 +66,10 @@ module ID(
 
     logic        except_type_is_syscall; //qf
     logic        except_type_is_eret;//qf
+    logic        except_type_is_break;
     logic        instr_valid;//qf
 
-    assign exception_o  = { 19'b0, except_type_is_eret, 2'b0, ~instr_valid, except_type_is_syscall, 8'b0};
+    assign exception_o  = { 19'b0, except_type_is_eret, 1'b0, except_type_is_break, ~instr_valid, except_type_is_syscall, 8'b0};
 
     assign is_in_delayslot_o = is_in_delayslot_i;//qf
     assign current_instr_addr_o = pc_i;  //qf
@@ -77,6 +78,8 @@ module ID(
 
     assign reg1_addr_o=rs;
     assign reg2_addr_o=rt;
+
+    assign except_type_is_break = inst_i[31:26] == `EXE_SPECIAL_INST && inst_i[5:0] == `EXE_BREAK ? 1'b1 : 1'b0;
 
     //寄存器堆接收到的信号
     logic [31:0] reg1_data;
