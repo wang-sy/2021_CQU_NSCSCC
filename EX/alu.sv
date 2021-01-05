@@ -41,7 +41,7 @@ logic overflow_exception; //溢出异常
 logic div_ready;
 logic [63:0]div_res;
 
-assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_exception,exception_type_i[9:8],8'b0};
+assign exception_type_o={exception_type_i[31:12],overflow_exception,trap_exception, exception_type_i[9:8],8'b0};
 
 //                              条件                            结果
     wire [31:0]logic_res = ( aluop_i == `EXE_ORI_OP  || aluop_i == `EXE_OR_OP )   ? (reg1_i | reg2_i   )  :
