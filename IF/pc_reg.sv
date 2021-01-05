@@ -13,6 +13,9 @@ module pc_reg (
     input   logic           stall_i,
     input   logic [31:0]    pc_i,
 
+    input logic         flush_i,
+    input logic [31:0]  new_pc_i,
+
     output  logic [31:0]    pc_o,
     output  logic           ce_o
 );
@@ -25,8 +28,11 @@ module pc_reg (
         if(rst_i == 1'b1) begin
             pc_o <= 32'hbfc00000;
         end
+        else if(flush_i==1'b1) begin
+            pc_o <=new_pc_i;
+        end
         else if(stall_i) begin
-                pc_o <= pc_o;
+            pc_o <= pc_o;
         end
         else begin
             pc_o <= pc_i;
