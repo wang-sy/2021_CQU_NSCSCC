@@ -262,6 +262,7 @@ module datapath (
 
 	    .current_inst_addr_i(mem_current_instr_addr_o),//
 	    .is_in_delayslot_i(mem_in_delayslot_o),//
+        .soft_int(soft_int),
 
 	    .data_o(cp0_data_o),//
 	    .count_o(cp0_count_o),//

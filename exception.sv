@@ -8,13 +8,17 @@ module exception(
     input  logic        adel,
     input  logic        ades,
 
-    input               soft_int,  //此处不使用
+    input  logic [1:0]  soft_int,  //此处不使用
 
 	output logic [31:0] exception_type_o
 );
 
+logic [31:0]cp0_cause_harzrd;
+assign cp0_cause_harzrd = {cp0_cause_i[31:10], soft_int, cp0_cause_i[7:0]};
+
+
 assign exception_type_o =   rst_i == 1'b1 ? 32'b0 : 
-                            (((cp0_cause_i[15:8] & cp0_status_i[15:8]) != 8'h00) &&(cp0_status_i[1] == 1'b0) && (cp0_status_i[0] == 1'b1))==1'b1 ? 32'h00000001 : 
+                            (((cp0_cause_harzrd[15:8] & cp0_status_i[15:8]) != 8'h00) &&(cp0_status_i[1] == 1'b0) && (cp0_status_i[0] == 1'b1))==1'b1 ? 32'h00000001 : 
                             (adel ||exception_type_i[14])   ==   1'b1 ? 32'h00000004 :      
                             ades                          ==   1'b1 ? 32'h00000005 :     
                             exception_type_i[8]           ==   1'b1 ? 32'h00000008 :
