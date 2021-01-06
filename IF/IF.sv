@@ -14,7 +14,9 @@ module IF (
     input logic [31:0]  branch_to_addr_i,
 
     output logic [31:0] pc_o,
-    output logic        ce_o
+    output logic        ce_o,
+
+    output logic        addr_exception
 );
 
     logic [31:0]pc_next;
@@ -32,6 +34,8 @@ module IF (
         .pc_o(pc_o),
         .ce_o(ce_o)
     );
+
+    assign addr_exception = (pc_o[1:0] == 2'b00) ? 1'b1 : 1'b0;
 
     // 对下一时序的 pc 进行选择
     pc_next_sel if_pc_next_sel(

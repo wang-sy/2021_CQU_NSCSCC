@@ -28,6 +28,8 @@ module ID(
 
     input logic         is_in_delayslot_i,  //qf
 
+    input logic         addr_exception_i,
+
     // //输出
     output logic [4:0]  rs_o,
     output logic [4:0]  rt_o,
@@ -70,8 +72,8 @@ module ID(
     logic        except_type_is_eret;//qf
     logic        except_type_is_break;
     logic        instr_valid;//qf
-
-    assign exception_o  = { 18'b0,except_type_is_break, except_type_is_eret, 2'b0, ~instr_valid, except_type_is_syscall, 8'b0};
+                                     //[14]
+    assign exception_o  = { 17'b0,addr_exception_i,except_type_is_break, except_type_is_eret, 2'b0, ~instr_valid, except_type_is_syscall, 8'b0};
 
     assign is_in_delayslot_o = is_in_delayslot_i;//qf
     assign current_instr_addr_o = pc_i;  //qf

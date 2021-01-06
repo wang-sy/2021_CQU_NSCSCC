@@ -276,6 +276,9 @@ module datapath (
     // IF为取指令模块，主要负责对PC进行更新
     // IF模块会与指令寄存器（ROM）进行交互
     // 交互后，会获取到rom_data_i，即：当前pc对应的指令
+
+    logic addr_exception;
+
     IF datapath_if(
         .clk_i(clk_i),
         .rst_i(rst_i),
@@ -288,9 +291,11 @@ module datapath (
         .branch_to_addr_i(id_branch_to_addr),
 
         .pc_o(rom_addr_o),
-        .ce_o(rom_ce_o)
+        .ce_o(rom_ce_o),
+        .addr_exception(addr_exception)
     );
-
+    
+    logic if2id_addr_exception;
     // 从IF到ID的信号传递
     IF2ID datapath_if2id(
         .clk_i(clk_i),
@@ -299,11 +304,13 @@ module datapath (
 
         .if_pc_i(rom_addr_o),
         .if_inst_i(rom_data_i),
+        .addr_exception_i(addr_exception),
 
         .flush_i(controller_flush),
         
         .id_pc_o(id_pc),
-        .id_inst_o(id_inst)
+        .id_inst_o(id_inst),
+        .addr_exception_o(if2id_addr_exception)
     );
 
     // ID阶段
@@ -322,6 +329,7 @@ module datapath (
 
         .pc_i(id_pc),
         .inst_i(id_inst),
+        .addr_exception_i(if2id_addr_exception),
 
         .we_i(wb_wreg_control),
         .waddr_i(wb_wd_control),
