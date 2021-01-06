@@ -183,4 +183,3 @@ assign wvalid = do_req&&do_wr_r&&!wdata_rcv;
 assign bready  = 1'b1;
 
 endmodule
-

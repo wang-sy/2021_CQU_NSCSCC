@@ -198,7 +198,7 @@ module datapath (
     logic                wb_cp0_reg_we_control;//qf
     logic [4:0]          wb_cp0_reg_write_addr_control;//qf
     logic [31:0]         wb_cp0_reg_data_control; //qf
-    
+    logic [31:0]         exe2mem_inst_o;
     logic id2exe_reg1_read;
     logic id2exe_reg2_read;
 
@@ -411,7 +411,7 @@ module datapath (
 
         .next_is_in_delayslot_i(id_next_is_in_delayslot_o),
 
-        .id_inst_i(id_inst_o),
+        .id_inst_i(id_inst),
         .id_inst_o(id2exe_inst_o),
  
         .rd_i(id_rd_o),

@@ -8,7 +8,7 @@ module ade_exception(
 	output logic        adelM_o ,
     output logic        adesM_o ,
 
-    output logic        bad_addr_o
+    output logic [31:0] bad_addr_o
     );
 	
 	always @(*) begin
@@ -16,31 +16,30 @@ module ade_exception(
 		adesM_o     <=  1'b0;
 		adelM_o     <=  1'b0;
 		case (op_i) //op_i
-			`LW:begin
+			`EXE_LW:begin
 				if(addr_i[1:0] != 2'b00) begin //addr_i
 					adelM_o <= 1'b1;
 					bad_addr_o <= addr_i;
 				end 
 			end
-			`LH,`LHU:begin
+			`EXE_LH,`EXE_LHU:begin
                 case (addr_i[1:0])
 					2'b10:;
 					2'b00:;
 					default :begin
                         adelM_o <= 1'b1;
                         bad_addr_o <= addr_i;
-						sel <= 4'b0000;
 					end 
 				endcase
 			end
-			`SW:begin 
+			`EXE_SW:begin 
 				if(addr_i[1:0] == 2'b00) begin
 				end else begin 
 					adesM_o <= 1'b1;
 					bad_addr_o <= addr_i;
 				end
 			end
-			`SH:begin
+			`EXE_SH:begin
 				case (addr_i[1:0])
 					2'b10:;
 					2'b00:;
