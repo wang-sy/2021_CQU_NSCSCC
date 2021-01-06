@@ -72,8 +72,9 @@ module ID(
     logic        except_type_is_eret;//qf
     logic        except_type_is_break;
     logic        instr_valid;//qf
+    logic        instr_valid_rejudge;
                                      //[14]
-    assign exception_o  = { 17'b0,addr_exception_i,except_type_is_break, except_type_is_eret, 2'b0, ~instr_valid, except_type_is_syscall, 8'b0};
+    assign exception_o  = { 17'b0,addr_exception_i,except_type_is_break, except_type_is_eret, 2'b0, ~instr_valid_rejudge, except_type_is_syscall, 8'b0};
 
     assign is_in_delayslot_o = is_in_delayslot_i;//qf
     assign current_instr_addr_o = pc_i;  //qf
@@ -84,7 +85,7 @@ module ID(
     assign reg2_addr_o=rt;
 
     assign except_type_is_break = inst_i[31:26] == `EXE_SPECIAL_INST && inst_i[5:0] == `EXE_BREAK ? 1'b1 : 1'b0;
-
+    assign instr_valid_rejudge = (instr_valid | except_type_is_break);
     //寄存器堆接收到的信号
     logic [31:0] reg1_data;
     logic [31:0] reg2_data;
@@ -262,11 +263,11 @@ module ID(
             (sel == `EXE_TLTU)    ?   `TLTU_DECODE    :
             (sel == `EXE_TNE)     ?   `TNE_DECODE     :
             //系统调用指令
-            (sel == `EXE_SYSCALL) ?   `SYSCALL_DECODE : `INIT_DECODE
+            (sel == `EXE_SYSCALL) ?   `SYSCALL_DECODE : `NOT_VALID_DECODE
 
         ) : (op == `EXE_SPECIAL2_INST) ? (
             // special2 中的mul指令
-            (sel == `EXE_MUL) ? `MUL_DECODE : `INIT_DECODE
+            (sel == `EXE_MUL) ? `MUL_DECODE : `NOT_VALID_DECODE
         ) : (op == `EXE_REGIMM_INST) ? (
             // 对branch指令的具体类型进行�?�择，需要判断rt
             (rt == `EXE_BGEZ    ) ? `BGEZ_DECODE    : 
@@ -279,11 +280,11 @@ module ID(
             (rt == `EXE_TGEIU   ) ? `TGEIU_DECODE   :
             (rt == `EXE_TLTI    ) ? `TLTI_DECODE    :
             (rt == `EXE_TLTIU   ) ? `TLTIU_DECODE   :
-            (rt == `EXE_TNEI    ) ? `TNEI_DECODE    : `INIT_DECODE
+            (rt == `EXE_TNEI    ) ? `TNEI_DECODE    : `NOT_VALID_DECODE
         ) : inst_i==`EXE_ERET ? `ERET_DECODE : 
             //MFCO MFT0
             (inst_i[31:21]==11'b01000000000 && inst_i[10:0]==11'b0000000000) ? `MFC0_DECODE : 
-            (inst_i[31:21]==11'b01000000100 && inst_i[10:0]==11'b0000000000) ? `MTC0_DECODE : `INIT_DECODE//qf
+            (inst_i[31:21]==11'b01000000100 && inst_i[10:0]==11'b0000000000) ? `MTC0_DECODE : `NOT_VALID_DECODE//qf
     );
 
     assign {rs_o, rt_o, reg1_read_o, reg2_read_o} = {rs, rt, reg1_read, reg2_read};
