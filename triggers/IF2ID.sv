@@ -16,7 +16,7 @@ module IF2ID (
 
     output logic [31:0] id_pc_o,
     output logic [31:0] id_inst_o,
-    output logic        addr_exception_o,
+    output logic        addr_exception_o
 
 );
 

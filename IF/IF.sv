@@ -35,7 +35,8 @@ module IF (
         .ce_o(ce_o)
     );
 
-    assign addr_exception = (pc_o[1:0] == 2'b00) ? 1'b1 : 1'b0;
+    // 地址异常错误，原因：没有对齐
+    assign addr_exception = (pc_o[1:0] == 2'b00) ? 1'b0 : 1'b1;
 
     // 对下一时序的 pc 进行选择
     pc_next_sel if_pc_next_sel(
