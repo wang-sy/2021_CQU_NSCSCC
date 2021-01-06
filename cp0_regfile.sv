@@ -77,72 +77,19 @@ always @ (posedge clk) begin
                 end					
             endcase
         end
-        if (have_exception) begin
-            case (excepttype_i)
-                32'h00000000:		begin
-                    if(is_in_delayslot_i == `InDelaySlot ) begin
-                        epc_o <= current_inst_addr_i - 4 ;
-                        cause_o[31] <= 1'b1;
-                    end else begin
-                        epc_o <= current_inst_addr_i;
-                        cause_o[31] <= 1'b0;
-                    end
-                    status_o[1] <= 1'b1;
-                    cause_o[6:2] <= 5'b00000;
+        case (excepttype_i)
+            32'h00000001:		begin
+                if(is_in_delayslot_i == `InDelaySlot ) begin
+                    epc_o <= current_inst_addr_i - 4 ;
+                    cause_o[31] <= 1'b1;
+                end else begin
+                    epc_o <= current_inst_addr_i + 4;
+                    cause_o[31] <= 1'b0;
                 end
-                32'h00000001:		begin
-                    if(is_in_delayslot_i == `InDelaySlot ) begin
-                        epc_o <= current_inst_addr_i - 4 ;
-                        cause_o[31] <= 1'b1;
-                    end else begin
-                        epc_o <= current_inst_addr_i;
-                        cause_o[31] <= 1'b0;
-                    end
-                    status_o[1] <= 1'b1;
-                    cause_o[6:2] <= 5'b00000;
-                end
-                32'h00000004:begin
-                        if(is_in_delayslot_i == `InDelaySlot) begin
-                            /* code */
-                            epc_o <= current_inst_addr_i - 4;
-                            cause_o[31] <= 1'b1;
-                        end else begin
-                            epc_o <= current_inst_addr_i;
-                            cause_o[31] <= 1'b0;
-                        end
-                        status_o[1] <= 1'b1;
-                        cause_o[6:2] <= 5'b00100;
-                        badvaddr <= bad_addr_i;
-                    end
-                32'h00000005:begin
-                        if(is_in_delayslot_i == `InDelaySlot) begin
-                            /* code */
-                            epc_o <= current_inst_addr_i - 4;
-                            cause_o[31] <= 1'b1;
-                        end else begin
-                            epc_o <= current_inst_addr_i;
-                            cause_o[31] <= 1'b0;
-                        end
-                        status_o[1] <= 1'b1;
-                        cause_o[6:2] <= 5'b00101;
-                        badvaddr <= bad_addr_i;
-                end
-
-                32'h00000008:		begin
-                    if(status_o[1] == 1'b0) begin
-                        if(is_in_delayslot_i == `InDelaySlot ) begin
-                            epc_o <= current_inst_addr_i - 4 ;
-                            cause_o[31] <= 1'b1;
-                        end else begin
-                        epc_o <= current_inst_addr_i;
-                        cause_o[31] <= 1'b0;
-                        end
-                    end
-                    status_o[1] <= 1'b1;
-                    cause_o[6:2] <= 5'b01000;			
-                end
-                
-                32'h00000009:begin
+                status_o[1] <= 1'b1;
+                cause_o[6:2] <= 5'b00000;
+            end
+            32'h00000004:begin
                     if(is_in_delayslot_i == `InDelaySlot) begin
                         /* code */
                         epc_o <= current_inst_addr_i - 4;
@@ -152,55 +99,95 @@ always @ (posedge clk) begin
                         cause_o[31] <= 1'b0;
                     end
                     status_o[1] <= 1'b1;
-                    cause_o[6:2] <= 5'b01001;
-                end
+                    cause_o[6:2] <= 5'b00100;
+                    badvaddr <= bad_addr_i;
+            end
+            32'h00000005:begin
+                    if(is_in_delayslot_i == `InDelaySlot) begin
+                        /* code */
+                        epc_o <= current_inst_addr_i - 4;
+                        cause_o[31] <= 1'b1;
+                    end else begin
+                        epc_o <= current_inst_addr_i;
+                        cause_o[31] <= 1'b0;
+                    end
+                    status_o[1] <= 1'b1;
+                    cause_o[6:2] <= 5'b00101;
+                    badvaddr <= bad_addr_i;
+            end
 
-                32'h0000000a:		begin
-                    if(status_o[1] == 1'b0) begin
-                        if(is_in_delayslot_i == `InDelaySlot ) begin
-                            epc_o <= current_inst_addr_i - 4 ;
-                            cause_o[31] <= 1'b1;
-                        end else begin
-                        epc_o <= current_inst_addr_i;
-                        cause_o[31] <= 1'b0;
-                        end
+            32'h00000008:		begin
+                if(status_o[1] == 1'b0) begin
+                    if(is_in_delayslot_i == `InDelaySlot ) begin
+                        epc_o <= current_inst_addr_i - 4 ;
+                        cause_o[31] <= 1'b1;
+                    end else begin
+                    epc_o <= current_inst_addr_i;
+                    cause_o[31] <= 1'b0;
                     end
-                    status_o[1] <= 1'b1;
-                    cause_o[6:2] <= 5'b01010;					
                 end
-                32'h0000000d:		begin
-                    if(status_o[1] == 1'b0) begin
-                        if(is_in_delayslot_i == `InDelaySlot ) begin
-                            epc_o <= current_inst_addr_i - 4 ;
-                            cause_o[31] <= 1'b1;
-                        end else begin
-                        epc_o <= current_inst_addr_i;
-                        cause_o[31] <= 1'b0;
-                        end
+                status_o[1] <= 1'b1;
+                cause_o[6:2] <= 5'b01000;			
+            end
+            
+            32'h00000009:begin
+                if(is_in_delayslot_i == `InDelaySlot) begin
+                    /* code */
+                    epc_o <= current_inst_addr_i - 4;
+                    cause_o[31] <= 1'b1;
+                end else begin
+                    epc_o <= current_inst_addr_i;
+                    cause_o[31] <= 1'b0;
+                end
+                status_o[1] <= 1'b1;
+                cause_o[6:2] <= 5'b01001;
+            end
+
+            32'h0000000a:		begin
+                if(status_o[1] == 1'b0) begin
+                    if(is_in_delayslot_i == `InDelaySlot ) begin
+                        epc_o <= current_inst_addr_i - 4 ;
+                        cause_o[31] <= 1'b1;
+                    end else begin
+                    epc_o <= current_inst_addr_i;
+                    cause_o[31] <= 1'b0;
                     end
-                    status_o[1] <= 1'b1;
-                    cause_o[6:2] <= 5'b01101;					
                 end
-                32'h0000000c:		begin
-                    if(status_o[1] == 1'b0) begin
-                        if(is_in_delayslot_i == `InDelaySlot ) begin
-                            epc_o <= current_inst_addr_i - 4 ;
-                            cause_o[31] <= 1'b1;
-                        end else begin
-                        epc_o <= current_inst_addr_i;
-                        cause_o[31] <= 1'b0;
-                        end
+                status_o[1] <= 1'b1;
+                cause_o[6:2] <= 5'b01010;					
+            end
+            32'h0000000d:		begin
+                if(status_o[1] == 1'b0) begin
+                    if(is_in_delayslot_i == `InDelaySlot ) begin
+                        epc_o <= current_inst_addr_i - 4 ;
+                        cause_o[31] <= 1'b1;
+                    end else begin
+                    epc_o <= current_inst_addr_i;
+                    cause_o[31] <= 1'b0;
                     end
-                    status_o[1] <= 1'b1;
-                    cause_o[6:2] <= 5'b01100;					
-                end				
-                32'h0000000e:   begin
-                    status_o[1] <= 1'b0;
                 end
-                default:				begin
+                status_o[1] <= 1'b1;
+                cause_o[6:2] <= 5'b01101;					
+            end
+            32'h0000000c:		begin
+                if(status_o[1] == 1'b0) begin
+                    if(is_in_delayslot_i == `InDelaySlot ) begin
+                        epc_o <= current_inst_addr_i - 4 ;
+                        cause_o[31] <= 1'b1;
+                    end else begin
+                    epc_o <= current_inst_addr_i;
+                    cause_o[31] <= 1'b0;
+                    end
                 end
-            endcase	
-        end		
+                status_o[1] <= 1'b1;
+                cause_o[6:2] <= 5'b01100;					
+            end				
+            32'h0000000e:   begin
+                status_o[1] <= 1'b0;
+            end
+            default:				begin
+            end
+        endcase	
     end
 end
 

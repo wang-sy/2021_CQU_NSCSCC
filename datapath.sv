@@ -230,7 +230,6 @@ module datapath (
         .id_reg2_read_ena_i(id_reg2_read),
         .ex_wreg_i(ex_wreg),
         .ex_wd_i(ex_wd),
-        .soft_int(soft_int),
 
         .if2id_stall_o(if2id_stall),
         .if_stall_o(if_stall),
@@ -614,7 +613,7 @@ module datapath (
         .is_in_delayslot_i(ex2mem_in_delayslot_o),
 
         .cp0_status_i(cp0_status_o),
-        .cp0_cause_i(cp0_status_o),
+        .cp0_cause_i(cp0_cause_o),
         .cp0_epc_i(cp0_epc_o),
 
         .inst_i(exe2mem_inst_o),

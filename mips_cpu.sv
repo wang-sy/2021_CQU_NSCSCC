@@ -143,6 +143,7 @@ module mycpu_top (
     i_sram2sram_like top_i_sram2sram_like(
         .clk_i(aclk),
         .rst_i(rst_i),
+        .cpu_flush_i(cpu_flush),
         .cpu_rom_addr_i(cpu_rom_addr),
         .cpu_rom_ce_i(cpu_rom_ce),
         .stall_all_i(stall_all),
