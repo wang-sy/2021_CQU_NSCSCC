@@ -52,7 +52,7 @@ module div_ip(
     //  Divisor  Width:     32                          //
     //  Output Channel:     Remainder                   //
     //  Fractional Width:   32                          //
-    //  Clocks per Division:32                          //
+    //  Clocks per Division:1                           //
     //  Latency Config:     Manual                      //
     //  Latency:            16                          //
     //  ACLKEN:             YES                         //
