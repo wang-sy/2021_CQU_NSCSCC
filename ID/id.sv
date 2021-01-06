@@ -76,9 +76,12 @@ module ID(
                                      //[14]
     assign exception_o  = { 17'b0,addr_exception_i,except_type_is_break, except_type_is_eret, 2'b0, ~instr_valid_rejudge, except_type_is_syscall, 8'b0};
 
+
+    logic is_branch_inst_now;
+
     assign is_in_delayslot_o = is_in_delayslot_i;//qf
     assign current_instr_addr_o = pc_i;  //qf
-    assign next_is_in_delayslot_o = branch_flag_o;
+    assign next_is_in_delayslot_o = is_branch_inst_now;
     assign rd_o = rd; 
 
     assign reg1_addr_o=rs;
@@ -191,7 +194,8 @@ module ID(
         mem_io_addr_o,
         except_type_is_syscall,
         except_type_is_eret,
-        instr_valid
+        instr_valid,
+        is_branch_inst_now
     } = (rst == 1'b1    )   ? `INIT_DECODE  : (
         (op == `EXE_ORI)    ? `ORI_DECODE   :
         (op == `EXE_ANDI)   ? `ANDI_DECODE  :
