@@ -46,11 +46,13 @@ module MEM2WB (
             wb_wd_o               <= `NOPRegAddr;
             wb_wreg_o             <= 1'b0;
             wb_wdata_o            <= `ZeroWord;
-            wb_pc_o               <= 32'b0;
-            wb_cp0_reg_we         <= 1'b0;//qf
-            wb_cp0_reg_write_addr <= 32'b0;//qf
-            wb_cp0_reg_data       <= 32'b0;//qf
-            mem_bad_addr_o<=32'b0;
+
+            // 这些都不应该被清空
+            wb_pc_o               <= mem_pc_i;
+            wb_cp0_reg_we         <= mem_cp0_reg_we;//qf
+            wb_cp0_reg_write_addr <= mem_cp0_reg_write_addr;//qf
+            wb_cp0_reg_data       <= mem_cp0_reg_data;//qf
+            mem_bad_addr_o<=mem_bad_addr_i;
         end
         else if (stall_i == 1'b1) begin
             wb_wd_o               <= wb_wd_o;

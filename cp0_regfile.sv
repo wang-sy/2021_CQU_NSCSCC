@@ -193,6 +193,7 @@ assign data_o = rst    == 1'b1            ? 32'b0:
                 raddr_i==`CP0_REG_CAUSE   ? cause_o:
                 raddr_i==`CP0_REG_EPC     ? epc_o:
                 raddr_i==`CP0_REG_CONFIG  ? config_o:
-                raddr_i==`CP0_REG_PRID    ? prid_o:32'b0;
+                raddr_i==`CP0_REG_PRID    ? prid_o: 
+                raddr_i==`CP0_REG_BADVADDR? badvaddr: 32'b0;
 
 endmodule

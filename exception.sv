@@ -25,4 +25,3 @@ assign exception_type_o =   rst_i == 1'b1 ? 32'b0 :
                             exception_type_i[10]  ==   1'b1 ? 32'h0000000d :
                             exception_type_i[12]  ==   1'b1 ? 32'h0000000e :  32'h0;
 endmodule
-

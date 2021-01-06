@@ -256,7 +256,7 @@ module datapath (
 	    .excepttype_i(mem_exception_type_o),//
 	    .int_i(int_i),//
 
-        .bad_addr_i(mem2wb_bad_addr),
+        .bad_addr_i(mem_bad_addr),
 
 
 	    .current_inst_addr_i(mem_current_instr_addr_o),//

@@ -161,6 +161,7 @@ module mycpu_top (
     d_sram2sram_like top_d_sram2sram_like(
         .clk_i(aclk),
         .rst_i(rst_i),
+        .cpu_flush_i(cpu_flush),
         .cpu_ram_ce_i(cpu_ram_ce),
         .cpu_ram_addr_i(cpu_ram_addr),
         .cpu_ram_wdata_i(cpu_ram_wdata),

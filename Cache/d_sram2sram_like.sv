@@ -2,6 +2,7 @@ module d_sram2sram_like (
     input logic         clk_i,
     input logic         rst_i,
     // cpu side input
+    input logic         cpu_flush_i,
     input logic         cpu_ram_ce_i,
     input logic [31:0]  cpu_ram_addr_i,
     input logic [31:0]  cpu_ram_wdata_i,
@@ -25,8 +26,16 @@ module d_sram2sram_like (
     output logic [31:0] cache_data_wdata_o
 );
 
+    // 对 flush进行记录，当flush后，不再记录本次的读取结果
+    logic is_clear;
     logic addr_rcv;      //地址握手成功
     logic do_finish;     //读事务结束
+
+    always @(posedge clk_i) begin
+        is_clear <= rst_i ? 1'b1 :
+                    cache_data_data_ok_i ? 1'b1 :
+                    cpu_flush_i ? 1'b0 : is_clear;
+    end
 
     // 记录地址是否握手成功
     // 当且仅当在地址确认成功，并且没有获取到数据时为1
@@ -40,6 +49,7 @@ module d_sram2sram_like (
     // 如果当前从sramlike获取到了数据则置为1，如果当前在全局stall中，则将状态锁存
     always @(posedge clk_i) begin
         do_finish <= rst_i              ? 1'b0 :
+                     ~is_clear          ? 1'b0 :
                      cache_data_data_ok_i ? 1'b1 :
                      ~stall_all_i       ? 1'b0 : do_finish;
     end
@@ -49,6 +59,7 @@ module d_sram2sram_like (
     logic [31:0] data_rdata_save;
     always @(posedge clk_i) begin
         data_rdata_save <= rst_i                ? 32'b0             :
+                           ~is_clear            ? 1'b0 :
                            cache_data_data_ok_i   ? cache_data_rdata_i  : data_rdata_save;
     end
     

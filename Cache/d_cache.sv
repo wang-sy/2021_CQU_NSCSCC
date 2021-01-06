@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module d_cache #(parameter A_WIDTH = 32,
-    parameter C_INDEX = 6)(
+    parameter C_INDEX = 10)(
         input wire[A_WIDTH-1:0] p_a,
         input wire[31:0] p_dout,
         output wire[31:0] p_din,
