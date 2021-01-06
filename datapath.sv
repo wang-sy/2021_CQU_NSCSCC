@@ -230,6 +230,7 @@ module datapath (
         .id_reg2_read_ena_i(id_reg2_read),
         .ex_wreg_i(ex_wreg),
         .ex_wd_i(ex_wd),
+        .soft_int(soft_int),
 
         .if2id_stall_o(if2id_stall),
         .if_stall_o(if_stall),
@@ -588,6 +589,8 @@ module datapath (
     // 访存操作主要分为两种：1、对内存进行读取；2、对内存进行写操作
     logic [31:0] mem_bad_addr;
 
+    logic [1:0] soft_int;
+
     MEM datapath_mem(
         .clk_i(clk_i),
         .rst_i(rst_i),
@@ -646,7 +649,8 @@ module datapath (
         .cp0_reg_write_addr_o(mem_cp0_reg_write_addr),//qf
         .cp0_reg_data_o(mem_cp0_reg_data),//qf
 
-        .bad_addr_o(mem_bad_addr)
+        .bad_addr_o(mem_bad_addr),
+        .soft_int(soft_int)
 
     );
 

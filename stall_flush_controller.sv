@@ -26,6 +26,7 @@ module stall_flush_controller (
     // ex 阶段正在运算的信号
     input   logic           ex_wreg_i,
     input   logic [4:0]     ex_wd_i,
+    input   logic [1:0]     soft_int,
 
     output  logic           if_stall_o,
     output  logic           if2id_stall_o,
@@ -41,7 +42,7 @@ module stall_flush_controller (
     output  logic[31:0]     new_pc  //qf
 );
 
-    assign flush = rst_i == 1'b1 ? 1'b0 : (|exception_type_encode_i);
+    assign flush = rst_i == 1'b1 ? 1'b0 : ((|exception_type_encode_i) | ((soft_int[1] | soft_int[0])));
 
     assign new_pc = rst_i==1'b1 ? 32'b0 : 
                     (exception_type_encode_i == 32'h0000001) ? 32'hBFC00380 :
@@ -54,7 +55,8 @@ module stall_flush_controller (
                     (exception_type_encode_i == 32'h000000a) ? 32'hBFC00380 :
                     (exception_type_encode_i == 32'h000000d) ? 32'hBFC00380 :
                     (exception_type_encode_i == 32'h000000c) ? 32'hBFC00380 :
-                    (exception_type_encode_i == 32'h000000e) ? cp0_epc_i    : 32'h0;
+                    (exception_type_encode_i == 32'h000000e) ? cp0_epc_i    : 
+                    (soft_int[1]|| soft_int[0]) == 1'b1      ? 32'hBFC00380 : 32'h0;
 
     assign stall_all_o = inst_stall_i | data_stall_i | ~ex_ok_i;
 

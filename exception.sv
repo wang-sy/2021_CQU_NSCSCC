@@ -8,6 +8,7 @@ module exception(
     input  logic        adel,
     input  logic        ades,
 
+    input               soft_int,  //此处不使用
 
 	output logic [31:0] exception_type_o
 );

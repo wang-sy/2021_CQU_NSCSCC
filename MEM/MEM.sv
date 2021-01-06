@@ -54,7 +54,8 @@ module MEM (
     output logic [4:0]          cp0_reg_write_addr_o,//qf
     output logic [31:0]         cp0_reg_data_o, //qf
 
-    output logic [31:0]         bad_addr_o////qfqf
+    output logic [31:0]         bad_addr_o,////qfqf
+    output logic [1:0]          soft_int
 
 );
 
@@ -93,12 +94,19 @@ module MEM (
     );
     logic adelM_o,adesM_o;
 
+    assign soft_int[1:0] = (cp0_reg_we_i==1'b1 && cp0_reg_write_addr_i == `CP0_REG_CAUSE) ?cp0_reg_data_i[9:8] : 2'b00;
+
+    assign cp0_reg_we_o             = cp0_reg_we_i;
+    assign cp0_reg_write_addr_o     = cp0_reg_write_addr_i;
+    assign cp0_reg_data_o           = cp0_reg_data_i;
+
     //exception_type_o
     exception exception_type(
         .rst_i(rst_i),
         .adel(adelM_o),
         .ades(adesM_o),
         .exception_type_i(exception_type_i),
+        .soft_int(soft_int),
         .cp0_status_i(cp0_status_i),
         .cp0_cause_i(cp0_cause_i),
         .exception_type_o(exception_type_o)
