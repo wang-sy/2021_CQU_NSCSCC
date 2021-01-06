@@ -82,7 +82,7 @@ module MEM (
     //输出�?新cp0_epc
     assign cp0_epc_o = CP0_Epc_Newest;
 
-    module ade_exception(
+    ade_exception mem_ade_exception(
         .op_i(inst_i[31:26])                  ,
         .addr_i(mem_io_addr_i)                ,
         .pc_i(current_instr_addr_i)           ,
