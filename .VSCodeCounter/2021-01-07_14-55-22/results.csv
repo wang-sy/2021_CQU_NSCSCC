@@ -1,0 +1,57 @@
+"filename", "language", "System Verilog", "XML", "Verilog", "Markdown", "comment", "blank", "total"
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\Cache\cache.sv", "System Verilog", 95, 0, 0, 0, 47, 17, 159
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\Cache\d_cache.sv", "System Verilog", 185, 0, 0, 0, 21, 26, 232
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\Cache\d_sram2sram_like.sv", "System Verilog", 55, 0, 0, 0, 13, 12, 80
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\Cache\i_cache.sv", "System Verilog", 64, 0, 0, 0, 21, 17, 102
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\Cache\i_sram2sram_like.sv", "System Verilog", 52, 0, 0, 0, 13, 12, 77
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\EX\EX.sv", "System Verilog", 106, 0, 0, 0, 9, 39, 154
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\EX\alu.sv", "System Verilog", 123, 0, 0, 0, 31, 36, 190
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\EX\alu_data_sel.sv", "System Verilog", 18, 0, 0, 0, 0, 1, 19
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\EX\div.sv", "System Verilog", 93, 0, 0, 0, 31, 9, 133
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\EX\div_ip.sv", "System Verilog", 48, 0, 0, 0, 17, 11, 76
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\EX\ex_reg_hazard.sv", "System Verilog", 25, 0, 0, 0, 9, 11, 45
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\EX\mul_ip.sv", "System Verilog", 40, 0, 0, 0, 14, 5, 59
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\ID\branch_controller.sv", "System Verilog", 16, 0, 0, 0, 4, 4, 24
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\ID\id.sv", "System Verilog", 227, 0, 0, 0, 37, 37, 301
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\ID\id_defines.vh", "Verilog", 0, 0, 74, 0, 14, 10, 98
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\ID\reg_harzrd.sv", "System Verilog", 28, 0, 0, 0, 9, 7, 44
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\ID\regfile.sv", "System Verilog", 24, 0, 0, 0, 5, 8, 37
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\IF\IF.sv", "System Verilog", 34, 0, 0, 0, 6, 12, 52
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\IF\pc_next_sel.sv", "System Verilog", 12, 0, 0, 0, 4, 4, 20
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\IF\pc_reg.sv", "System Verilog", 27, 0, 0, 0, 10, 5, 42
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\MEM\MEM.sv", "System Verilog", 111, 0, 0, 0, 11, 28, 150
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\MEM\ade_exception.sv", "System Verilog", 50, 0, 0, 0, 0, 5, 55
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\MEM\exception.sv", "System Verilog", 23, 0, 0, 0, 2, 9, 34
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\MEM\hilo_reg.sv", "System Verilog", 25, 0, 0, 0, 2, 5, 32
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\MEM\mem_io_controller.sv", "System Verilog", 56, 0, 0, 0, 0, 9, 65
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\README.md", "Markdown", 0, 0, 0, 6, 0, 3, 9
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\WB\wb.sv", "System Verilog", 20, 0, 0, 0, 1, 9, 30
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\cp0_regfile.sv", "System Verilog", 182, 0, 0, 0, 5, 17, 204
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\cpu_axi_interface.v", "Verilog", 0, 0, 126, 0, 48, 11, 185
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\datapath.sv", "System Verilog", 519, 0, 0, 0, 48, 147, 714
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\debug_controller.sv", "System Verilog", 47, 0, 0, 0, 0, 8, 55
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\defines.vh", "Verilog", 0, 0, 232, 0, 12, 31, 275
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\docs\cyy\diary.md", "Markdown", 0, 0, 0, 61, 0, 47, 108
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\docs\fanqin\CP0模块.md", "Markdown", 0, 0, 0, 3, 0, 1, 4
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\docs\fanqin\异常处理模块.md", "Markdown", 0, 0, 0, 2, 0, 0, 2
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\docs\wsy\Day1.md", "Markdown", 0, 0, 0, 21, 0, 26, 47
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\docs\wsy\Day2.md", "Markdown", 0, 0, 0, 21, 0, 36, 57
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\docs\wsy\Day3.md", "Markdown", 0, 0, 0, 16, 0, 26, 42
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\docs\wsy\Day4.md", "Markdown", 0, 0, 0, 7, 0, 8, 15
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\docs\wsy\添加axi桥.md", "Markdown", 0, 0, 0, 34, 0, 49, 83
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\mips_cpu.sv", "System Verilog", 247, 0, 0, 0, 19, 29, 295
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\stall_flush_controller.sv", "System Verilog", 85, 0, 0, 0, 14, 15, 114
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\test\EX_test.sv", "System Verilog", 42, 0, 0, 0, 0, 5, 47
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\test\ID_test.sv", "System Verilog", 42, 0, 0, 0, 26, 22, 90
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\test\IF_test.sv", "System Verilog", 34, 0, 0, 0, 0, 3, 37
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\test\test1-ori\test1.sv", "System Verilog", 17, 0, 0, 0, 0, 3, 20
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\test\test13-tlb\test13.sv", "System Verilog", 102, 0, 0, 0, 28, 3, 133
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\tlb.sv", "System Verilog", 251, 0, 0, 0, 21, 30, 302
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\tlbdefines.vh", "Verilog", 0, 0, 15, 0, 0, 0, 15
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\triggers\EX2MEM.sv", "System Verilog", 132, 0, 0, 0, 0, 14, 146
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\triggers\ID2EXE.sv", "System Verilog", 135, 0, 0, 0, 1, 29, 165
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\triggers\IF2ID.sv", "System Verilog", 36, 0, 0, 0, 3, 7, 46
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\triggers\MEM2WB.sv", "System Verilog", 65, 0, 0, 0, 1, 13, 79
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\unsigned_divd\unsigned_divd.xml", "XML", 0, 1916, 0, 0, 0, 1, 1917
+"c:\Users\wangsy\Desktop\2021_CQU_NSCSCC\unsigned_mult\unsigned_mult.xml", "XML", 0, 1040, 0, 0, 0, 1, 1041
+"Total", "-", 3493, 2956, 447, 171, 557, 933, 8557

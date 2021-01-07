@@ -96,10 +96,6 @@ module MEM (
 
     assign soft_int[1:0] = (cp0_reg_we_i==1'b1 && cp0_reg_write_addr_i == `CP0_REG_CAUSE) ?cp0_reg_data_i[9:8] : 2'b00;
 
-    assign cp0_reg_we_o             = cp0_reg_we_i;
-    assign cp0_reg_write_addr_o     = cp0_reg_write_addr_i;
-    assign cp0_reg_data_o           = cp0_reg_data_i;
-
     //exception_type_o
     exception exception_type(
         .rst_i(rst_i),
