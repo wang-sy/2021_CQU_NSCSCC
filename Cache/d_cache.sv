@@ -606,7 +606,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .doutb(c_tags_way_0)
     );
 
-    tags_way_1 tags_way_0 (
+    tags_way_1 tags_way_1 (
         .clka(clk),
         .ena(wr_bram),
         .wea(tags_way_1_wea),
@@ -617,7 +617,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .doutb(c_tags_way_1)
     );
 
-    tags_way_2 tags_way_0 (
+    tags_way_2 tags_way_2 (
         .clka(clk),
         .ena(wr_bram),
         .wea(tags_way_2_wea),
@@ -628,7 +628,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .doutb(c_tags_way_2)
     );
 
-    tags_way_3 tags_way_0 (
+    tags_way_3 tags_way_3 (
         .clka(clk),
         .ena(wr_bram),
         .wea(tags_way_3_wea),
@@ -650,7 +650,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .doutb(c_way_age_way_0)
     );
 
-    way_age_way_1 way_age_way_0 (
+    way_age_way_1 way_age_way_1 (
         .clka(clk),
         .ena(wr_bram),
         .addra(index),
@@ -661,7 +661,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .doutb(c_way_age_way_1)
     );
 
-    way_age_way_2 way_age_way_0 (
+    way_age_way_2 way_age_way_2 (
         .clka(clk),
         .ena(wr_bram),
         .addra(index),
@@ -672,7 +672,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .doutb(c_way_age_way_2)
     );
 
-    way_age_way_3 way_age_way_0 (
+    way_age_way_3 way_age_way_3 (
         .clka(clk),
         .ena(wr_bram),
         .addra(index),
