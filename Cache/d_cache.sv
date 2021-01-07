@@ -601,7 +601,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .wea(tags_way_0_wea),
         .addra(index),
         .dina(tag),
-        .clkb(~clk),
+        .clkb(clk),
         .addrb(index),
         .doutb(c_tags_way_0)
     );
@@ -612,7 +612,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .wea(tags_way_1_wea),
         .addra(index),
         .dina(tag),
-        .clkb(~clk),
+        .clkb(clk),
         .addrb(index),
         .doutb(c_tags_way_1)
     );
@@ -623,7 +623,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .wea(tags_way_2_wea),
         .addra(index),
         .dina(tag),
-        .clkb(~clk),
+        .clkb(clk),
         .addrb(index),
         .doutb(c_tags_way_2)
     );
@@ -634,7 +634,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .wea(tags_way_3_wea),
         .addra(index),
         .dina(tag),
-        .clkb(~clk),
+        .clkb(clk),
         .addrb(index),
         .doutb(c_tags_way_3)
     );
@@ -645,7 +645,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .addra(index),
         .wea(wr_bram),
         .dina(dina_way_age_way_0),
-        .clkb(~clk),
+        .clkb(clk),
         .addrb(index),
         .doutb(c_way_age_way_0)
     );
@@ -656,7 +656,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .addra(index),
         .wea(wr_bram),
         .dina(dina_way_age_way_1),
-        .clkb(~clk),
+        .clkb(clk),
         .addrb(index),
         .doutb(c_way_age_way_1)
     );
@@ -667,7 +667,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .addra(index),
         .wea(wr_bram),
         .dina(dina_way_age_way_2),
-        .clkb(~clk),
+        .clkb(clk),
         .addrb(index),
         .doutb(c_way_age_way_2)
     );
@@ -678,7 +678,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .addra(index),
         .wea(wr_bram),
         .dina(dina_way_age_way_3),
-        .clkb(~clk),
+        .clkb(clk),
         .addrb(index),
         .doutb(c_way_age_way_3)
     );
@@ -689,7 +689,7 @@ module d_cache#(parameter A_WIDTH = 32,parameter SET_ADDR_LEN = 11,parameter WOR
         .wea(data_bram_wea_wire),      // input wire [15 : 0] wea
         .addra(index),
         .dina(wr_mem_data),    // input wire [127 : 0] dina
-        .clkb(~clk),
+        .clkb(clk),
         .addrb(index),
         .doutb({c_data1_way_0,c_data1_way_1,c_data1_way_2,c_data1_way_3,c_data2_way_0,c_data2_way_1,c_data2_way_2,c_data2_way_3,c_data3_way_0,c_data3_way_1,c_data3_way_2,c_data3_way_3,c_data4_way_0,c_data4_way_1,c_data4_way_2,c_data4_way_3})  // output wire [127 : 0] doutb
     );
