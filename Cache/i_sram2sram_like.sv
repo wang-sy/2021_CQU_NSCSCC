@@ -47,6 +47,7 @@ module i_sram2sram_like (
     // 如果当前从sramlike获取到了数据则置为1，如果当前在全局stall中，则将状态锁存
     always @(posedge clk_i) begin
         do_finish <= rst_i              ? 1'b0 :
+                     (is_clear & cache_inst_rdata_i) ? 1'b0 : // 如果当前不需要被忽略并且获取到了数据，那么就直接返回
                      cpu_flush_i        ? 1'b0 :
                      ~is_clear          ? 1'b0 :
                      cache_inst_data_ok_i ? 1'b1 :
@@ -64,14 +65,15 @@ module i_sram2sram_like (
     
 
     //sram like
-    assign cache_inst_req_o   = cpu_rom_ce_i & ~addr_rcv & ~do_finish;
+    assign cache_inst_req_o   = cpu_rom_ce_i & ~do_finish;
     assign cache_inst_wr_o    = 1'b0;
     assign cache_inst_size_o  = 2'b10;
     assign cache_inst_addr_o  = cpu_rom_addr_i;
     assign cache_inst_wdata_o = 32'b0;
 
+    // 如果当前不在clear，并且收到了信号，那么就直接将结果进行返回
     //sram
-    assign cpu_rom_data_o   = inst_rdata_save;
-    assign cpu_rom_stall_o  = cpu_rom_ce_i & ~do_finish & ~cpu_flush_i;
+    assign cpu_rom_data_o   = (is_clear & cache_inst_rdata_i) ? cache_inst_rdata_i : inst_rdata_save;
+    assign cpu_rom_stall_o  = (is_clear & cache_inst_rdata_i) ? 1'b0 : (cpu_rom_ce_i & ~do_finish & ~cpu_flush_i);
     
 endmodule
