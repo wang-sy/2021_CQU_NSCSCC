@@ -103,7 +103,7 @@ module EXE(
 
     assign cp0data2E = ((ex_rd_i!=0)&(ex_rd_i == mem_rd_i)&(mem_wcp0_i)) ? mem_wdata_i : ex_cp0_data_i;
 
-	alu alu(srca2E,srcb3E,ex_sa_i,ex_alucontrol_i,hi2E,lo2E,cp0data2E,aluoutE,ov_o,hi_alu_outE,lo_alu_outE);
+	alu alu(clk,srca2E,srcb3E,ex_sa_i,ex_alucontrol_i,hi2E,lo2E,cp0data2E,aluoutE,ov_o,hi_alu_outE,lo_alu_outE);
 
     assign exe_aluout_o = (ex_jal_i | ex_jalr_i | ex_bal_i) ?  ex_pc_i+8 : aluoutE;
     assign writereg1E = ex_regdst_i==1'b1 ? ex_rd_i : ex_rt_i;

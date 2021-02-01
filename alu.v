@@ -59,17 +59,116 @@
 `include "defines.h"
 
 module alu(
+	input wire clk,
 	input wire[31:0] a,b,
 	input wire[4:0] sa,
 	input wire[4:0] alucontrol,
 	input wire [31:0] hi_in,lo_in,
 	input wire [31:0] cp0data,
-	output reg[31:0] y,
-	output reg overflow,
-	output  reg[31:0] hi_alu_out,lo_alu_out
+	output wire [31:0] y,
+	output wire overflow,
+	output wire [31:0] hi_alu_out,lo_alu_out
     );
 	
-	always @(*) begin
+	wire [31:0] result_and;
+	assign result_and = a & b;
+
+	wire [31:0] result_or;
+	assign result_or = a | b;
+
+	wire [31:0] result_xor;
+	assign result_xor = a ^ b;
+
+	wire [31:0] result_nor;
+	assign result_nor = ~(a | b);
+
+	wire [31:0] result_add;
+	assign result_add = (a + b);
+
+	wire [31:0] result_sub;
+	assign result_sub = (a - b);
+
+	wire [31:0] result_slt;
+	assign result_slt = {{31{1'b0}},($signed(a)<$signed(b))?1:0};
+
+	wire [31:0] result_sltu;
+	assign result_sltu = {{31{1'b0}},(a<b)?1:0};
+
+	wire [31:0] result_lui;
+	assign result_lui = {b[15:0], 16'b0};
+
+	wire [63:0] result_mult;
+	assign result_mult = $signed(a)*$signed(b);
+
+	wire [63:0] result_multu;
+	assign result_multu = a * b;
+
+	wire [31:0] result_sll;
+	assign result_sll = b << sa;
+
+	wire [31:0] result_srl;
+	assign result_srl = b >> sa;
+
+	wire [31:0] result_sra;
+	assign result_sra = ({32{b[31]}} << (6'd32-{1'b0,sa})) | b >> sa;
+
+	wire [31:0] result_sllv;
+	assign result_sllv = b << a[4:0];
+
+	wire [31:0] result_srlv;
+	assign result_srlv = b >> a[4:0];
+
+	wire [31:0] result_srav;
+	assign result_srav = ({32{b[31]}} << (6'd32-{1'b0,a[4:0]})) | b >> a[4:0];
+
+	wire [31:0] result_mfhi;
+	assign result_mfhi = hi_in[31:0];
+
+	wire [31:0] result_mflo;
+	assign result_mflo = lo_in[31:0];
+
+	wire [31:0] result_mfc0;
+	assign result_mfc0 = cp0data;
+
+	wire [31:0] result_mtc0;
+	assign result_mtc0 = b;
+
+	assign y = 
+		({32{alucontrol == `AND_CONTROL}} & result_and) |
+		({32{alucontrol == `OR_CONTROL}} & result_or) | 
+		({32{alucontrol == `XOR_CONTROL}} & result_xor) |
+		({32{alucontrol == `NOR_CONTROL}} & result_nor) |
+		({32{alucontrol == `ADD_CONTROL}} & result_add) |
+		({32{alucontrol == `ADDU_CONTROL}} & result_add) |
+		({32{alucontrol == `SUB_CONTROL}} & result_sub) |
+		({32{alucontrol == `SUBU_CONTROL}} & result_sub) |
+		({32{alucontrol == `SLT_CONTROL}} & result_slt) |
+		({32{alucontrol == `SLTU_CONTROL}} & result_sltu) |
+		({32{alucontrol == `LUI_CONTROL}} & result_lui) |
+		({32{alucontrol == `SLL_CONTROL}} & result_sll) |
+		({32{alucontrol == `SRL_CONTROL}} & result_srl) |
+		({32{alucontrol == `SRA_CONTROL}} & result_sra) |
+		({32{alucontrol == `SLLV_CONTROL}} & result_sllv) |
+		({32{alucontrol == `SRLV_CONTROL}} & result_srlv) |
+		({32{alucontrol == `SRAV_CONTROL}} & result_srav) |
+
+		({32{alucontrol == `MFHI_CONTROL}} & result_mfhi) |
+		({32{alucontrol == `MFLO_CONTROL}} & result_mflo) |
+		({32{alucontrol == `MFC0_CONTROL}} & result_mfc0) |
+		({32{alucontrol == `MTC0_CONTROL}} & result_mtc0);
+
+	assign hi_alu_out = 
+		({32{alucontrol == `MULT_CONTROL}} & result_mult[63:32]) |
+		({32{alucontrol == `MULTU_CONTROL}} & result_multu[63:32]) | 
+		({32{alucontrol == `MTHI_CONTROL}} & a);
+	
+	assign lo_alu_out = 
+		({32{alucontrol == `MULT_CONTROL}} & result_mult[31:0]) |
+		({32{alucontrol == `MULTU_CONTROL}} & result_multu[31:0]) | 
+		({32{alucontrol == `MTLO_CONTROL}} & a);
+
+	/*
+	always @(negedge clk) begin
 		case (alucontrol)
 			// logic and algor inst
 			`AND_CONTROL:  y <= a & b;
@@ -101,14 +200,10 @@ module alu(
 			default : y <= 32'b0;
 		endcase	
 	end
+	*/
+	assign overflow = 
+		( (alucontrol == `ADD_CONTROL) & a[31] & b[31] & ~y[31] | ~a[31] & ~b[31] & y[31])
+		|
+		( (alucontrol == `SUB_CONTROL) & ((a[31]&&!b[31])&&!y[31])||((!a[31]&&b[31])&&y[31]) );
 
-	always @(*) begin
-		case (alucontrol)
-			`ADD_CONTROL: overflow <= a[31] & b[31] & ~y[31] | ~a[31] & ~b[31] & y[31];
-			`SUB_CONTROL: overflow <= ((a[31]&&!b[31])&&!y[31])||((!a[31]&&b[31])&&y[31]);
-			`ADDU_CONTROL:overflow <= 0;
-			`SUBU_CONTROL:overflow <= 0;
-			default: overflow <= 0;
-        endcase
-	end
 endmodule
