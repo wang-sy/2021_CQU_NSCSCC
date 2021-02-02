@@ -133,7 +133,7 @@ module alu(
 	wire [31:0] result_mtc0;
 	assign result_mtc0 = b;
 
-	assign y = 
+	assign y = alucontrol ? (
 		({32{alucontrol == `AND_CONTROL}} & result_and) |
 		({32{alucontrol == `OR_CONTROL}} & result_or) | 
 		({32{alucontrol == `XOR_CONTROL}} & result_xor) |
@@ -155,7 +155,8 @@ module alu(
 		({32{alucontrol == `MFHI_CONTROL}} & result_mfhi) |
 		({32{alucontrol == `MFLO_CONTROL}} & result_mflo) |
 		({32{alucontrol == `MFC0_CONTROL}} & result_mfc0) |
-		({32{alucontrol == `MTC0_CONTROL}} & result_mtc0);
+		({32{alucontrol == `MTC0_CONTROL}} & result_mtc0)
+	) : 0;
 
 	assign hi_alu_out = 
 		({32{alucontrol == `MULT_CONTROL}} & result_mult[63:32]) |
@@ -167,43 +168,9 @@ module alu(
 		({32{alucontrol == `MULTU_CONTROL}} & result_multu[31:0]) | 
 		({32{alucontrol == `MTLO_CONTROL}} & a);
 
-	/*
-	always @(negedge clk) begin
-		case (alucontrol)
-			// logic and algor inst
-			`AND_CONTROL:  y <= a & b;
-			`OR_CONTROL:   y <= a | b;
-			`XOR_CONTROL:  y <= a ^ b;
-			`NOR_CONTROL:  y <= ~(a | b);
-
-			`ADD_CONTROL, `ADDU_CONTROL: y <= a + b;
-			`SUB_CONTROL, `SUBU_CONTROL: y <= a - b;
-			`SLT_CONTROL:  y <= ($signed(a)<$signed(b))? 1 : 0;
-			`SLTU_CONTROL: y <= (a<b);
-			`LUI_CONTROL:  y <= {b[15:0], 16'b0};
-			`MULT_CONTROL: {hi_alu_out,lo_alu_out} = $signed(a)*$signed(b);
-			`MULTU_CONTROL:{hi_alu_out,lo_alu_out} = a * b;
-			//shift inst
-			`SLL_CONTROL:  y <= b << sa;
-			`SRL_CONTROL:  y <= b >> sa;
-			`SRA_CONTROL:  y <= ({32{b[31]}} << (6'd32-{1'b0,sa})) | b >> sa;
-			`SLLV_CONTROL: y <= b << a[4:0];
-			`SRLV_CONTROL: y <= b >> a[4:0];
-			`SRAV_CONTROL: y <= ({32{b[31]}} << (6'd32-{1'b0,a[4:0]})) | b >> a[4:0];
-			//data_move inst
-			`MFHI_CONTROL:y <= hi_in[31:0];
-			`MFLO_CONTROL:y <= lo_in[31:0];
-			`MTHI_CONTROL:hi_alu_out <= a;
-			`MTLO_CONTROL:lo_alu_out <= a;
-			`MFC0_CONTROL: y <= cp0data;
-			`MTC0_CONTROL: y <= b;
-			default : y <= 32'b0;
-		endcase	
-	end
-	*/
 	assign overflow = 
-		( (alucontrol == `ADD_CONTROL) & a[31] & b[31] & ~y[31] | ~a[31] & ~b[31] & y[31])
+		( (alucontrol == `ADD_CONTROL) & (a[31] & b[31] & ~y[31] | ~a[31] & ~b[31] & y[31]) )
 		|
-		( (alucontrol == `SUB_CONTROL) & ((a[31]&&!b[31])&&!y[31])||((!a[31]&&b[31])&&y[31]) );
+		( (alucontrol == `SUB_CONTROL) & (((a[31]&&!b[31])&&!y[31])||((!a[31]&&b[31])&&y[31])) );
 
 endmodule
