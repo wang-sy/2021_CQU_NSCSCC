@@ -1,4 +1,4 @@
-`include "defines.h"
+`include "defines.vh"
 
 
 `define JR_DECODE       {11'b0_0_0_0_0_0_0_0_1_0_0, `ZERO_CONTROL,  3'b000}

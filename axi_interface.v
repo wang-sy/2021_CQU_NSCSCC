@@ -18,7 +18,7 @@ module axi_interface(
     //ar
     output  wire    [3:0]   arid,       //read request id, fixed 4'b0
     output  wire    [31:0]  araddr,     //read request address
-    output  wire    [7:0]   arlen,      //read request transfer length(beats), fixed 4'b0
+    output  wire    [3:0]   arlen,      //read request transfer length(beats), fixed 4'b0
     output  wire    [2:0]   arsize,     //read request transfer size(bytes per beats)
     output  wire    [1:0]   arburst,    //transfer type, fixed 2'b01
     output  wire    [1:0]   arlock,     //atomic lock, fixed 2'b0
@@ -115,7 +115,6 @@ module axi_interface(
     end
 
 
-    // ��������ź�
     always @(posedge clk) begin
 		read_addr_finish  <= (~resetn) ? 1'b0 :
 		                     (read_req && arvalid && arready) ? 1'b1 :
@@ -142,7 +141,7 @@ module axi_interface(
 	
 	assign arid         = 4'b0;
 	assign araddr       = read_addr;
-    assign arlen        = 8'b0;
+    assign arlen        = 4'b0;
 	assign arsize       = read_size;
     assign arburst      = 2'b01;
     assign arlock       = 2'b0;

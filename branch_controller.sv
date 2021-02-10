@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-`include "defines.h"
+`include "defines.vh"
 module branch_controller(
 	input  wire [31:0] rdata1_i,
 	input  wire [31:0] rdata2_i,

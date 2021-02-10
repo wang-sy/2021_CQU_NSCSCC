@@ -21,7 +21,7 @@
 
 // 此处CP0暂时用学长的替代，下一步用2路组
 
-module i_cache#(parameter A_WIDTH = 32,parameter C_INDEX = 13)(
+module i_cache#(parameter A_WIDTH = 32,parameter C_INDEX = 6)(
         input wire p_flush,
         input wire[A_WIDTH-1:0] p_a,
         output wire[31:0] p_din,
@@ -75,7 +75,7 @@ module i_cache#(parameter A_WIDTH = 32,parameter C_INDEX = 13)(
 
     always @(posedge clk) begin
         if (clrn == 1'b0) begin
-            
+            //TODO: 这个地方应该用generate替换，不然Cache大了会炸时序
             for (i = 0; i<(1<<C_INDEX); i=i+1 ) begin
                 d_valid[i] <= 1'b0;
             end 

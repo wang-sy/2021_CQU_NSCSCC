@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-`include "defines.h"
+`include "defines.vh"
 module id2exe(
     input   logic          clk_i,
     input   logic          rst_i,

@@ -1,4 +1,4 @@
-`include "defines.h"
+`include "defines.vh"
 module id_reg_harzrd (
     // 用于读取的地址和数据
     input logic             rst_i,

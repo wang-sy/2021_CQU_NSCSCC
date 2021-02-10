@@ -2,7 +2,7 @@
 
 // 此处CP0暂时用学长的替代，目前此模块还不完善 
 
-`include "defines.h"
+`include "defines.vh"
 module cp0(
 	input wire clk,
 	input wire rst,

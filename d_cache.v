@@ -1,9 +1,8 @@
 `timescale 1ns / 1ps
 
-// ??CP0?????????????2??
 
 module d_cache #(parameter A_WIDTH = 32,
-    parameter C_INDEX = 13)(
+    parameter C_INDEX = 6)(
         input wire[A_WIDTH-1:0] p_a,
         input wire[31:0] p_dout,
         output wire[31:0] p_din,
@@ -105,7 +104,7 @@ module d_cache #(parameter A_WIDTH = 32,
     wire    [T_WIDTH-1:0]   tagout;
     wire    [31:0]          c_out;
 
-    //cache å†�?�ç´¢å�??
+    //cache
     wire [C_INDEX-1:0]  index   =   aluoutM[C_INDEX+1:2];
     wire [T_WIDTH-1:0]  tag     =   aluoutM[A_WIDTH-1:C_INDEX+2];
     wire                valid   =   d_valid[index];
@@ -137,11 +136,12 @@ module d_cache #(parameter A_WIDTH = 32,
     assign data_wen = 4'b1111;
     assign data_size = 2'b10;
 
-// cpu/dram writes data_cache   å†™cache
+// cpu/dram writes data_cache
     always@(posedge clk)
     begin
         if(rst)                     //init cache memery
         begin
+            //TODO: 这个地方应该用generate替换，不然Cache大了会炸时序
             for(i=0;i<(1<<C_INDEX);i=i+1)
             begin
                 d_valid[i] <= 1'b0;
@@ -160,7 +160,7 @@ module d_cache #(parameter A_WIDTH = 32,
             d_data4[index]  <=  data_rdata[7:0];
 
         end
-        else if( cache_hit & memenM & memwriteM )       //hit å¹¶ä¸�? å†™cache
+        else if( cache_hit & memenM & memwriteM )       //hit cache
         begin
             // wirte dirty bit
             //D_SRAM[index][51]     <=  1'b1;
@@ -197,7 +197,7 @@ module d_cache #(parameter A_WIDTH = 32,
         end
     end
 
-    // data_cache writes dram   cacheå†™å†�?�å­˜çš�?�æ�?�°æ�?
+    // data_cache writes dram
     //assign dram_wr_data = D_SRAM[index][31:0];
     assign dram_wr_data =c_out;
 

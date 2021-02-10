@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-`include "defines.h"
+`include "defines.vh"
 module memsel(
 	input wire[31:0] pc,
 	input wire[5:0] op,

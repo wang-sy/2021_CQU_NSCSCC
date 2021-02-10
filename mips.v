@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
-`include "defines.h"
+`include "defines.vh"
 
-// cputop¶¥²ãÄ£¿é
+// cputopé¡¶å±‚æ¨¡å—
 /*
-	¶ÔÓÚÕâ¸öÄ£¿é
-	ÎÒÃÇ½«Ó²¼şÖĞ¶Ï½øĞĞÁË´¦Àí£¬ÎÒÃÇ·¢ÏÖÖ®Ç°Ñ§³¤ÎªÁËÍµÀÁÖ±½Ó½«Ó²¼şÖĞ¶Ïµ±×÷Áù¸öÁã´«ÈëÁË£¨TAT£©
-	ÏÖÔÚÎÒÃÇ¶ÔËû½øĞĞÁË´¦Àí£¬Ëü»á±»´«µ½datapath½øĞĞ¾ßÌåµÄ´¦Àí
+	å¯¹äºè¿™ä¸ªæ¨¡å—
+	æˆ‘ä»¬å°†ç¡¬ä»¶ä¸­æ–­è¿›è¡Œäº†å¤„ç†ï¼Œæˆ‘ä»¬å‘ç°ä¹‹å‰å­¦é•¿ä¸ºäº†å·æ‡’ç›´æ¥å°†ç¡¬ä»¶ä¸­æ–­å½“ä½œå…­ä¸ªé›¶ä¼ å…¥äº†ï¼ˆTATï¼‰
+	ç°åœ¨æˆ‘ä»¬å¯¹ä»–è¿›è¡Œäº†å¤„ç†ï¼Œå®ƒä¼šè¢«ä¼ åˆ°datapathè¿›è¡Œå…·ä½“çš„å¤„ç†
 
 */
 module mycpu_top(
@@ -205,20 +205,20 @@ module mycpu_top(
 		.stallreq_from_if	(stallreq_from_if),
 		.stallreq_from_mem	(stallreq_from_mem),
 		
-		.mem_we			(memwriteM),// mipsÊ¹ÓÃ
-		.mem_en				(memenM)// mipsÊ¹ÓÃ
+		.mem_we			(memwriteM),// mipsä½¿ç”¨
+		.mem_en				(memenM)// mipsä½¿ç”¨
 	);
 	
 
 	i_cache i_cache(
-		// cpu ¶Ë½»»¥ĞÅºÅ
+		// cpu ç«¯äº¤äº’ä¿¡å·
 		.p_flush			(|excepttypeM),
         .p_a				(inst_sram_addr),
         .p_din				(inst_sram_rdata),
         .p_strobe			(inst_sram_en),
         .p_ready			(i_ready),
 		.cache_miss			(cache_miss),
-		// ÄÚ´æ¶Ë½»»¥ĞÅºÅ
+		// å†…å­˜ç«¯äº¤äº’ä¿¡å·
         .clk				(aclk),
 		.clrn				(aresetn),
         .m_a				(i_addr),
@@ -229,7 +229,7 @@ module mycpu_top(
     );
 
 	d_cache d_cache(
-		// cpu ¶Ë½»»¥ĞÅºÅ
+		// cpu ç«¯äº¤äº’ä¿¡å·
         .p_a				(data_sram_addr),
         .p_dout				(data_sram_wdata),
         .p_din				(data_sram_rdata),
@@ -238,7 +238,7 @@ module mycpu_top(
 		.p_size				(data_sram_size),
         .p_rw				(data_sram_write), //0: read, 1:write
         .p_ready			(d_ready),
-		// ÄÚ´æ¶Ë½»»¥ĞÅºÅ
+		// å†…å­˜ç«¯äº¤äº’ä¿¡å·
         .clk				(aclk),
 		.clrn				(aresetn),
         .m_a				(d_addr),
@@ -252,9 +252,9 @@ module mycpu_top(
     );
 
 	
-	// cacheµÄÑ¡Ôñ²¿·Ö
-	// ´æÔÚµÄÔ­Òò£º axi_interfaceÒ»´ÎÖ»ÄÜ¶ÁĞ´µØ·½
-	// Ö´ĞĞÂß¼­£º	i_cacheÓÅÏÈÔ­Ôò
+	// cacheçš„é€‰æ‹©éƒ¨åˆ†
+	// å­˜åœ¨çš„åŸå› ï¼š axi_interfaceä¸€æ¬¡åªèƒ½è¯»å†™åœ°æ–¹
+	// æ‰§è¡Œé€»è¾‘ï¼š	i_cacheä¼˜å…ˆåŸåˆ™
 	assign sel_i 				= cache_miss;
 	assign m_addr 				= sel_i ? i_addr : d_addr;
 	assign mem_access 			= sel_i ? m_fetch : m_ld_st;

@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-`include "defines.h"
+`include "defines.vh"
 
 module EXE(
     input logic          clk,
