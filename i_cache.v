@@ -61,7 +61,14 @@ module i_cache#(parameter A_WIDTH = 32,parameter C_INDEX = 6)(
     wire [A_WIDTH-1:0] c_din = m_dout;
     assign p_din = sel_out? c_dout:m_dout;
 
-    integer i;
+    genvar i;
+    generate
+        for (i=0;i<(1<<C_INDEX);i=i+1) begin
+            always @(posedge clk) begin
+                if (!clrn) d_valid[i] <= 1'b0;
+            end
+        end
+    endgenerate
 
     always @(posedge clk) begin
         if (~clrn) begin
@@ -74,13 +81,8 @@ module i_cache#(parameter A_WIDTH = 32,parameter C_INDEX = 6)(
     end
 
     always @(posedge clk) begin
-        if (clrn == 1'b0) begin
-            //TODO: 这个地方应该用generate替换，不然Cache大了会炸时序
-            for (i = 0; i<(1<<C_INDEX); i=i+1 ) begin
-                d_valid[i] <= 1'b0;
-            end 
-        end else if (c_write & ~flush_ready) begin
-                d_valid[index] <= 1'b1;
+        if (clrn & c_write & ~flush_ready) begin
+            d_valid[index] <= 1'b1;
         end
       
     end
