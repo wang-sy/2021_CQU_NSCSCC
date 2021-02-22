@@ -6,15 +6,15 @@ module datapath(
 	input wire         clk,
 	input wire         rst,
 
-	output wire[31:0]  if_pc,
-	input wire[31:0]   if_instr,
+	(*mark_debug = "true"*) output wire[31:0]  if_pc,
+	(*mark_debug = "true"*) input wire[31:0]   if_instr,
 
 	output wire        id_equal,
-	output wire        id_stall,
-	output wire [31:0] id_instr,
+	(*mark_debug = "true"*) output wire        id_stall,
+	(*mark_debug = "true"*) output wire [31:0] id_instr,
 
-	output wire        ex_flush,
-	output wire        ex_stall,
+	(*mark_debug = "true"*) output wire        ex_flush,
+	(*mark_debug = "true"*) output wire        ex_stall,
 
 	output wire[31:0]  mem_wdata,
 	output wire[31:0]  mem_wdata_last,
@@ -22,9 +22,9 @@ module datapath(
 	input  wire[31:0]  mem_rdata,
 	output wire [3:0]  sel,
 
-	output wire        mem_stall,
-	output wire        mem_flush,
-	output wire [31:0] mem_excepttype,
+	(*mark_debug = "true"*) output wire        mem_stall,
+	(*mark_debug = "true"*) output wire        mem_flush,
+	(*mark_debug = "true"*) output wire [31:0] mem_excepttype,
 
 	output wire [31:0] wb_pc ,    
 	output wire [4:0]  wb_regdst, 
