@@ -93,15 +93,22 @@
 `define SYSCALL 6'b001100
 `define BREAK 6'b001101
    
-`define ERET 5'b10000
+`define CO1_INST 5'b10000
 
 `define R_TYPE 6'b000000
 `define REGIMM_INST 6'b000001
-`define SPECIAL3_INST 6'b010000
-//change the SPECIAL2_INST from 6'b011100 to 6'b010000
+
 `define MTC0 5'b00100
 `define MFC0 5'b00000
 
+`define COP0_INST 6'b010000
+
+//CO1_INST
+`define ERET  6'b011000
+`define TLBP  6'b001000
+`define TLBR  6'b000001
+`define TLBWI 6'b000010
+`define TLBWR 6'b000110
 // ALU OP 4bit
 
 `define ANDI_OP 4'b0000
